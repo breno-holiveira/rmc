@@ -1,4 +1,0 @@
-streamlit>=1.25,<2.0
-pandas>=1.5
-openpyxl
-plotly>=5.10
