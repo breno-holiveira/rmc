@@ -64,7 +64,7 @@ html_code = f"""
   html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    background: transparent;
+    background: #transparent;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     color: #333;
@@ -80,8 +80,9 @@ html_code = f"""
     background-color: transparent;
     padding: 10px 14px;
     box-sizing: border-box;
-    overflow-y: hidden;
+    overflow-y: hidden; /* tira scroll */
     border-radius: 10px 0 0 10px;
+    box-shadow: inset 0px 0 0px 0px rgba(0, 0, 0, 0);
     font-size: 12px;
     line-height: 1.25;
     color: #555;
@@ -125,6 +126,7 @@ html_code = f"""
     flex-grow: 1;
     position: relative;
     background: #fefefe;
+    border-radius: 0;
     min-width: 0;
     background-repeat: no-repeat;
     background-position: left, right;
@@ -138,13 +140,14 @@ html_code = f"""
     background: transparent;
   }}
 
-  /* Janela flutuante info coluna direita */
+  /* Janela flutuante info deslocada para coluna direita */
   #info-panel {{
     width: 260px;
     padding: 14px 18px;
     box-sizing: border-box;
     background: transparent;
     border-radius: 0 10px 10px 0;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0);
     color: #555;
     font-size: 13px;
     line-height: 1.4;
@@ -197,7 +200,7 @@ html_code = f"""
     opacity: 0.75;
   }}
 
-  /* Hover: só contorno */
+  /* Hover: só contorno (mais suave e fino) */
   .polygon:hover {{
     fill: transparent !important;
     stroke: rgba(50, 90, 150, 0.85);
@@ -206,7 +209,7 @@ html_code = f"""
     opacity: 1;
   }}
 
-  /* Selecionado */
+  /* Selecionado: preenchimento mais suave */
   .polygon.selected {{
     fill: rgba(30, 70, 140, 0.3);
     stroke: rgba(30, 70, 140, 0.7);
@@ -375,7 +378,7 @@ html_code = f"""
         left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
       }}
       if(top + tooltip.offsetHeight > mapRect.height) {{
-        top = e.clientY - mapDiv.top - tooltip.offsetHeight - 8;
+        top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
       }}
 
       tooltip.style.left = left + "px";
