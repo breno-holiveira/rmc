@@ -1,9 +1,12 @@
 import streamlit as st
 import geopandas as gpd
 import json
+import streamlit.components.v1 as components
+
+st.title('RMC Data')
 
 st.set_page_config(layout="wide")
-st.title('RMC Data')
+
 st.header('Dados e indicadores da Região Metropolitana de Campinas')
 
 dados_extra = {
@@ -28,13 +31,13 @@ dados_extra = {
     "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
 }
 
-# Carrega shapefile e ajusta CRS para WGS84
+# Carrega shapefile e ajusta CRS
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
 gdf = gdf.sort_values(by="NM_MUN")
 
-# Monta GeoJSON com propriedades extras (população, área, PIB)
+# Monta GeoJSON com propriedades extras
 geojson = {"type": "FeatureCollection", "features": []}
 for _, row in gdf.iterrows():
     name = row["NM_MUN"]
@@ -53,7 +56,7 @@ for _, row in gdf.iterrows():
 
 geojson_str = json.dumps(geojson)
 
-# HTML + CSS + JS com o geojson_str embutido no script
+# Código HTML + CSS + JS (JS embutido no f-string, usando geojson_str)
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -309,9 +312,9 @@ html_code = f"""
       return;
     }}
     infoPanel.querySelector('h3').textContent = data.name;
-    infoPanel.querySelectorAll('div')[0].innerHTML = `<strong>População:</strong> ${{formatNumber(data.populacao)}}`;
-    infoPanel.querySelectorAll('div')[1].innerHTML = `<strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}}`;
-    infoPanel.querySelectorAll('div')[2].innerHTML = `<strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}}`;
+    infoPanel.querySelectorAll('div')[0].innerHTML = <strong>População:</strong> ${{formatNumber(data.populacao)}};
+    infoPanel.querySelectorAll('div')[1].innerHTML = <strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}};
+    infoPanel.querySelectorAll('div')[2].innerHTML = <strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}};
   }}
 
   function clearHighlight() {{
@@ -351,11 +354,11 @@ html_code = f"""
 
     if (geom.type === "Polygon") {{
       const pathData = polygonToPath(geom.coordinates[0]);
-      pathD = `M${{pathData}} Z`;
+      pathD = M${{pathData}} Z;
     }} else if (geom.type === "MultiPolygon") {{
       geom.coordinates.forEach(poly => {{
         const pathData = polygonToPath(poly[0]);
-        pathD += `M${{pathData}} Z`;
+        pathD += M${{pathData}} Z;
       }});
     }}
 
@@ -421,5 +424,18 @@ html_code = f"""
 </html>
 """
 
-# Exibe o HTML gerado no Streamlit
+# Finalmente, exibe o HTML no Streamlit
+st.components.v1.html(html_code, height=600, scrolling=True)
+
+Agora eu criei o html e jogouei o novo codigo html que você mandou lá dentro.
+
+isso abaixo deve susbtituir os dados numericos? Porque o grafico puxa eles
+
+import streamlit as st
+
+# Lê o conteúdo do HTML
+with open("grafico.html", "r", encoding="utf-8") as f:
+    html_code = f.read()
+
+# Mostra o HTML no Streamlit
 st.components.v1.html(html_code, height=950, scrolling=True)
