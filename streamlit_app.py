@@ -57,155 +57,196 @@ html_code = f"""
 <style>
   html, body {{
     margin: 0; padding: 0;
-    height: 100%;
-    background-color: #121212;
+    height: 100vh;
+    background: #transparent;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    color: #ddd;
+    color: #333;
     user-select: none;
     display: flex;
+    flex-direction: row;
+    overflow: hidden;
   }}
 
+  /* Legenda esquerda */
   #legend {{
-    width: 180px;
-    background-color: rgba(18, 18, 18, 0.85);
-    padding: 14px 16px;
+    width: 200px;
+    background-color: transparent;
+    padding: 10px 14px;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: hidden; /* tira scroll */
     border-radius: 10px 0 0 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.7);
-    font-size: 13px;
-    line-height: 1.3;
-    color: #bbb;
+    box-shadow: inset 0px 0 0px 0px rgba(0, 0, 0, 0);
+    font-size: 12px;
+    line-height: 1.25;
+    color: #555;
+    flex-shrink: 0;
   }}
 
   #legend strong {{
-    font-size: 16px;
-    color: #eee;
-    margin-bottom: 12px;
+    font-size: 13px;
+    color: #222;
+    margin-bottom: 10px;
     display: block;
     font-weight: 600;
+    padding-bottom: 6px;
   }}
 
   #legend div {{
-    padding: 6px 10px;
-    margin-bottom: 5px;
-    border-radius: 5px;
+    padding: 5px 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
     cursor: pointer;
-    color: #999;
+    color: #555;
     transition: background-color 0.3s ease, color 0.3s ease;
-  }}
-  #legend div:hover {{
-    background-color: #224466;
-    color: #a0c4ff;
-    font-weight: 600;
-  }}
-  #legend div.active {{
-    background-color: #335a99;
-    color: #cbd8ff;
-    font-weight: 700;
-    box-shadow: 0 0 6px #335a99aa;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }}
 
+  #legend div:hover {{
+    background-color: transparent;
+    color: #5a6c7a;
+  }}
+
+  #legend div.active {{
+    background-color: #bbd4ff;
+    color: #0d3b66;
+    font-weight: 600;
+  }}
+
+  /* Container do mapa */
   #map {{
-    flex: 2.2;
+    flex-grow: 1;
     position: relative;
-    background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
-    border-radius: 0 10px 10px 0;
-    box-shadow: inset 0 0 18px #000c;
+    background: #fefefe;
+    border-radius: 0;
+    min-width: 0;
+    background-repeat: no-repeat;
+    background-position: left, right;
+    background-size: 40px 100%;
   }}
 
   svg {{
     width: 100%;
-    height: 100%;
+    height: 100vh;
     display: block;
     background: transparent;
   }}
 
-  .polygon {{
-    fill: rgba(80, 150, 255, 0.14);
-    stroke: #444444;
-    stroke-width: 1.3;
-    opacity: 0.85;
-    cursor: pointer;
-    transition: stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease, fill 0.3s ease;
-  }}
-  .polygon.highlight {{
-    stroke: #5599ff !important;
-    stroke-width: 2.6 !important;
-    opacity: 1 !important;
+  /* Janela flutuante info deslocada para coluna direita */
+  #info-panel {{
+    width: 260px;
+    padding: 14px 18px;
+    box-sizing: border-box;
+    background: transparent;
+    border-radius: 0 10px 10px 0;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0);
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+    user-select: text;
+    overflow-y: auto;
+    height: 100vh;
+    flex-shrink: 0;
   }}
 
+  #info-panel h3 {{
+    margin-top: 0;
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+  }}
+
+  #info-panel div {{
+    margin-bottom: 10px;
+  }}
+
+  /* Scrollbar legendas e info */
+  #legend::-webkit-scrollbar,
+  #info-panel::-webkit-scrollbar {{
+    width: 6px;
+  }}
+  #legend::-webkit-scrollbar-track,
+  #info-panel::-webkit-scrollbar-track {{
+    background: transparent;
+  }}
+  #legend::-webkit-scrollbar-thumb,
+  #info-panel::-webkit-scrollbar-thumb {{
+    background-color: #c0c0c0;
+    border-radius: 3px;
+  }}
+  #legend::-webkit-scrollbar-thumb:hover,
+  #info-panel::-webkit-scrollbar-thumb:hover {{
+    background-color: #a0a0a0;
+  }}
+
+  /* Polígonos */
+  .polygon {{
+    fill: rgba(50, 90, 150, 0.15);
+    stroke: rgba(50, 90, 150, 0.5);
+    stroke-width: 0.8;
+    cursor: pointer;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease, fill 0.3s ease;
+    opacity: 0.75;
+  }}
+
+  /* Hover: só contorno (mais suave e fino) */
+  .polygon:hover {{
+    fill: transparent !important;
+    stroke: rgba(50, 90, 150, 0.85);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 4px rgba(50, 90, 150, 0.3));
+    opacity: 1;
+  }}
+
+  /* Selecionado: preenchimento mais suave */
+  .polygon.selected {{
+    fill: rgba(30, 70, 140, 0.3);
+    stroke: rgba(30, 70, 140, 0.7);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 5px rgba(30, 70, 140, 0.4));
+    opacity: 1;
+  }}
+
+  /* Tooltip */
   #tooltip {{
     position: absolute;
     pointer-events: none;
-    padding: 2px 6px;
-    background: rgba(85, 153, 255, 0.9);
-    color: #121212;
-    font-weight: 500;
+    padding: 3px 8px;
+    background: rgba(50, 90, 150, 0.85);
+    color: #fefefe;
+    font-weight: 600;
     font-size: 11px;
     border-radius: 4px;
     white-space: nowrap;
-    box-shadow: 0 0 6px rgba(85, 153, 255, 0.4);
+    box-shadow: 0 0 6px rgba(50, 90, 150, 0.4);
     display: none;
     user-select: none;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }}
-
-  #info-panel {{
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 180px;
-    background: rgba(18, 18, 18, 0.68);
-    border-radius: 8px;
-    box-shadow: 0 0 14px rgba(85, 153, 255, 0.65);
-    padding: 6px 10px;
-    font-size: 11px;
-    color: #bbb;
-    user-select: none;
-    display: none;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }}
-  #info-panel h3 {{
-    margin-top: 0;
-    font-weight: 700;
-    font-size: 13px;
-    color: #7eb2ff;
-    border-bottom: 1.5px solid #5599ff;
-    padding-bottom: 3px;
-  }}
-  #info-panel div {{
-    margin-bottom: 5px;
-  }}
-
-  /* Scrollbar legenda */
-  #legend::-webkit-scrollbar {{
-    width: 6px;
-  }}
-  #legend::-webkit-scrollbar-track {{
-    background: transparent;
-  }}
-  #legend::-webkit-scrollbar-thumb {{
-    background-color: #333;
-    border-radius: 3px;
-  }}
-  #legend::-webkit-scrollbar-thumb:hover {{
-    background-color: #555;
   }}
 </style>
 </head>
 <body>
 
 <div id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
-  <strong>Municípios RMC</strong>
+  <strong>Selecione um município:</strong>
   <div id="mun-list"></div>
 </div>
 
 <div id="map" role="region" aria-label="Mapa interativo dos municípios da RMC">
   <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
   <div id="tooltip" role="tooltip"></div>
-  <div id="info-panel" aria-live="polite"></div>
+</div>
+
+<div id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+  <h3>Selecione um município</h3>
+  <div><strong>População:</strong> -</div>
+  <div><strong>Área:</strong> -</div>
+  <div><strong>PIB (2021):</strong> -</div>
 </div>
 
 <script>
@@ -213,8 +254,11 @@ html_code = f"""
   const svg = document.querySelector("svg");
   const munList = document.getElementById("mun-list");
   const tooltip = document.getElementById("tooltip");
-  const mapDiv = document.getElementById("map");
   const infoPanel = document.getElementById("info-panel");
+  const mapDiv = document.getElementById("map");
+
+  let selectedName = null;
+  const paths = {{}};
 
   let allCoords = [];
   geojson.features.forEach(f => {{
@@ -240,8 +284,6 @@ html_code = f"""
     return [x, y];
   }}
 
-  const paths = {{}};
-
   function polygonToPath(coords) {{
     return coords.map(c => {{
       const [x, y] = project(c);
@@ -254,22 +296,45 @@ html_code = f"""
     return num.toLocaleString('pt-BR');
   }}
 
-  function showInfo(data) {{
+  function updateInfoPanel(data) {{
     if(!data) {{
-      infoPanel.style.display = "none";
+      infoPanel.querySelector('h3').textContent = "Selecione um município";
+      infoPanel.querySelectorAll('div').forEach(d => d.innerHTML = "<strong>–</strong>");
       return;
     }}
-    const pop = formatNumber(data.populacao);
-    const area = data.area ? data.area.toFixed(1) + " km²" : "N/A";
-    const pib = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A";
+    infoPanel.querySelector('h3').textContent = data.name;
+    infoPanel.querySelectorAll('div')[0].innerHTML = <strong>População:</strong> ${{formatNumber(data.populacao)}};
+    infoPanel.querySelectorAll('div')[1].innerHTML = <strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}};
+    infoPanel.querySelectorAll('div')[2].innerHTML = <strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}};
+  }}
 
-    infoPanel.innerHTML = `
-      <h3>${{data.name}}</h3>
-      <div><strong>População:</strong> ${{pop}}</div>
-      <div><strong>Área:</strong> ${{area}}</div>
-      <div><strong>PIB (2021):</strong> ${{pib}}</div>
-    `;
-    infoPanel.style.display = "block";
+  function clearHighlight() {{
+    Object.values(paths).forEach(p => p.classList.remove("highlight"));
+  }}
+
+  function clearSelection() {{
+    Object.values(paths).forEach(p => p.classList.remove("selected"));
+  }}
+
+  function setActiveLegend(name) {{
+    const legendItems = munList.children;
+    for(let i=0; i < legendItems.length; i++) {{
+      legendItems[i].classList.toggle("active", legendItems[i].dataset.name === name);
+    }}
+  }}
+
+  function selectMunicipio(name) {{
+    clearHighlight();
+    clearSelection();
+    if(paths[name]) paths[name].classList.add("selected");
+    setActiveLegend(name);
+    selectedName = name;
+
+    // Atualiza painel de informações
+    const data = geojson.features.find(f => f.properties.name === name);
+    if (data) {{
+      updateInfoPanel(data.properties);
+    }}
   }}
 
   geojson.features.forEach(f => {{
@@ -280,11 +345,11 @@ html_code = f"""
 
     if (geom.type === "Polygon") {{
       const pathData = polygonToPath(geom.coordinates[0]);
-      pathD = `M${{pathData}} Z`;
+      pathD = M${{pathData}} Z;
     }} else if (geom.type === "MultiPolygon") {{
       geom.coordinates.forEach(poly => {{
         const pathData = polygonToPath(poly[0]);
-        pathD += `M${{pathData}} Z`;
+        pathD += M${{pathData}} Z;
       }});
     }}
 
@@ -307,15 +372,16 @@ html_code = f"""
         left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
       }}
       if(top + tooltip.offsetHeight > mapRect.height) {{
-        top = e.clientY - mapDiv.getBoundingClientRect().top - tooltip.offsetHeight - 8;
+        top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
       }}
 
       tooltip.style.left = left + "px";
       tooltip.style.top = top + "px";
 
-      // Apenas o município em foco é destacado
       clearHighlight();
-      paths[name].classList.add("highlight");
+      if (!pathEl.classList.contains("selected")) {{
+        pathEl.classList.add("highlight");
+      }}
     }});
 
     pathEl.addEventListener("mouseleave", () => {{
@@ -324,8 +390,7 @@ html_code = f"""
     }});
 
     pathEl.addEventListener("click", () => {{
-      showInfo(props);
-      setActiveLegend(name);
+      selectMunicipio(name);
     }});
 
     const legendItem = document.createElement("div");
@@ -335,28 +400,15 @@ html_code = f"""
 
     legendItem.addEventListener("mouseenter", () => {{
       clearHighlight();
-      if(paths[name]) paths[name].classList.add("highlight");
+      if(paths[name] && !paths[name].classList.contains("selected")) paths[name].classList.add("highlight");
     }});
     legendItem.addEventListener("mouseleave", () => {{
       clearHighlight();
     }});
-
     legendItem.addEventListener("click", () => {{
-      showInfo(props);
-      setActiveLegend(name);
+      selectMunicipio(name);
     }});
   }});
-
-  function clearHighlight() {{
-    Object.values(paths).forEach(p => p.classList.remove("highlight"));
-  }}
-
-  function setActiveLegend(name) {{
-    const legendItems = munList.children;
-    for(let i=0; i < legendItems.length; i++) {{
-      legendItems[i].classList.toggle("active", legendItems[i].dataset.name === name);
-    }}
-  }}
 </script>
 
 </body>
