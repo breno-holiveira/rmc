@@ -122,7 +122,7 @@ html_code = f"""
   #map {{
     flex-grow: 1;
     position: relative;
-    background: #0e1117;
+    background: #fefefe;
     box-shadow: inset 0 0 0px #000c;
     border-radius: 0;
     min-width: 0; /* para scroll dentro do flex */
