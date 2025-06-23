@@ -61,20 +61,20 @@ html_code = f"""
 <meta charset="UTF-8" />
 <title>Mapa Interativo RMC - Transparência</title>
 <style>
-  html, body {{
-    margin: 0; padding: 0;
-    height: 100vh;
-    background: radial-gradient(circle at center, #fefefe 0%, #e0e7ef 70%), 
+html, body {{
+  margin: 0; padding: 0;
+  height: 100vh;
+  background: radial-gradient(circle at center, #fefefe 0%, #e0e7ef 70%), 
               repeating-radial-gradient(circle at center, #d0d8e0 0, #d0d8e0 10px, transparent 10px, transparent 20px);
-}
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    color: #333;
-    user-select: none;
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
-  }}
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  color: #333;
+  user-select: none;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}}
+
 
   /* Barra lateral esquerda - lista municípios */
   #legend {{
