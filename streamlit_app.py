@@ -3,7 +3,7 @@ import geopandas as gpd
 import json
 import streamlit.components.v1 as components
 
-st.title('XERO DOCE')
+st.title('Data')
 
 st.header('Dados e indicadores da Região Metropolitana de Campinas')
 
