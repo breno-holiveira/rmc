@@ -103,7 +103,7 @@ html_code = f"""
     width: 100%; height: 100vh; display: block; background: transparent;
   }}
   #info-panel {{
-    position: absolute; top: 16px; right: 32px; width: 240px; background: #fefefe;
+    position: absolute; top: 16px; right: 8px; width: 240px; background: #fefefe;
     padding: 14px 18px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
     font-size: 13px; line-height: 1.4; color: #555; user-select: text; pointer-events: auto;
   }}
