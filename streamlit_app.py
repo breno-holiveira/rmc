@@ -79,7 +79,7 @@ html_code = f"""
 
   /* Legenda esquerda */
   #legend {{
-    width: 220px;
+    width: 200px;
     background-color: #fefefe;
     padding: 10px 14px;
     box-sizing: border-box;
