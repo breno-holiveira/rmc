@@ -115,8 +115,8 @@ html_code = f"""
   }}
 
   #legend div:hover {{
-    background-color: #4a4a4a;
-    color: #4a4a4a;
+    background-color:;
+    color: #0d3b66;
   }}
 
   #legend div.active {{
