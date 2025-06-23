@@ -1,9 +1,8 @@
 import streamlit as st
 import geopandas as gpd
 import json
-import streamlit.components.v1 as components
+from pathlib import Path
 
-# Configurações da página
 st.set_page_config(layout="wide")
 st.title('RMC Data')
 st.header('Dados e indicadores da Região Metropolitana de Campinas')
@@ -31,12 +30,13 @@ dados_extra = {
     "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
 }
 
-# Carrega shapefile e converte para EPSG:4326
+# Carrega shapefile e projeta
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
+gdf = gdf.sort_values(by="NM_MUN")
 
-# Constrói GeoJSON com dados adicionais
+# Constrói GeoJSON com os dados extras
 geojson = {"type": "FeatureCollection", "features": []}
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -53,15 +53,10 @@ for _, row in gdf.iterrows():
         "geometry": geom
     })
 
-# Converte para JSON string (vai ser usado no HTML)
+# Substitui placeholder no HTML
 geojson_str = json.dumps(geojson)
-
-# Lê o conteúdo do arquivo HTML (com placeholder)
-with open("grafico.html", "r", encoding="utf-8") as f:
-    html_template = f.read()
-
-# Substitui o placeholder pelo geojson
-html_code = html_template.replace("{geojson_str}", geojson_str)
+html = Path("grafico.html").read_text(encoding="utf-8")
+html = html.replace("{{geojson}}", geojson_str)
 
 # Renderiza no Streamlit
-components.html(html_code, height=700, scrolling=True)
+st.components.v1.html(html, height=700, scrolling=True)
