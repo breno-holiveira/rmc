@@ -1,8 +1,12 @@
 import streamlit as st
 import geopandas as gpd
 import json
-import streamlit.components.v1 as components
 
+st.set_page_config(layout="wide")
+st.title('RMC Data')
+st.header('Dados e indicadores da Região Metropolitana de Campinas')
+
+# Dicionário com dados adicionais
 dados_extra = {
     "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
     "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
@@ -25,29 +29,32 @@ dados_extra = {
     "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
 }
 
+# Carrega e projeta shapefile
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
 gdf = gdf.sort_values(by="NM_MUN")
 
+# Monta GeoJSON com os dados extras
 geojson = {"type": "FeatureCollection", "features": []}
 for _, row in gdf.iterrows():
-    name = row["NM_MUN"]
+    nome = row["NM_MUN"]
     geom = row["geometry"].__geo_interface__
-    extra = dados_extra.get(name, {"populacao": None, "area": None, "pib_2021": None})
+    extra = dados_extra.get(nome, {"populacao": None, "area": None, "pib_2021": None})
     geojson["features"].append({
         "type": "Feature",
         "properties": {
-            "name": name,
+            "name": nome,
             "populacao": extra["populacao"],
             "area": extra["area"],
-            "pib_2021": extra["pib_2021"],
+            "pib_2021": extra["pib_2021"]
         },
         "geometry": geom
     })
 
 geojson_str = json.dumps(geojson)
 
+# HTML com o placeholder {geojson_str} que será substituído
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -303,9 +310,9 @@ html_code = f"""
       return;
     }}
     infoPanel.querySelector('h3').textContent = data.name;
-    infoPanel.querySelectorAll('div')[0].innerHTML = <strong>População:</strong> ${{formatNumber(data.populacao)}};
-    infoPanel.querySelectorAll('div')[1].innerHTML = <strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}};
-    infoPanel.querySelectorAll('div')[2].innerHTML = <strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}};
+    infoPanel.querySelectorAll('div')[0].innerHTML = `<strong>População:</strong> ${{formatNumber(data.populacao)}}`;
+    infoPanel.querySelectorAll('div')[1].innerHTML = `<strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}}`;
+    infoPanel.querySelectorAll('div')[2].innerHTML = `<strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}}`;
   }}
 
   function clearHighlight() {{
@@ -345,11 +352,11 @@ html_code = f"""
 
     if (geom.type === "Polygon") {{
       const pathData = polygonToPath(geom.coordinates[0]);
-      pathD = M${{pathData}} Z;
+      pathD = `M${{pathData}} Z`;
     }} else if (geom.type === "MultiPolygon") {{
       geom.coordinates.forEach(poly => {{
         const pathData = polygonToPath(poly[0]);
-        pathD += M${{pathData}} Z;
+        pathD += `M${{pathData}} Z`;
       }});
     }}
 
@@ -415,4 +422,5 @@ html_code = f"""
 </html>
 """
 
-components.html(html_code, height=650, scrolling=False)
+# Renderiza no Streamlit
+st.components.v1.html(html_code, height=950, scrolling=True)
