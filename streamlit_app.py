@@ -131,9 +131,6 @@ html_code = f"""
     background: #fefefe;
     border-radius: 0;
     min-width: 0;
-    background-image:
-      linear-gradient(to left, rgba(254,254,254,0) 0%, #fefefe 20%),
-      linear-gradient(to right, rgba(254,254,254,0) 0%, #fefefe 20%);
     background-repeat: no-repeat;
     background-position: left, right;
     background-size: 40px 100%;
