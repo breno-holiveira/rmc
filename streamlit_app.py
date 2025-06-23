@@ -62,83 +62,184 @@ html_code = f"""
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Mapa Interativo RMC</title>
+<title>Mapa Interativo RMC - Transparência</title>
 <style>
-  /* Estilos resumidos */
   html, body {{
-    margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: row; overflow: hidden;
+    margin: 0; padding: 0;
+    height: 100vh;
+    background: #fefefe;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background: #fefefe;
     color: #333;
     user-select: none;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
   }}
+
+  /* Legenda esquerda */
   #legend {{
-    width: 220px; padding: 14px 16px; overflow-y: auto; border-radius: 10px 0 0 10px;
-    box-shadow: inset 3px 0 6px -3px rgba(0,0,0,0.1);
+    width: 200px;
+    background-color: #fefefe;
+    padding: 10px 14px;
+    box-sizing: border-box;
+    overflow-y: hidden; /* tira scroll */
+    border-radius: 10px 0 0 10px;
+    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    line-height: 1.25;
+    color: #555;
+    flex-shrink: 0;
     background-image: linear-gradient(to right, #fefefe 80%, rgba(254,254,254,0) 100%);
-    color: #555; font-size: 13px; line-height: 1.3; flex-shrink: 0;
   }}
+
   #legend strong {{
-    font-weight: 600; font-size: 14px; color: #222; margin-bottom: 12px; display: block;
-    padding-bottom: 8px;
+    font-size: 13px;
+    color: #222;
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 600;
+    padding-bottom: 6px;
   }}
+
   #legend div {{
-    padding: 6px 8px; margin-bottom: 5px; border-radius: 5px; cursor: pointer;
-    color: #555; transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 5px 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }}
+
   #legend div:hover {{
-    background-color: color: #1a1a1a;
+    background-color: #dceeff;
+    color: #1a1a1a;
   }}
+
   #legend div.active {{
-    background-color: #cfe2ff; color: #0d3b66; font-weight: 600;
+    background-color: #bbd4ff;
+    color: #0d3b66;
+    font-weight: 600;
   }}
+
+  /* Container do mapa */
   #map {{
-    flex-grow: 1; position: relative; background: #fefefe;
-    background-image: linear-gradient(to left, rgba(254,254,254,0) 0%, #fefefe 20%), 
-                      linear-gradient(to right, rgba(254,254,254,0) 0%, #fefefe 20%);
-    background-repeat: no-repeat; background-position: left, right; background-size: 40px 100%;
+    flex-grow: 1;
+    position: relative;
+    background: #fefefe;
+    border-radius: 0;
+    min-width: 0;
+    background-image:
+      linear-gradient(to left, rgba(254,254,254,0) 0%, #fefefe 20%),
+      linear-gradient(to right, rgba(254,254,254,0) 0%, #fefefe 20%);
+    background-repeat: no-repeat;
+    background-position: left, right;
+    background-size: 40px 100%;
   }}
+
   svg {{
-    width: 100%; height: 100vh; display: block; background: transparent;
+    width: 100%;
+    height: 100vh;
+    display: block;
+    background: transparent;
   }}
+
+  /* Janela flutuante info deslocada para coluna direita */
   #info-panel {{
-    position: absolute; top: 16px; right: 8px; width: 240px; background: #fefefe;
-    padding: 14px 18px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    font-size: 13px; line-height: 1.4; color: #555; user-select: text; pointer-events: auto;
+    width: 260px;
+    padding: 14px 18px;
+    box-sizing: border-box;
+    background: #fefefe;
+    border-radius: 0 10px 10px 0;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.07);
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+    user-select: text;
+    overflow-y: auto;
+    height: 100vh;
+    flex-shrink: 0;
   }}
+
   #info-panel h3 {{
-    margin-top: 0; font-weight: 600; font-size: 16px; color: #222; border-bottom: 1px solid #ccc;
-    padding-bottom: 8px; margin-bottom: 12px;
+    margin-top: 0;
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
   }}
+
+  #info-panel div {{
+    margin-bottom: 10px;
+  }}
+
+  /* Scrollbar legendas e info */
+  #legend::-webkit-scrollbar,
+  #info-panel::-webkit-scrollbar {{
+    width: 6px;
+  }}
+  #legend::-webkit-scrollbar-track,
+  #info-panel::-webkit-scrollbar-track {{
+    background: transparent;
+  }}
+  #legend::-webkit-scrollbar-thumb,
+  #info-panel::-webkit-scrollbar-thumb {{
+    background-color: #c0c0c0;
+    border-radius: 3px;
+  }}
+  #legend::-webkit-scrollbar-thumb:hover,
+  #info-panel::-webkit-scrollbar-thumb:hover {{
+    background-color: #a0a0a0;
+  }}
+
+  /* Polígonos */
   .polygon {{
-    fill: rgba(50, 90, 150, 0.25);
-    stroke: rgba(50, 90, 150, 0.7);
-    stroke-width: 1.2;
+    fill: rgba(50, 90, 150, 0.15);
+    stroke: rgba(50, 90, 150, 0.5);
+    stroke-width: 0.8;
     cursor: pointer;
     transition: stroke 0.3s ease, stroke-width 0.3s ease, fill 0.3s ease;
-    opacity: 0.85;
+    opacity: 0.75;
   }}
+
+  /* Hover: só contorno (mais suave e fino) */
   .polygon:hover {{
     fill: transparent !important;
-    stroke: rgba(50, 90, 150, 1);
-    stroke-width: 3;
-    filter: drop-shadow(0 0 5px rgba(50, 90, 150, 0.5));
+    stroke: rgba(50, 90, 150, 0.85);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 4px rgba(50, 90, 150, 0.3));
     opacity: 1;
   }}
+
+  /* Selecionado: preenchimento mais suave */
   .polygon.selected {{
-    fill: rgba(30, 70, 140, 0.5);
-    stroke: rgba(30, 70, 140, 1);
-    stroke-width: 3.5;
-    filter: drop-shadow(0 0 6px rgba(30, 70, 140, 0.7));
+    fill: rgba(30, 70, 140, 0.3);
+    stroke: rgba(30, 70, 140, 0.7);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 5px rgba(30, 70, 140, 0.4));
     opacity: 1;
   }}
+
+  /* Tooltip */
   #tooltip {{
-    position: absolute; pointer-events: none; padding: 3px 8px;
-    background: rgba(50, 90, 150, 0.9); color: #fefefe; font-weight: 600;
-    font-size: 11px; border-radius: 4px; white-space: nowrap;
-    box-shadow: 0 0 8px rgba(50, 90, 150, 0.5); display: none;
-    user-select: none; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    position: absolute;
+    pointer-events: none;
+    padding: 3px 8px;
+    background: rgba(50, 90, 150, 0.85);
+    color: #fefefe;
+    font-weight: 600;
+    font-size: 11px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 0 6px rgba(50, 90, 150, 0.4);
+    display: none;
+    user-select: none;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   }}
 </style>
 </head>
@@ -152,12 +253,13 @@ html_code = f"""
 <div id="map" role="region" aria-label="Mapa interativo dos municípios da RMC">
   <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
   <div id="tooltip" role="tooltip"></div>
-  <div id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Selecione um município</h3>
-    <div><strong>População:</strong> -</div>
-    <div><strong>Área:</strong> -</div>
-    <div><strong>PIB (2021):</strong> -</div>
-  </div>
+</div>
+
+<div id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+  <h3>Selecione um município</h3>
+  <div><strong>População:</strong> -</div>
+  <div><strong>Área:</strong> -</div>
+  <div><strong>PIB (2021):</strong> -</div>
 </div>
 
 <script>
@@ -241,6 +343,7 @@ html_code = f"""
     setActiveLegend(name);
     selectedName = name;
 
+    // Atualiza painel de informações
     const data = geojson.features.find(f => f.properties.name === name);
     if (data) {{
       updateInfoPanel(data.properties);
