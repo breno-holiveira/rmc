@@ -65,7 +65,7 @@ html_code = f"""
   html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    background: #transparent;
+    background: #FAFAFA;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     color: #333;
@@ -146,7 +146,7 @@ html_code = f"""
     width: 260px;
     padding: 14px 18px;
     box-sizing: border-box;
-    background: transparent;
+    background: #FAFAFA;
     border-radius: 0 10px 10px 0;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0);
     color: #555;
