@@ -423,6 +423,7 @@ html_code = f"""
 
 </body>
 </html>
+
 """
 
 
