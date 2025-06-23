@@ -85,7 +85,7 @@ html_code = f"""
     box-sizing: border-box;
     overflow-y: hidden; /* tira scroll */
     border-radius: 10px 0 0 10px;
-    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.06);
+    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0);
     font-size: 12px;
     line-height: 1.25;
     color: #555;
@@ -152,9 +152,9 @@ html_code = f"""
     width: 260px;
     padding: 14px 18px;
     box-sizing: border-box;
-    background: #fefefe;
+    background: transparent;
     border-radius: 0 10px 10px 0;
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.07);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0);
     color: #555;
     font-size: 13px;
     line-height: 1.4;
