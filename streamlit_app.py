@@ -54,6 +54,7 @@ for _, row in gdf.iterrows():
 
 geojson_str = json.dumps(geojson)
 
+html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -405,6 +406,6 @@ geojson_str = json.dumps(geojson)
 
 </body>
 </html>
-
+"""
 
 components.html(html_code, height=500, scrolling=False)
