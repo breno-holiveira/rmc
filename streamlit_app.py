@@ -77,7 +77,7 @@ html_code = f"""
   /* Barra lateral esquerda - lista municípios */
   #legend {{
     width: 220px;
-    background-color: #fffafa;
+    background-color: #fefefe;
     padding: 14px 16px;
     box-sizing: border-box;
     overflow-y: auto;
