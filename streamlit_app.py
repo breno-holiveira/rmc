@@ -88,7 +88,7 @@ html_code = f"""
     color: #555; transition: background-color 0.3s ease, color 0.3s ease;
   }}
   #legend div:hover {{
-    background-color: #e6f0ff; color: #1a1a1a;
+    background-color: color: #1a1a1a;
   }}
   #legend div.active {{
     background-color: #cfe2ff; color: #0d3b66; font-weight: 600;
