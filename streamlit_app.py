@@ -82,7 +82,7 @@ html_code = f"""
     box-sizing: border-box;
     overflow-y: auto;
     border-radius: 10px 0 0 10px;
-    box-shadow: inset 0 0 0px #111827cc;
+    box-shadow: inset 0 0 0px;
     font-size: 13px;
     line-height: 1.3;
     color: #e1e3e7;
