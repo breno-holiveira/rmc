@@ -85,7 +85,7 @@ html_code = f"""
     box-sizing: border-box;
     overflow-y: hidden; /* tira scroll */
     border-radius: 10px 0 0 10px;
-    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0px 0 0px -3px rgba(0, 0, 0, 0.1);
     font-size: 12px;
     line-height: 1.25;
     color: #555;
@@ -115,7 +115,7 @@ html_code = f"""
   }}
 
   #legend div:hover {{
-    background-color: #dceeff;
+    background-color:;
     color: #1a1a1a;
   }}
 
