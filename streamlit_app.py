@@ -64,7 +64,7 @@ html_code = f"""
   html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    background-color: #0e1117;
+    background-color: #fefefe;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     color: #ddd;
@@ -179,7 +179,7 @@ fill: rgba(70, 130, 180, 0.35);    /* Azul steel suave, translúcido */
   /* Nova barra lateral direita - painel resumo */
   #info-panel {{
     width: 220px;
-    background: #0e1117;
+    background: #fefefe;
     padding: 14px 16px;
     box-sizing: border-box;
     overflow-y: auto;
