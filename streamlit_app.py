@@ -113,7 +113,7 @@ html_code = f"""
   }}
 
   #legend div.active {{
-    background-color: #cfe2ff;
+    background-color: ;
     color: #0d3b66;
     font-weight: 600;
   }}
