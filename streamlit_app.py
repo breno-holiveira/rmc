@@ -122,7 +122,7 @@ html_code = f"""
   #map {{
     flex-grow: 1;
     position: relative;
-    background: #fefefe;
+     background: linear-gradient(135deg, #fefefe 0%, #e8ecef 100%);;
     box-shadow: inset 0 0 0px #000c;
     border-radius: 0;
     min-width: 0; /* para scroll dentro do flex */
