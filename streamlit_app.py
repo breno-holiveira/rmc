@@ -268,7 +268,7 @@ html_code = f"""
   const mapDiv = document.getElementById("map");
 
   let selectedName = null;
-  const paths = {};
+  const paths = {{}};
 
   let allCoords = [];
   geojson.features.forEach(f => {
