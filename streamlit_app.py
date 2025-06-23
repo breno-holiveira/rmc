@@ -2,17 +2,10 @@ import streamlit as st
 import geopandas as gpd
 import json
 
-# Configuração da página
-st.set_page_config(
-    page_title="RMC Data",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+st.set_page_config(layout="wide")
+st.title('RMC Data')
+st.header('Dados e indicadores da Região Metropolitana de Campinas')
 
-st.title("RMC Data")
-st.header("Dados e indicadores da Região Metropolitana de Campinas")
-
-# Dados extras dos municípios
 dados_extra = {
     "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
     "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
@@ -35,149 +28,201 @@ dados_extra = {
     "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
 }
 
-@st.cache_data(show_spinner=True)
-def load_geojson():
-    # Carrega shapefile e projeta para EPSG:4326
-    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-    if gdf.crs != "EPSG:4326":
-        gdf = gdf.to_crs("EPSG:4326")
-    gdf = gdf.sort_values("NM_MUN")
+# Carregando shapefile e garantindo CRS correto
+gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+if gdf.crs != "EPSG:4326":
+    gdf = gdf.to_crs("EPSG:4326")
+gdf = gdf.sort_values(by="NM_MUN")
 
-    features = []
-    for _, row in gdf.iterrows():
-        nome = row["NM_MUN"]
-        geom = row["geometry"].__geo_interface__
-        extra = dados_extra.get(nome, {"populacao": None, "area": None, "pib_2021": None})
-        features.append({
-            "type": "Feature",
-            "properties": {
-                "name": nome,
-                "populacao": extra["populacao"],
-                "area": extra["area"],
-                "pib_2021": extra["pib_2021"],
-            },
-            "geometry": geom,
-        })
-    return {"type": "FeatureCollection", "features": features}
+# Criando GeoJSON com dados extras
+geojson = {"type": "FeatureCollection", "features": []}
+for _, row in gdf.iterrows():
+    nome = row["NM_MUN"]
+    geom = row["geometry"].__geo_interface__
+    extra = dados_extra.get(nome, {"populacao": None, "area": None, "pib_2021": None})
+    geojson["features"].append({
+        "type": "Feature",
+        "properties": {
+            "name": nome,
+            "populacao": extra["populacao"],
+            "area": extra["area"],
+            "pib_2021": extra["pib_2021"]
+        },
+        "geometry": geom
+    })
 
-geojson = load_geojson()
 geojson_str = json.dumps(geojson)
 
-# HTML + CSS + JS para o mapa interativo minimalista e profissional
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Mapa Interativo RMC</title>
+<title>Mapa Interativo RMC - Transparência</title>
 <style>
-  /* Reset básico */
-  * {{
-    margin: 0; padding: 0; box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  }}
-  body, html {{
-    width: 100vw; height: 100vh;
-    background: #f8f9fa;
-    color: #212529;
+  html, body {{
+    margin: 0; padding: 0;
+    height: 100vh;
+    background: #fafafa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    color: #333;
+    user-select: none;
     display: flex;
+    flex-direction: row;
     overflow: hidden;
   }}
+
   #legend {{
-    width: 240px;
-    background: #ffffffcc;
-    border-right: 1px solid #ddd;
-    padding: 1rem;
+    width: 220px;
+    background-color: #fff;
+    padding: 16px 20px;
+    box-sizing: border-box;
     overflow-y: auto;
-  }}
-  #legend strong {{
-    display: block;
-    margin-bottom: 1rem;
-    font-weight: 700;
-    color: #0d6efd;
-  }}
-  #legend div {{
-    padding: 6px 10px;
-    border-radius: 5px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    color: #495057;
-    font-size: 0.9rem;
-  }}
-  #legend div:hover {{
-    background-color: #e7f1ff;
-    color: #0d6efd;
-  }}
-  #legend div.active {{
-    background-color: #0d6efd;
-    color: #fff;
-    font-weight: 600;
+    border-radius: 12px 0 0 12px;
+    box-shadow: 1px 0 8px rgba(0,0,0,0.1);
+    font-size: 14px;
+    line-height: 1.3;
+    color: #444;
+    flex-shrink: 0;
   }}
 
-  #map-container {{
+  #legend strong {{
+    font-size: 16px;
+    color: #222;
+    margin-bottom: 12px;
+    display: block;
+    font-weight: 700;
+    padding-bottom: 8px;
+  }}
+
+  #legend div {{
+    padding: 6px 12px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }}
+
+  #legend div:hover {{
+    background-color: #e3f0ff;
+    color: #1a3a72;
+  }}
+
+  #legend div.active {{
+    background-color: #1a3a72;
+    color: #fff;
+    font-weight: 700;
+  }}
+
+  #map {{
     flex-grow: 1;
     position: relative;
-    background: #ffffff;
+    background: #fff;
+    border-radius: 0;
+    min-width: 0;
   }}
 
   svg {{
     width: 100%;
     height: 100vh;
     display: block;
-  }}
-
-  .polygon {{
-    fill: rgba(13, 110, 253, 0.15);
-    stroke: rgba(13, 110, 253, 0.6);
-    stroke-width: 1;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    opacity: 0.8;
-  }}
-  .polygon:hover {{
-    fill: rgba(13, 110, 253, 0.3);
-    stroke-width: 2;
-    filter: drop-shadow(0 0 5px rgba(13,110,253,0.4));
-    opacity: 1;
-  }}
-  .polygon.selected {{
-    fill: rgba(13, 110, 253, 0.5);
-    stroke-width: 3;
-    filter: drop-shadow(0 0 8px rgba(13,110,253,0.7));
-    opacity: 1;
+    background: transparent;
   }}
 
   #info-panel {{
-    width: 300px;
+    width: 280px;
+    padding: 20px 24px;
+    box-sizing: border-box;
     background: #fff;
-    border-left: 1px solid #ddd;
-    padding: 1rem 1.5rem;
-    font-size: 0.9rem;
+    border-radius: 0 12px 12px 0;
+    box-shadow: -1px 0 12px rgba(0, 0, 0, 0.05);
+    color: #444;
+    font-size: 14px;
+    line-height: 1.5;
+    user-select: text;
     overflow-y: auto;
+    height: 100vh;
+    flex-shrink: 0;
   }}
+
   #info-panel h3 {{
-    margin-bottom: 1rem;
-    color: #0d6efd;
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 20px;
+    color: #222;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
   }}
+
   #info-panel div {{
-    margin-bottom: 0.7rem;
+    margin-bottom: 14px;
+  }}
+
+  /* Scrollbar personalizadas */
+  #legend::-webkit-scrollbar,
+  #info-panel::-webkit-scrollbar {{
+    width: 8px;
+  }}
+  #legend::-webkit-scrollbar-track,
+  #info-panel::-webkit-scrollbar-track {{
+    background: transparent;
+  }}
+  #legend::-webkit-scrollbar-thumb,
+  #info-panel::-webkit-scrollbar-thumb {{
+    background-color: #b0b0b0;
+    border-radius: 4px;
+  }}
+  #legend::-webkit-scrollbar-thumb:hover,
+  #info-panel::-webkit-scrollbar-thumb:hover {{
+    background-color: #888;
+  }}
+
+  /* Polígonos */
+  .polygon {{
+    fill: rgba(30, 90, 160, 0.15);
+    stroke: rgba(30, 90, 160, 0.5);
+    stroke-width: 0.8;
+    cursor: pointer;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease, fill 0.3s ease;
+    opacity: 0.8;
+  }}
+
+  .polygon:hover {{
+    fill: transparent !important;
+    stroke: rgba(30, 90, 160, 0.85);
+    stroke-width: 2;
+    filter: drop-shadow(0 0 5px rgba(30, 90, 160, 0.3));
+    opacity: 1;
+  }}
+
+  .polygon.selected {{
+    fill: rgba(10, 60, 140, 0.3);
+    stroke: rgba(10, 60, 140, 0.7);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 8px rgba(10, 60, 140, 0.5));
+    opacity: 1;
   }}
 
   #tooltip {{
     position: absolute;
     pointer-events: none;
-    background: rgba(13, 110, 253, 0.85);
+    padding: 6px 14px;
+    background: rgba(30, 90, 160, 0.85);
     color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 0.8rem;
-    user-select: none;
-    display: none;
-    box-shadow: 0 0 8px rgba(13, 110, 253, 0.7);
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 6px;
     white-space: nowrap;
+    box-shadow: 0 0 8px rgba(30, 90, 160, 0.5);
+    display: none;
+    user-select: none;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     z-index: 10;
   }}
 </style>
@@ -185,11 +230,11 @@ html_code = f"""
 <body>
 
 <div id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
-  <strong>Selecione um município</strong>
+  <strong>Selecione um município:</strong>
   <div id="mun-list"></div>
 </div>
 
-<div id="map-container" role="region" aria-label="Mapa interativo dos municípios da RMC">
+<div id="map" role="region" aria-label="Mapa interativo dos municípios da RMC">
   <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
   <div id="tooltip" role="tooltip"></div>
 </div>
@@ -207,12 +252,11 @@ html_code = f"""
   const munList = document.getElementById("mun-list");
   const tooltip = document.getElementById("tooltip");
   const infoPanel = document.getElementById("info-panel");
-  const mapContainer = document.getElementById("map-container");
+  const mapDiv = document.getElementById("map");
 
   let selectedName = null;
   const paths = {{}};
 
-  // Obter todas as coordenadas para calcular escala e projeção simples
   let allCoords = [];
   geojson.features.forEach(f => {{
     const geom = f.geometry;
@@ -230,7 +274,6 @@ html_code = f"""
   const minLat = Math.min(...lats);
   const maxLat = Math.max(...lats);
 
-  // Projeção simples linear para SVG
   function project(coord) {{
     const [lon, lat] = coord;
     const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
@@ -238,7 +281,6 @@ html_code = f"""
     return [x, y];
   }}
 
-  // Converte coordenadas do polígono para atributo 'd' do <path>
   function polygonToPath(coords) {{
     return coords.map(c => {{
       const [x, y] = project(c);
@@ -246,39 +288,31 @@ html_code = f"""
     }}).join(" ");
   }}
 
-  // Formata números para BR locale com separadores de milhar
   function formatNumber(num) {{
     if(num === null || num === undefined) return "N/A";
     return num.toLocaleString('pt-BR');
   }}
 
-  // Atualiza painel de informações do município selecionado
   function updateInfoPanel(data) {{
     if(!data) {{
       infoPanel.querySelector('h3').textContent = "Selecione um município";
-      let divs = infoPanel.querySelectorAll('div');
-      divs[0].innerHTML = "<strong>População:</strong> –";
-      divs[1].innerHTML = "<strong>Área:</strong> –";
-      divs[2].innerHTML = "<strong>PIB (2021):</strong> –";
+      infoPanel.querySelectorAll('div').forEach(d => d.innerHTML = "<strong>–</strong>");
       return;
     }}
     infoPanel.querySelector('h3').textContent = data.name;
-    infoPanel.querySelectorAll('div')[0].innerHTML = `<strong>População:</strong> ${formatNumber(data.populacao)}`;
-    infoPanel.querySelectorAll('div')[1].innerHTML = `<strong>Área:</strong> ${data.area ? data.area.toFixed(1) + " km²" : "N/A"}`;
-    infoPanel.querySelectorAll('div')[2].innerHTML = `<strong>PIB (2021):</strong> ${data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}`;
+    infoPanel.querySelectorAll('div')[0].innerHTML = `<strong>População:</strong> ${{formatNumber(data.populacao)}}`;
+    infoPanel.querySelectorAll('div')[1].innerHTML = `<strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}}`;
+    infoPanel.querySelectorAll('div')[2].innerHTML = `<strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}}`;
   }}
 
-  // Limpa todos os highlights (hover)
   function clearHighlight() {{
     Object.values(paths).forEach(p => p.classList.remove("highlight"));
   }}
 
-  // Limpa todas as seleções
   function clearSelection() {{
     Object.values(paths).forEach(p => p.classList.remove("selected"));
   }}
 
-  // Atualiza legenda com o item ativo selecionado
   function setActiveLegend(name) {{
     const legendItems = munList.children;
     for(let i=0; i < legendItems.length; i++) {{
@@ -286,7 +320,6 @@ html_code = f"""
     }}
   }}
 
-  // Função principal para selecionar município
   function selectMunicipio(name) {{
     clearHighlight();
     clearSelection();
@@ -294,22 +327,26 @@ html_code = f"""
     setActiveLegend(name);
     selectedName = name;
 
+    // Atualiza painel de informações
     const data = geojson.features.find(f => f.properties.name === name);
-    if(data) updateInfoPanel(data.properties);
+    if (data) {{
+      updateInfoPanel(data.properties);
+    }}
   }}
 
-  // Cria os paths SVG para cada município, e itens da legenda
   geojson.features.forEach(f => {{
     const props = f.properties;
     const name = props.name;
     const geom = f.geometry;
     let pathD = "";
 
-    if(geom.type === "Polygon") {{
-      pathD = `M${polygonToPath(geom.coordinates[0])} Z`;
-    }} else if(geom.type === "MultiPolygon") {{
+    if (geom.type === "Polygon") {{
+      const pathData = polygonToPath(geom.coordinates[0]);
+      pathD = `M${{pathData}} Z`;
+    }} else if (geom.type === "MultiPolygon") {{
       geom.coordinates.forEach(poly => {{
-        pathD += `M${polygonToPath(poly[0])} Z`;
+        const pathData = polygonToPath(poly[0]);
+        pathD += `M${{pathData}} Z`;
       }});
     }}
 
@@ -324,23 +361,22 @@ html_code = f"""
     pathEl.addEventListener("mousemove", (e) => {{
       tooltip.style.display = "block";
       tooltip.textContent = name;
-
-      const mapRect = mapContainer.getBoundingClientRect();
-      let left = e.clientX - mapRect.left + 12;
-      let top = e.clientY - mapRect.top + 12;
+      const mapRect = mapDiv.getBoundingClientRect();
+      let left = e.clientX - mapRect.left + 10;
+      let top = e.clientY - mapRect.top + 10;
 
       if(left + tooltip.offsetWidth > mapRect.width) {{
-        left = e.clientX - mapRect.left - tooltip.offsetWidth - 12;
+        left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
       }}
       if(top + tooltip.offsetHeight > mapRect.height) {{
-        top = e.clientY - mapRect.top - tooltip.offsetHeight - 12;
+        top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
       }}
 
       tooltip.style.left = left + "px";
       tooltip.style.top = top + "px";
 
       clearHighlight();
-      if(!pathEl.classList.contains("selected")) {{
+      if (!pathEl.classList.contains("selected")) {{
         pathEl.classList.add("highlight");
       }}
     }});
@@ -354,7 +390,6 @@ html_code = f"""
       selectMunicipio(name);
     }});
 
-    // Legenda
     const legendItem = document.createElement("div");
     legendItem.textContent = name;
     legendItem.dataset.name = name;
@@ -362,9 +397,7 @@ html_code = f"""
 
     legendItem.addEventListener("mouseenter", () => {{
       clearHighlight();
-      if(paths[name] && !paths[name].classList.contains("selected")) {{
-        paths[name].classList.add("highlight");
-      }}
+      if(paths[name] && !paths[name].classList.contains("selected")) paths[name].classList.add("highlight");
     }});
     legendItem.addEventListener("mouseleave", () => {{
       clearHighlight();
@@ -379,4 +412,4 @@ html_code = f"""
 </html>
 """
 
-st.components.v1.html(html_code, height=720, scrolling=True)
+st.components.v1.html(html_code, height=650, scrolling=True)
