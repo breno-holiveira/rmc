@@ -7,57 +7,27 @@ st.set_page_config(layout="wide")
 st.title('RMC Data')
 st.header('Dados e indicadores da Região Metropolitana de Campinas')
 
-# Dicionário com dados adicionais
-dados_extra = {
-    "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
-    "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
-    "Campinas": {"populacao": 1200000, "area": 796.0, "pib_2021": 105_000_000_000},
-    "Cosmópolis": {"populacao": 70000, "area": 154.5, "pib_2021": 3_100_000_000},
-    "Engenheiro Coelho": {"populacao": 17000, "area": 130.1, "pib_2021": 900_000_000},
-    "Holambra": {"populacao": 13000, "area": 65.7, "pib_2021": 850_000_000},
-    "Hortolândia": {"populacao": 240000, "area": 62.5, "pib_2021": 9_500_000_000},
-    "Indaiatuba": {"populacao": 260000, "area": 311.4, "pib_2021": 15_000_000_000},
-    "Itatiba": {"populacao": 120000, "area": 322.3, "pib_2021": 6_500_000_000},
-    "Jaguariúna": {"populacao": 57000, "area": 141.2, "pib_2021": 3_200_000_000},
-    "Monte Mor": {"populacao": 46000, "area": 155.1, "pib_2021": 2_700_000_000},
-    "Morungaba": {"populacao": 14000, "area": 146.4, "pib_2021": 1_100_000_000},
-    "Nova Odessa": {"populacao": 62000, "area": 73.3, "pib_2021": 3_600_000_000},
-    "Paulínia": {"populacao": 110000, "area": 131.3, "pib_2021": 18_500_000_000},
-    "Santa Bárbara d'Oeste": {"populacao": 210000, "area": 310.4, "pib_2021": 10_500_000_000},
-    "Santo Antônio de Posse": {"populacao": 31000, "area": 154.0, "pib_2021": 1_600_000_000},
-    "Sumaré": {"populacao": 280000, "area": 153.3, "pib_2021": 14_200_000_000},
-    "Valinhos": {"populacao": 125000, "area": 148.0, "pib_2021": 7_400_000_000},
-    "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
-}
+# → Aqui vem seu `dados_extra` conforme já está
 
-# Carrega e projeta shapefile
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
 gdf = gdf.sort_values(by="NM_MUN")
 
-# Constrói GeoJSON com dados extras
-geojson = {"type": "FeatureCollection", "features": []}
+geojson = {"type":"FeatureCollection","features":[]}
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
     geom = row["geometry"].__geo_interface__
-    extra = dados_extra.get(nome, {"populacao": None, "area": None, "pib_2021": None})
+    extra = dados_extra.get(nome, {})
     geojson["features"].append({
-        "type": "Feature",
-        "properties": {
-            "name": nome,
-            "populacao": extra["populacao"],
-            "area": extra["area"],
-            "pib_2021": extra["pib_2021"]
-        },
-        "geometry": geom
+        "type":"Feature",
+        "properties":{"name":nome, **extra},
+        "geometry":geom
     })
 
-# Carrega o conteúdo do HTML externo e insere o GeoJSON
-html_path = Path("./grafico.html")
-html_template = html_path.read_text(encoding="utf-8")
 geojson_str = json.dumps(geojson)
-html_final = html_template.replace("{{geojson}}", geojson_str)
 
-# Exibe no Streamlit
-st.components.v1.html(html_final, height=700, scrolling=True)
+html = Path("grafico.html").read_text(encoding="utf-8")
+html = html.replace("{{geojson}}", geojson_str)
+
+st.components.v1.html(html, height=700, scrolling=True)
