@@ -31,11 +31,13 @@ dados_extra = {
     "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
 }
 
+# Carrega shapefile e ajusta CRS
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
 gdf = gdf.sort_values(by="NM_MUN")
 
+# Monta GeoJSON com propriedades extras
 geojson = {"type": "FeatureCollection", "features": []}
 for _, row in gdf.iterrows():
     name = row["NM_MUN"]
@@ -54,159 +56,61 @@ for _, row in gdf.iterrows():
 
 geojson_str = json.dumps(geojson)
 
-import streamlit as st
-import json
-
-# Suponha que geojson_str é sua variável string JSON já pronta (carregue do seu arquivo .geojson)
-# Exemplo: geojson_str = open("RMC_municipios.geojson", "r", encoding="utf-8").read()
-# Para efeito de exemplo, colocarei um JSON vazio abaixo:
-geojson_str = """
-{
-  "type": "FeatureCollection",
-  "features": []
-}
-"""
-
+# Código HTML + CSS + JS (JS embutido no f-string, usando geojson_str)
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Mapa Interativo RMC - Transparência</title>
+<title>Mapa Interativo RMC</title>
 <style>
+  /* Estilos resumidos */
   html, body {{
-    margin: 0; padding: 0;
-    height: 100vh;
-    background: #fefefe;
+    margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: row; overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: #fefefe;
     color: #333;
     user-select: none;
-    display: flex;
-    flex-direction: row;
-    overflow: hidden;
   }}
-
-  /* Legenda esquerda */
   #legend {{
-    width: 220px;
-    background-color: #fefefe;
-    padding: 14px 16px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    border-radius: 10px 0 0 10px;
-    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.1);
-    font-size: 13px;
-    line-height: 1.3;
-    color: #555;
-    flex-shrink: 0;
+    width: 220px; padding: 14px 16px; overflow-y: auto; border-radius: 10px 0 0 10px;
+    box-shadow: inset 3px 0 6px -3px rgba(0,0,0,0.1);
     background-image: linear-gradient(to right, #fefefe 80%, rgba(254,254,254,0) 100%);
+    color: #555; font-size: 13px; line-height: 1.3; flex-shrink: 0;
   }}
-
   #legend strong {{
-    font-size: 14px;
-    color: #222;
-    margin-bottom: 12px;
-    display: block;
-    font-weight: 600;
+    font-weight: 600; font-size: 14px; color: #222; margin-bottom: 12px; display: block;
     padding-bottom: 8px;
   }}
-
   #legend div {{
-    padding: 6px 10px;
-    margin-bottom: 5px;
-    border-radius: 5px;
-    cursor: pointer;
-    color: #555;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 6px 10px; margin-bottom: 5px; border-radius: 5px; cursor: pointer;
+    color: #555; transition: background-color 0.3s ease, color 0.3s ease;
   }}
-
   #legend div:hover {{
-    background-color: #e6f0ff;
-    color: #1a1a1a;
+    background-color: #e6f0ff; color: #1a1a1a;
   }}
-
   #legend div.active {{
-    background-color: #cfe2ff;
-    color: #0d3b66;
-    font-weight: 600;
+    background-color: #cfe2ff; color: #0d3b66; font-weight: 600;
   }}
-
-  /* Container do mapa */
   #map {{
-    flex-grow: 1;
-    position: relative;
-    background: #fefefe;
-    box-shadow: inset 0 0 0px #000c;
-    border-radius: 0;
-    min-width: 0;
-    background-image:
-      linear-gradient(to left, rgba(254,254,254,0) 0%, #fefefe 20%),
-      linear-gradient(to right, rgba(254,254,254,0) 0%, #fefefe 20%);
-    background-repeat: no-repeat;
-    background-position: left, right;
-    background-size: 40px 100%;
+    flex-grow: 1; position: relative; background: #fefefe;
+    background-image: linear-gradient(to left, rgba(254,254,254,0) 0%, #fefefe 20%), 
+                      linear-gradient(to right, rgba(254,254,254,0) 0%, #fefefe 20%);
+    background-repeat: no-repeat; background-position: left, right; background-size: 40px 100%;
   }}
-
   svg {{
-    width: 100%;
-    height: 100vh;
-    display: block;
-    background: transparent;
+    width: 100%; height: 100vh; display: block; background: transparent;
   }}
-
-  /* Janela flutuante info */
   #info-panel {{
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 240px;
-    background: #fefefe;
-    padding: 14px 18px;
-    box-sizing: border-box;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    font-size: 13px;
-    line-height: 1.4;
-    color: #555;
-    user-select: text;
-    pointer-events: auto;
+    position: absolute; top: 16px; right: 16px; width: 240px; background: #fefefe;
+    padding: 14px 18px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    font-size: 13px; line-height: 1.4; color: #555; user-select: text; pointer-events: auto;
   }}
-
   #info-panel h3 {{
-    margin-top: 0;
-    font-weight: 600;
-    font-size: 16px;
-    color: #222;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
+    margin-top: 0; font-weight: 600; font-size: 16px; color: #222; border-bottom: 1px solid #ccc;
+    padding-bottom: 8px; margin-bottom: 12px;
   }}
-
-  #info-panel div {{
-    margin-bottom: 10px;
-  }}
-
-  /* Scrollbar legendas e info */
-  #legend::-webkit-scrollbar,
-  #info-panel::-webkit-scrollbar {{
-    width: 6px;
-  }}
-  #legend::-webkit-scrollbar-track,
-  #info-panel::-webkit-scrollbar-track {{
-    background: transparent;
-  }}
-  #legend::-webkit-scrollbar-thumb,
-  #info-panel::-webkit-scrollbar-thumb {{
-    background-color: #c0c0c0;
-    border-radius: 3px;
-  }}
-  #legend::-webkit-scrollbar-thumb:hover,
-  #info-panel::-webkit-scrollbar-thumb:hover {{
-    background-color: #a0a0a0;
-  }}
-
-  /* Polígonos */
   .polygon {{
     fill: rgba(50, 90, 150, 0.25);
     stroke: rgba(50, 90, 150, 0.7);
@@ -215,8 +119,6 @@ html_code = f"""
     transition: stroke 0.3s ease, stroke-width 0.3s ease, fill 0.3s ease;
     opacity: 0.85;
   }}
-
-  /* Hover: só contorno */
   .polygon:hover {{
     fill: transparent !important;
     stroke: rgba(50, 90, 150, 1);
@@ -224,8 +126,6 @@ html_code = f"""
     filter: drop-shadow(0 0 5px rgba(50, 90, 150, 0.5));
     opacity: 1;
   }}
-
-  /* Selecionado: mantém preenchimento */
   .polygon.selected {{
     fill: rgba(30, 70, 140, 0.5);
     stroke: rgba(30, 70, 140, 1);
@@ -233,22 +133,12 @@ html_code = f"""
     filter: drop-shadow(0 0 6px rgba(30, 70, 140, 0.7));
     opacity: 1;
   }}
-
-  /* Tooltip */
   #tooltip {{
-    position: absolute;
-    pointer-events: none;
-    padding: 3px 8px;
-    background: rgba(50, 90, 150, 0.9);
-    color: #fefefe;
-    font-weight: 600;
-    font-size: 11px;
-    border-radius: 4px;
-    white-space: nowrap;
-    box-shadow: 0 0 8px rgba(50, 90, 150, 0.5);
-    display: none;
-    user-select: none;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    position: absolute; pointer-events: none; padding: 3px 8px;
+    background: rgba(50, 90, 150, 0.9); color: #fefefe; font-weight: 600;
+    font-size: 11px; border-radius: 4px; white-space: nowrap;
+    box-shadow: 0 0 8px rgba(50, 90, 150, 0.5); display: none;
+    user-select: none; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   }}
 </style>
 </head>
@@ -351,7 +241,6 @@ html_code = f"""
     setActiveLegend(name);
     selectedName = name;
 
-    // Atualiza painel de informações
     const data = geojson.features.find(f => f.properties.name === name);
     if (data) {{
       updateInfoPanel(data.properties);
@@ -436,8 +325,5 @@ html_code = f"""
 </html>
 """
 
-st.set_page_config(layout="wide", page_title="Mapa RMC Interativo")
+# Finalmente, exibe o HTML no Streamlit
 st.components.v1.html(html_code, height=950, scrolling=True)
-
-
-components.html(html_code, height=500, scrolling=False)
