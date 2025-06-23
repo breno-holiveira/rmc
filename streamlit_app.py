@@ -78,7 +78,7 @@ html_code = f"""
   /* Legenda esquerda */
   #legend {{
     width: 200px;
-    background-color: #F0F8FF;
+    background-color: #EDF6FA;
     padding: 10px 14px;
     box-sizing: border-box;
     overflow-y: hidden; /* tira scroll */
