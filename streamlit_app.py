@@ -84,7 +84,7 @@ html_code = f"""
     padding-bottom: 8px;
   }}
   #legend div {{
-    padding: 6px 10px; margin-bottom: 5px; border-radius: 5px; cursor: pointer;
+    padding: 6px 8px; margin-bottom: 5px; border-radius: 5px; cursor: pointer;
     color: #555; transition: background-color 0.3s ease, color 0.3s ease;
   }}
   #legend div:hover {{
