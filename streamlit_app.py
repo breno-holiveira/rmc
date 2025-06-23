@@ -420,6 +420,10 @@ html_code = f"""
   }});
 </script>
 
+<footer style="width: 100%; padding: 14px 0; background-color: #f7f9fb; border-top: 1px solid #ccc; text-align: center; font-size: 13px; color: #555;">
+  🔹 Desenvolvido por Breno Oliveira | Dados públicos e fontes oficiais | Última atualização: Junho/2025
+</footer>
+
 </body>
 </html>
 """
