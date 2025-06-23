@@ -8,7 +8,7 @@ st.header('Dados e indicadores da Região Metropolitana de Campinas')
 
 # Dicionário com dados adicionais
 dados_extra = {
-    "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
+    "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},f\
     "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
     "Campinas": {"populacao": 1200000, "area": 796.0, "pib_2021": 105_000_000_000},
     "Cosmópolis": {"populacao": 70000, "area": 154.5, "pib_2021": 3_100_000_000},
@@ -78,7 +78,7 @@ html_code = f"""
   /* Legenda esquerda */
   #legend {{
     width: 200px;
-    background-color: #FAFAFA;
+    background-color: #F0F8FF;
     padding: 10px 14px;
     box-sizing: border-box;
     overflow-y: hidden; /* tira scroll */
