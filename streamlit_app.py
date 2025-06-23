@@ -54,6 +54,19 @@ for _, row in gdf.iterrows():
 
 geojson_str = json.dumps(geojson)
 
+import streamlit as st
+import json
+
+# Suponha que geojson_str é sua variável string JSON já pronta (carregue do seu arquivo .geojson)
+# Exemplo: geojson_str = open("RMC_municipios.geojson", "r", encoding="utf-8").read()
+# Para efeito de exemplo, colocarei um JSON vazio abaixo:
+geojson_str = """
+{
+  "type": "FeatureCollection",
+  "features": []
+}
+"""
+
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -61,11 +74,10 @@ html_code = f"""
 <meta charset="UTF-8" />
 <title>Mapa Interativo RMC - Transparência</title>
 <style>
-  /* Estilo geral da página */
-  html, body {
+  html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    background: #fefefe;  /* off-white */
+    background: #fefefe;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     color: #333;
@@ -73,78 +85,78 @@ html_code = f"""
     display: flex;
     flex-direction: row;
     overflow: hidden;
-  }
+  }}
 
   /* Legenda esquerda */
-  #legend {
+  #legend {{
     width: 220px;
     background-color: #fefefe;
     padding: 14px 16px;
     box-sizing: border-box;
     overflow-y: auto;
     border-radius: 10px 0 0 10px;
-    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.1); /* sombra suave à esquerda */
+    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.1);
     font-size: 13px;
     line-height: 1.3;
     color: #555;
     flex-shrink: 0;
     background-image: linear-gradient(to right, #fefefe 80%, rgba(254,254,254,0) 100%);
-  }
+  }}
 
-  #legend strong {
+  #legend strong {{
     font-size: 14px;
     color: #222;
     margin-bottom: 12px;
     display: block;
     font-weight: 600;
     padding-bottom: 8px;
-  }
+  }}
 
-  #legend div {
+  #legend div {{
     padding: 6px 10px;
     margin-bottom: 5px;
     border-radius: 5px;
     cursor: pointer;
     color: #555;
     transition: background-color 0.3s ease, color 0.3s ease;
-  }
+  }}
 
-  #legend div:hover {
+  #legend div:hover {{
     background-color: #e6f0ff;
     color: #1a1a1a;
-  }
+  }}
 
-  #legend div.active {
+  #legend div.active {{
     background-color: #cfe2ff;
     color: #0d3b66;
     font-weight: 600;
-  }
+  }}
 
   /* Container do mapa */
-  #map {
+  #map {{
     flex-grow: 1;
     position: relative;
     background: #fefefe;
     box-shadow: inset 0 0 0px #000c;
     border-radius: 0;
-    min-width: 0; /* para scroll dentro do flex */
+    min-width: 0;
     background-image:
       linear-gradient(to left, rgba(254,254,254,0) 0%, #fefefe 20%),
       linear-gradient(to right, rgba(254,254,254,0) 0%, #fefefe 20%);
     background-repeat: no-repeat;
     background-position: left, right;
     background-size: 40px 100%;
-  }
+  }}
 
-  svg {
+  svg {{
     width: 100%;
     height: 100vh;
     display: block;
     background: transparent;
-  }
+  }}
 
   /* Janela flutuante info */
-  #info-panel {
+  #info-panel {{
     position: absolute;
     top: 16px;
     right: 16px;
@@ -159,9 +171,9 @@ html_code = f"""
     color: #555;
     user-select: text;
     pointer-events: auto;
-  }
+  }}
 
-  #info-panel h3 {
+  #info-panel h3 {{
     margin-top: 0;
     font-weight: 600;
     font-size: 16px;
@@ -169,61 +181,61 @@ html_code = f"""
     border-bottom: 1px solid #ccc;
     padding-bottom: 8px;
     margin-bottom: 12px;
-  }
+  }}
 
-  #info-panel div {
+  #info-panel div {{
     margin-bottom: 10px;
-  }
+  }}
 
   /* Scrollbar legendas e info */
   #legend::-webkit-scrollbar,
-  #info-panel::-webkit-scrollbar {
+  #info-panel::-webkit-scrollbar {{
     width: 6px;
-  }
+  }}
   #legend::-webkit-scrollbar-track,
-  #info-panel::-webkit-scrollbar-track {
+  #info-panel::-webkit-scrollbar-track {{
     background: transparent;
-  }
+  }}
   #legend::-webkit-scrollbar-thumb,
-  #info-panel::-webkit-scrollbar-thumb {
+  #info-panel::-webkit-scrollbar-thumb {{
     background-color: #c0c0c0;
     border-radius: 3px;
-  }
+  }}
   #legend::-webkit-scrollbar-thumb:hover,
-  #info-panel::-webkit-scrollbar-thumb:hover {
+  #info-panel::-webkit-scrollbar-thumb:hover {{
     background-color: #a0a0a0;
-  }
+  }}
 
   /* Polígonos */
-  .polygon {
-    fill: rgba(50, 90, 150, 0.25);   /* azul sóbrio, suave */
-    stroke: rgba(50, 90, 150, 0.7);   /* contorno azul escuro */
+  .polygon {{
+    fill: rgba(50, 90, 150, 0.25);
+    stroke: rgba(50, 90, 150, 0.7);
     stroke-width: 1.2;
     cursor: pointer;
     transition: stroke 0.3s ease, stroke-width 0.3s ease, fill 0.3s ease;
     opacity: 0.85;
-  }
+  }}
 
   /* Hover: só contorno */
-  .polygon:hover {
+  .polygon:hover {{
     fill: transparent !important;
     stroke: rgba(50, 90, 150, 1);
     stroke-width: 3;
     filter: drop-shadow(0 0 5px rgba(50, 90, 150, 0.5));
     opacity: 1;
-  }
+  }}
 
   /* Selecionado: mantém preenchimento */
-  .polygon.selected {
-    fill: rgba(30, 70, 140, 0.5); /* azul mais forte e suave */
+  .polygon.selected {{
+    fill: rgba(30, 70, 140, 0.5);
     stroke: rgba(30, 70, 140, 1);
     stroke-width: 3.5;
     filter: drop-shadow(0 0 6px rgba(30, 70, 140, 0.7));
     opacity: 1;
-  }
+  }}
 
   /* Tooltip */
-  #tooltip {
+  #tooltip {{
     position: absolute;
     pointer-events: none;
     padding: 3px 8px;
@@ -237,8 +249,7 @@ html_code = f"""
     display: none;
     user-select: none;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  }
-
+  }}
 </style>
 </head>
 <body>
@@ -271,14 +282,14 @@ html_code = f"""
   const paths = {{}};
 
   let allCoords = [];
-  geojson.features.forEach(f => {
+  geojson.features.forEach(f => {{
     const geom = f.geometry;
-    if (geom.type === "Polygon") {
+    if (geom.type === "Polygon") {{
       geom.coordinates[0].forEach(c => allCoords.push(c));
-    } else if (geom.type === "MultiPolygon") {
+    }} else if (geom.type === "MultiPolygon") {{
       geom.coordinates.forEach(poly => poly[0].forEach(c => allCoords.push(c)));
-    }
-  });
+    }}
+  }});
 
   const lons = allCoords.map(c => c[0]);
   const lats = allCoords.map(c => c[1]);
@@ -287,53 +298,53 @@ html_code = f"""
   const minLat = Math.min(...lats);
   const maxLat = Math.max(...lats);
 
-  function project(coord) {
+  function project(coord) {{
     const [lon, lat] = coord;
     const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
     const y = 900 - ((lat - minLat) / (maxLat - minLat)) * 850;
     return [x, y];
-  }
+  }}
 
-  function polygonToPath(coords) {
-    return coords.map(c => {
+  function polygonToPath(coords) {{
+    return coords.map(c => {{
       const [x, y] = project(c);
       return x + "," + y;
-    }).join(" ");
-  }
+    }}).join(" ");
+  }}
 
-  function formatNumber(num) {
+  function formatNumber(num) {{
     if(num === null || num === undefined) return "N/A";
     return num.toLocaleString('pt-BR');
-  }
+  }}
 
-  function updateInfoPanel(data) {
-    if(!data) {
+  function updateInfoPanel(data) {{
+    if(!data) {{
       infoPanel.querySelector('h3').textContent = "Selecione um município";
       infoPanel.querySelectorAll('div').forEach(d => d.innerHTML = "<strong>–</strong>");
       return;
-    }
+    }}
     infoPanel.querySelector('h3').textContent = data.name;
-    infoPanel.querySelectorAll('div')[0].innerHTML = `<strong>População:</strong> ${formatNumber(data.populacao)}`;
-    infoPanel.querySelectorAll('div')[1].innerHTML = `<strong>Área:</strong> ${data.area ? data.area.toFixed(1) + " km²" : "N/A"}`;
-    infoPanel.querySelectorAll('div')[2].innerHTML = `<strong>PIB (2021):</strong> ${data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}`;
-  }
+    infoPanel.querySelectorAll('div')[0].innerHTML = `<strong>População:</strong> ${{formatNumber(data.populacao)}}`;
+    infoPanel.querySelectorAll('div')[1].innerHTML = `<strong>Área:</strong> ${{data.area ? data.area.toFixed(1) + " km²" : "N/A"}}`;
+    infoPanel.querySelectorAll('div')[2].innerHTML = `<strong>PIB (2021):</strong> ${{data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A"}}`;
+  }}
 
-  function clearHighlight() {
+  function clearHighlight() {{
     Object.values(paths).forEach(p => p.classList.remove("highlight"));
-  }
+  }}
 
-  function clearSelection() {
+  function clearSelection() {{
     Object.values(paths).forEach(p => p.classList.remove("selected"));
-  }
+  }}
 
-  function setActiveLegend(name) {
+  function setActiveLegend(name) {{
     const legendItems = munList.children;
-    for(let i=0; i < legendItems.length; i++) {
+    for(let i=0; i < legendItems.length; i++) {{
       legendItems[i].classList.toggle("active", legendItems[i].dataset.name === name);
-    }
-  }
+    }}
+  }}
 
-  function selectMunicipio(name) {
+  function selectMunicipio(name) {{
     clearHighlight();
     clearSelection();
     if(paths[name]) paths[name].classList.add("selected");
@@ -342,26 +353,26 @@ html_code = f"""
 
     // Atualiza painel de informações
     const data = geojson.features.find(f => f.properties.name === name);
-    if (data) {
+    if (data) {{
       updateInfoPanel(data.properties);
-    }
-  }
+    }}
+  }}
 
-  geojson.features.forEach(f => {
+  geojson.features.forEach(f => {{
     const props = f.properties;
     const name = props.name;
     const geom = f.geometry;
     let pathD = "";
 
-    if (geom.type === "Polygon") {
+    if (geom.type === "Polygon") {{
       const pathData = polygonToPath(geom.coordinates[0]);
-      pathD = `M${pathData} Z`;
-    } else if (geom.type === "MultiPolygon") {
-      geom.coordinates.forEach(poly => {
+      pathD = `M${{pathData}} Z`;
+    }} else if (geom.type === "MultiPolygon") {{
+      geom.coordinates.forEach(poly => {{
         const pathData = polygonToPath(poly[0]);
-        pathD += `M${pathData} Z`;
-      });
-    }
+        pathD += `M${{pathData}} Z`;
+      }});
+    }}
 
     const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
     pathEl.setAttribute("d", pathD);
@@ -371,59 +382,62 @@ html_code = f"""
     svg.appendChild(pathEl);
     paths[name] = pathEl;
 
-    pathEl.addEventListener("mousemove", (e) => {
+    pathEl.addEventListener("mousemove", (e) => {{
       tooltip.style.display = "block";
       tooltip.textContent = name;
       const mapRect = mapDiv.getBoundingClientRect();
       let left = e.clientX - mapRect.left + 10;
       let top = e.clientY - mapRect.top + 10;
 
-      if(left + tooltip.offsetWidth > mapRect.width) {
+      if(left + tooltip.offsetWidth > mapRect.width) {{
         left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
-      }
-      if(top + tooltip.offsetHeight > mapRect.height) {
+      }}
+      if(top + tooltip.offsetHeight > mapRect.height) {{
         top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
-      }
+      }}
 
       tooltip.style.left = left + "px";
       tooltip.style.top = top + "px";
 
       clearHighlight();
-      if (!pathEl.classList.contains("selected")) {
+      if (!pathEl.classList.contains("selected")) {{
         pathEl.classList.add("highlight");
-      }
-    });
+      }}
+    }});
 
-    pathEl.addEventListener("mouseleave", () => {
+    pathEl.addEventListener("mouseleave", () => {{
       tooltip.style.display = "none";
       clearHighlight();
-    });
+    }});
 
-    pathEl.addEventListener("click", () => {
+    pathEl.addEventListener("click", () => {{
       selectMunicipio(name);
-    });
+    }});
 
     const legendItem = document.createElement("div");
     legendItem.textContent = name;
     legendItem.dataset.name = name;
     munList.appendChild(legendItem);
 
-    legendItem.addEventListener("mouseenter", () => {
+    legendItem.addEventListener("mouseenter", () => {{
       clearHighlight();
       if(paths[name] && !paths[name].classList.contains("selected")) paths[name].classList.add("highlight");
-    });
-    legendItem.addEventListener("mouseleave", () => {
+    }});
+    legendItem.addEventListener("mouseleave", () => {{
       clearHighlight();
-    });
-    legendItem.addEventListener("click", () => {
+    }});
+    legendItem.addEventListener("click", () => {{
       selectMunicipio(name);
-    });
-  });
+    }});
+  }});
 </script>
 
 </body>
 </html>
 """
+
+st.set_page_config(layout="wide", page_title="Mapa RMC Interativo")
+st.components.v1.html(html_code, height=950, scrolling=True)
 
 
 components.html(html_code, height=500, scrolling=False)
