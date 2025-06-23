@@ -90,7 +90,6 @@ html_code = f"""
     line-height: 1.25;
     color: #555;
     flex-shrink: 0;
-    background-image: linear-gradient(to right, #fefefe 80%, rgba(254,254,254,0) 100%);
   }}
 
   #legend strong {{
