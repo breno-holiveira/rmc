@@ -5,6 +5,8 @@ import streamlit.components.v1 as components
 
 st.title('Data')
 
+st.set_page_config(layout="wide")
+
 st.header('Dados e indicadores da Região Metropolitana de Campinas')
 
 dados_extra = {
