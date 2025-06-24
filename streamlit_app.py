@@ -35,42 +35,42 @@ html_code = f"""
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<!-- Fixar viewport para largura fixa 1280px -->
-<meta name="viewport" content="width=1280" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
+  /* Container fixo para página */
   html, body {{
-    width: 1280px;
-    height: 720px;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sans-serif;
+    width: 1000px;  /* fixo para evitar scroll horizontal */
+    height: 700px;  /* fixo para evitar scroll vertical */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f9fafa;
     overflow: hidden;
-    user-select: none;
-  }}
-  body {{
     display: flex;
     flex-direction: row;
   }}
+
+  /* Sidebar fixa */
   #sidebar {{
     width: 260px;
+    height: 700px;
     background: #fff;
     padding: 20px 16px 12px 16px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
-    height: 720px;
-    overflow: hidden;
+    user-select: none;
   }}
+
   #sidebar h2 {{
     margin: 0 0 8px 0;
     font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
   }}
+
   #search {{
     margin-bottom: 12px;
     padding: 8px 12px;
@@ -79,44 +79,46 @@ html_code = f"""
     border-radius: 8px;
     outline-offset: 2px;
     transition: border-color 0.3s;
-    width: 100%;
-    box-sizing: border-box;
   }}
   #search:focus {{
     border-color: #4d648d;
     box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
   }}
+
   #list {{
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 6px;
+    font-size: 15px;
+    color: #1a2d5a;
   }}
   #list div {{
     padding: 8px 12px;
     margin-bottom: 6px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 15px;
-    color: #1a2d5a;
+    user-select: none;
     transition: background-color 0.3s, color 0.3s;
   }}
-  #list div:hover {{ background-color: #e3ecf9; }}
+  #list div:hover {{
+    background-color: #e3ecf9;
+  }}
   #list div.active {{
     background-color: #4d648d;
     color: #fff;
     font-weight: 600;
   }}
+
+  /* Mapa fixo */
   #map {{
-    width: 920px;
-    height: 720px;
     position: relative;
+    width: 640px;
+    height: 700px;
     overflow: hidden;
-    flex-shrink: 0;
   }}
   svg {{
-    width: 920px;
-    height: 720px;
-    display: block;
+    width: 640px;
+    height: 700px;
   }}
   .area {{
     fill: #b6cce5;
@@ -133,6 +135,8 @@ html_code = f"""
     fill: #4d648d;
     stroke: #1a2d5a;
   }}
+
+  /* Tooltip */
   #tooltip {{
     position: fixed;
     padding: 5px 10px;
@@ -144,26 +148,33 @@ html_code = f"""
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
+    user-select: none;
   }}
+
+  /* Caixa de informações fixa e não sobrepõe */
   #info {{
     position: fixed;
-    right: 24px;
-    top: 40px;
+    right: 16px;
+    top: 16px;
+    width: 280px;
+    max-height: 660px;
     background: #f0f3f8;
     padding: 16px 20px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    width: 320px;
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
+    user-select: none;
+    overflow-y: auto;
     border: 1px solid #d9e2f3;
-    z-index: 20;
     display: none;
+    z-index: 20;
   }}
   #info.visible {{
     display: block;
   }}
+
   #info h3 {{
     margin: 0 0 12px 0;
     font-size: 20px;
@@ -172,26 +183,29 @@ html_code = f"""
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 6px;
   }}
+
   #info .grid {{
-    display: table;
-    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+    column-gap: 24px;
   }}
-  #info .label, #info .value {{
-    display: table-cell;
-    padding: 4px 8px;
-    white-space: nowrap;
-  }}
+
   #info .label {{
     font-weight: 600;
     color: #4d648d;
+    white-space: nowrap;
   }}
+
   #info .value {{
     font-weight: 500;
     text-align: right;
     color: #34495e;
+    overflow-wrap: break-word;
   }}
+
   #info .fonte {{
-    display: block;
+    grid-column: 1 / -1;
     font-size: 11px;
     color: #7f8caa;
     font-style: italic;
@@ -201,24 +215,24 @@ html_code = f"""
 </style>
 </head>
 <body>
-  <div id="sidebar">
+  <div id="sidebar" role="complementary" aria-label="Lista de municípios">
     <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar..."/>
-    <div id="list"></div>
+    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
+    <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
-  <div id="map">
+  <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-    <div id="tooltip"></div>
+    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
-  <div id="info">
+  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
     <div class="grid">
-      <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
-      <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
-      <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-      <div class="label">População:</div><div class="value" id="pop"></div>
-      <div class="label">Área:</div><div class="value" id="area"></div>
-      <div class="label">Densidade:</div><div class="value" id="dens"></div>
+      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
+      <div class="label">Área:</div> <div class="value" id="area"></div>
+      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
       <div class="fonte">Fonte: IBGE Cidades</div>
     </div>
   </div>
@@ -229,8 +243,10 @@ const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
+
 let selected = null;
 const paths = {{}};
+
 let coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
@@ -241,12 +257,17 @@ const lons = coords.map(c => c[0]);
 const lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
 const minY = Math.min(...lats), maxY = Math.max(...lats);
+
 function project([lon, lat]) {{
   const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
   const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
   return [x, y];
 }}
-function polygonToPath(coords) {{ return coords.map(c => project(c).join(",")).join(" "); }}
+
+function polygonToPath(coords) {{
+  return coords.map(c => project(c).join(",")).join(" ");
+}}
+
 function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
@@ -256,11 +277,28 @@ function select(name) {{
   if (paths[name]) {{
     paths[name].classList.add("selected");
     [...list.children].forEach(div => {{
-      if(div.dataset.name === name) div.classList.add("active");
+      if(div.dataset.name === name) {{
+        div.classList.add("active");
+        // Scroll customizado para só rolar a barra lateral e não a página
+        const container = list;
+        const containerHeight = container.clientHeight;
+        const containerTop = container.getBoundingClientRect().top;
+
+        const elementTop = div.getBoundingClientRect().top;
+        const elementHeight = div.offsetHeight;
+
+        const scrollTop = container.scrollTop;
+        const offset = elementTop - containerTop;
+
+        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
+
+        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
+      }}
     }});
     showInfo(name);
   }}
 }}
+
 function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
@@ -273,44 +311,84 @@ function showInfo(name) {{
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
   info.classList.add("visible");
 }}
+
 function updateList(filter = "") {{
   const filterLower = filter.toLowerCase();
   [...list.children].forEach(div => {{
-    div.style.display = div.textContent.toLowerCase().includes(filterLower) ? "block" : "none";
+    if(div.textContent.toLowerCase().includes(filterLower)) {{
+      div.style.display = "block";
+    }} else {{
+      div.style.display = "none";
+    }}
   }});
 }}
+
+// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
-  if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-  else f.geometry.coordinates.forEach(p => {{ d += "M" + polygonToPath(p[0]) + " Z "; }});
+  if (f.geometry.type === "Polygon") {{
+    d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
+  }} else {{
+    f.geometry.coordinates.forEach(p => {{
+      d += "M" + polygonToPath(p[0]) + " Z ";
+    }});
+  }}
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d.trim());
   path.classList.add("area");
   path.setAttribute("data-name", name);
   svg.appendChild(path);
   paths[name] = path;
+
+  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    tooltip.style.left = (e.clientX + 8) + "px";
-    tooltip.style.top = (e.clientY - 22) + "px";
+    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
+    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
+    tooltip.style.left = (e.clientX + offsetX) + "px";
+    tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
     tooltip.textContent = name;
   }});
-  path.addEventListener("mouseleave", () => {{ tooltip.style.display = "none"; }});
-  path.addEventListener("click", e => {{ e.preventDefault(); e.stopPropagation(); select(name); }});
+  path.addEventListener("mouseleave", () => {{
+    tooltip.style.display = "none";
+  }});
+  path.addEventListener("click", e => {{
+    e.preventDefault();
+    e.stopPropagation();
+    select(name);
+  }});
+
+  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
   div.tabIndex = 0;
+  div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
-  div.addEventListener("keydown", e => {{ if (e.key === "Enter" || e.key === " ") {{ e.preventDefault(); select(name); }} }});
+  div.addEventListener("keydown", e => {{
+    if (e.key === "Enter" || e.key === " ") {{
+      e.preventDefault();
+      select(name);
+    }}
+  }});
   list.appendChild(div);
 }});
-search.addEventListener("input", e => {{ updateList(e.target.value); }});
-if(geo.features.length > 0) {{ select(geo.features[0].properties.name); }}
+
+search.addEventListener("input", e => {{
+  updateList(e.target.value);
+  const visibleItems = [...list.children].filter(d => d.style.display !== "none");
+  if(visibleItems.length === 1) {{
+    select(visibleItems[0].dataset.name);
+  }}
+}});
+
+if(geo.features.length > 0) {{
+  select(geo.features[0].properties.name);
+}}
 </script>
 </body>
 </html>
 """
 
-st.components.v1.html(html_code, height=720, scrolling=False)
+st.components.v1.html(html_code, height=700, scrolling=False)
