@@ -49,7 +49,7 @@ html_code = f"""
   }}
   /* Sidebar */
   #sidebar {{
-    width: 230px;
+    width: 220px;
     background: #fff;
     padding: 14px 11px 7px 11px;
     border-right: 1px solid #e1e4e8;
@@ -153,7 +153,7 @@ html_code = f"""
     border-radius: 9px;
     box-shadow: 0 0.9px 5.4px rgba(0,0,0,0.1);
     max-width: 288px;
-    font-size: 12.6px;
+    font-size: 12px;
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
