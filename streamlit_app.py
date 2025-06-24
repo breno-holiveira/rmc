@@ -148,7 +148,7 @@ html_code = f"""
     font-weight: 700;
     font-size: 16px;
     color: #0b3d91;
-    border-bottom: none;
+    border-bottom: 2px solid #0b3d91;
     padding-bottom: 8px;
     margin-bottom: 16px;
   }}
