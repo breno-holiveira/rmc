@@ -39,202 +39,178 @@ html_code = f"""
 <title>Mapa Interativo RMC</title>
 <style>
   html, body {{
-    margin: 0; padding: 0; height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f8fafc;
-    overflow: hidden;
-    color: #2c3e70;
-  }}
-
-  body {{
-    display: flex;
     height: 100vh;
-    width: 100vw;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9fafa;
+    display: flex;
+    overflow: hidden;
   }}
-
   /* Sidebar */
   #sidebar {{
-    flex: 0 0 260px;
+    width: 260px;
     background: #fff;
-    border-right: 1px solid #e0e4eb;
-    padding: 18px 16px;
-    box-shadow: 2px 0 12px rgba(0,0,0,0.05);
+    padding: 16px 12px 8px 12px;
+    border-right: 1px solid #e1e4e8;
+    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
   }}
   #sidebar h2 {{
-    margin: 0 0 16px 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #223152;
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a2d5a;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 16px;
-    padding: 10px 14px;
-    font-size: 15px;
-    border: 1.3px solid #c4c9d6;
-    border-radius: 12px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
     outline-offset: 2px;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s;
   }}
   #search:focus {{
-    border-color: #2f54eb;
-    box-shadow: 0 0 8px rgba(47, 84, 235, 0.35);
+    border-color: #4d648d;
+    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
   }}
   #list {{
     flex-grow: 1;
     overflow-y: auto;
+    padding-right: 4px;
   }}
   #list div {{
-    padding: 9px 14px;
-    margin-bottom: 8px;
-    border-radius: 10px;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 15px;
-    line-height: 1.4;
-    color: #223152;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #1a2d5a;
+    transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
-    background-color: #ebf0fd;
+    background-color: #e3ecf9;
   }}
   #list div.active {{
-    background-color: #2f54eb;
+    background-color: #4d648d;
     color: #fff;
-    font-weight: 700;
+    font-weight: 600;
   }}
 
-  /* Mapa - ocupa espaço principal */
+  /* Mapa */
   #map {{
-    flex: 1 1 auto;
+    flex-grow: 1;
     position: relative;
-    background: #e7ecf6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
   }}
   svg {{
-    width: 95%;
-    height: 95%;
-    max-width: 950px;
-    max-height: 880px;
+    width: 100%;
+    height: 100%;
   }}
   .area {{
-    fill: #a2b4d8;
-    stroke: #2f54eb;
+    fill: #b6cce5;
+    stroke: #4d648d;
     stroke-width: 1;
     cursor: pointer;
-    transition: fill 0.3s ease, stroke-width 0.3s ease;
+    transition: all 0.3s ease;
   }}
   .area:hover {{
-    fill: #5f7edb;
+    fill: #8db3dd;
     stroke-width: 1.5;
   }}
   .area.selected {{
-    fill: #2f54eb;
-    stroke: #1b2a5a;
+    fill: #4d648d;
+    stroke: #1a2d5a;
   }}
 
-  /* Tooltip minimalista */
+  /* Tooltip */
   #tooltip {{
     position: fixed;
     padding: 5px 10px;
-    background: rgba(47, 84, 235, 0.85);
+    background: rgba(30, 60, 120, 0.95);
     color: white;
     font-size: 13px;
-    border-radius: 6px;
+    border-radius: 5px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 10px rgba(0,0,0,0.15);
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
     user-select: none;
-    white-space: nowrap;
   }}
 
-  /* Painel info: coluna fixa direita, proporcional e fluida */
+  /* Painel info compacto com ajuste para evitar quebra */
   #info {{
-    flex: 0 0 300px;
-    background: #ffffffee;
-    margin-left: 12px;
-    border-radius: 14px;
-    box-shadow: 0 12px 30px rgba(47, 84, 235, 0.15);
-    padding: 22px 28px;
-    font-size: 15px;
-    line-height: 1.5;
-    color: #223152;
+    position: fixed;
+    right: 24px;
+    top: 40px;
+    background: #f0f3f8;
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    max-width: 320px;
+    font-size: 13px;
+    line-height: 1.3;
+    color: #1a2d5a;
     user-select: none;
-    overflow-y: auto;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-  }}
-  #info.hidden {{
     display: none;
+    border: 1px solid #d9e2f3;
+    z-index: 20;
+  }}
+  #info.visible {{
+    display: block;
   }}
   #info h3 {{
-    margin: 0 0 20px 0;
-    font-weight: 800;
-    font-size: 22px;
-    color: #1a264b;
-    border-bottom: 2px solid #d7def9;
-    padding-bottom: 8px;
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2c3e70;
+    border-bottom: 1px solid #c3d0e8;
+    padding-bottom: 4px;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 30px;
-    flex-grow: 1;
+    row-gap: 6px;
+    column-gap: 20px;
   }}
   #info .label {{
-    font-weight: 700;
-    color: #2f54eb;
-    white-space: nowrap;
+    font-weight: 600;
+    color: #4d648d;
+    white-space: nowrap;  /* não quebra */
   }}
   #info .value {{
-    font-weight: 600;
+    font-weight: 500;
     text-align: right;
-    color: #415a9e;
-    white-space: nowrap;
+    color: #34495e;
+    white-space: nowrap;  /* não quebra */
     overflow-wrap: normal;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 12px;
-    color: #8a95b7;
+    font-size: 10px;
+    color: #7f8caa;
     font-style: italic;
-    margin-top: 24px;
+    margin-top: 12px;
     text-align: right;
-  }}
-
-  /* Scrollbar fininho */
-  #sidebar::-webkit-scrollbar,
-  #list::-webkit-scrollbar,
-  #info::-webkit-scrollbar {{
-    width: 6px;
-  }}
-  #sidebar::-webkit-scrollbar-thumb,
-  #list::-webkit-scrollbar-thumb,
-  #info::-webkit-scrollbar-thumb {{
-    background-color: rgba(47, 84, 235, 0.25);
-    border-radius: 3px;
   }}
 </style>
 </head>
 <body>
   <div id="sidebar" role="complementary" aria-label="Lista de municípios">
     <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" autocomplete="off"/>
+    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
     <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado" class="hidden">
+  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
     <div class="grid">
       <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
@@ -246,7 +222,6 @@ html_code = f"""
       <div class="fonte">Fonte: IBGE Cidades</div>
     </div>
   </div>
-
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
@@ -315,7 +290,7 @@ function showInfo(name) {{
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-  info.classList.remove("hidden");
+  info.classList.add("visible");
 }}
 
 function updateList(filter = "") {{
@@ -394,4 +369,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=720, scrolling=False)
+st.components.v1.html(html_code, height=600, scrolling=False)
