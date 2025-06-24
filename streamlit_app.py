@@ -172,7 +172,7 @@ html_code = f"""
     padding-bottom: 6px;
   }}
   #info .grid {{
-    display: grid;
+    display: flex;
     grid-template-columns: 1fr 1fr;
     row-gap: 8px;
     column-gap: 24px;
