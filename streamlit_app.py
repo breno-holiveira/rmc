@@ -98,7 +98,7 @@ html_code = f"""
     font-size: 16px;
     margin-bottom: 12px;
     color: #0b3d91;
-    text-align: center;
+    text-align: left;
   }}
   #legend div {{
     margin-bottom: 8px;
