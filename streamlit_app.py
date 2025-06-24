@@ -53,7 +53,8 @@ for _, row in gdf.iterrows():
         }
     features.append({"type": "Feature", "geometry": geom, "properties": props})
 
-geojson_str = json.dumps({"type": "FeatureCollection", "features": features})
+geojson_obj = {"type": "FeatureCollection", "features": features}
+geojson_str = json.dumps(geojson_obj)  # JSON limpo para JS
 
 # --- HTML com SVG + JS ---
 html_code = f"""
@@ -188,94 +189,94 @@ html_code = f"""
   // Ajustar para encaixar bem no viewBox 1000x950
   const margin = 20;
   let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
-  geojson.features.forEach(f => {{
-    f.geometry.coordinates.flat(Infinity).forEach(coord => {{
+  geojson.features.forEach(f => {
+    f.geometry.coordinates.flat(Infinity).forEach(coord => {
       if (coord[0] < bounds[0]) bounds[0] = coord[0];
       if (coord[1] < bounds[1]) bounds[1] = coord[1];
       if (coord[0] > bounds[2]) bounds[2] = coord[0];
       if (coord[1] > bounds[3]) bounds[3] = coord[1];
-    }});
-  }});
+    });
+  });
 
   const width = 1000 - margin*2;
   const height = 950 - margin*2;
   const scaleX = width / (bounds[2] - bounds[0]);
   const scaleY = height / (bounds[3] - bounds[1]);
 
-  function proj(x, y) {{
+  function proj(x, y) {
     return [
       margin + (x - bounds[0]) * scaleX,
       margin + height - (y - bounds[1]) * scaleY // inverter Y para SVG
     ];
-  }}
+  }
 
   // Criar path SVG para polígonos
-  function polygonPath(coords) {{
+  function polygonPath(coords) {
     let path = "";
-    coords.forEach(ring => {{
+    coords.forEach(ring => {
       path += "M";
-      ring.forEach((point, i) => {{
+      ring.forEach((point, i) => {
         const [x,y] = proj(point[0], point[1]);
         path += (i === 0 ? "" : "L") + x.toFixed(2) + "," + y.toFixed(2);
-      }});
+      });
       path += "Z ";
-    }});
+    });
     return path.trim();
-  }}
+  }
 
   // Desenhar polígonos
-  geojson.features.forEach((feature, i) => {{
+  geojson.features.forEach((feature, i) => {
     const pathData = polygonPath(feature.geometry.coordinates);
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", pathData);
     path.classList.add("municipio");
     path.dataset.index = i;
     svg.appendChild(path);
-  }});
+  });
 
   const municipiosList = document.getElementById("municipios-list");
 
   // Criar lista lateral
-  geojson.features.forEach((feature, i) => {{
+  geojson.features.forEach((feature, i) => {
     const div = document.createElement("div");
     div.textContent = feature.properties.name;
     div.dataset.index = i;
     municipiosList.appendChild(div);
-  }});
+  });
 
   let selectedIndex = null;
 
   // Função para formatar números grandes
-  function fmtNum(n) {{
+  function fmtNum(n) {
     if (n === null || n === undefined) return "-";
-    if (typeof n === "number") {{
+    if (typeof n === "number") {
       return n.toLocaleString("pt-BR");
-    }}
+    }
     return n;
-  }}
+  }
 
   // Evento mouseover para tooltip e highlight
-  function onMouseOver(e) {{
+  function onMouseOver(e) {
     const idx = e.target.dataset.index;
     if (idx === undefined) return;
     const feature = geojson.features[idx];
     tooltip.style.display = "block";
     tooltip.textContent = feature.properties.name;
-  }}
+  }
 
   // Evento mousemove para posicionar tooltip
-  function onMouseMove(e) {{
+  function onMouseMove(e) {
     tooltip.style.left = (e.pageX + 15) + "px";
     tooltip.style.top = (e.pageY + 15) + "px";
-  }}
+  }
 
   // Evento mouseout para esconder tooltip
-  function onMouseOut(e) {{
+  function onMouseOut(e) {
     tooltip.style.display = "none";
-  }}
+  }
 
   // Atualiza painel info
-  function showInfo(idx) {{
+  function showInfo(idx) {
     const f = geojson.features[idx];
     selectedIndex = idx;
 
@@ -284,8 +285,8 @@ html_code = f"""
     document.querySelectorAll("#municipios-list > div").forEach(d => d.classList.remove("active"));
 
     // Seleciona o clicado
-    svg.querySelector(`path[data-index='${{idx}}']`).classList.add("selected");
-    municipiosList.querySelector(`div[data-index='${{idx}}']`).classList.add("active");
+    svg.querySelector(`path[data-index='${idx}']`).classList.add("selected");
+    municipiosList.querySelector(`div[data-index='${idx}']`).classList.add("active");
 
     infoPanel.hidden = false;
     document.getElementById("info-name").textContent = f.properties.name;
@@ -295,32 +296,32 @@ html_code = f"""
     document.getElementById("info-populacao").textContent = fmtNum(f.properties.populacao);
     document.getElementById("info-area").textContent = fmtNum(f.properties.area);
     document.getElementById("info-densidade").textContent = fmtNum(f.properties.densidade_demografica);
-  }}
+  }
 
   // Clique nos polígonos
-  svg.querySelectorAll(".municipio").forEach(path => {{
+  svg.querySelectorAll(".municipio").forEach(path => {
     path.addEventListener("mouseover", onMouseOver);
     path.addEventListener("mousemove", onMouseMove);
     path.addEventListener("mouseout", onMouseOut);
-    path.addEventListener("click", e => {{
+    path.addEventListener("click", e => {
       showInfo(e.target.dataset.index);
-    }});
-  }});
+    });
+  });
 
   // Clique na lista lateral
-  municipiosList.querySelectorAll("div").forEach(div => {{
-    div.addEventListener("click", e => {{
+  municipiosList.querySelectorAll("div").forEach(div => {
+    div.addEventListener("click", e => {
       showInfo(e.target.dataset.index);
-    }});
-  }});
+    });
+  });
 
   // Fechar painel info
-  closeBtn.addEventListener("click", () => {{
+  closeBtn.addEventListener("click", () => {
     infoPanel.hidden = true;
     selectedIndex = null;
     document.querySelectorAll(".municipio").forEach(p => p.classList.remove("selected"));
     document.querySelectorAll("#municipios-list > div").forEach(d => d.classList.remove("active"));
-  }});
+  });
 </script>
 
 </body>
