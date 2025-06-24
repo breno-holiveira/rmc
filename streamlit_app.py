@@ -38,176 +38,257 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
+  /* Reset */
+  * {{
+    box-sizing: border-box;
+  }}
   html, body {{
     height: 100vh;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f9fafa;
+    margin: 0; padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, rgba(250,250,252,0.95) 0%, rgba(230,235,240,0.9) 100%);
     display: flex;
     overflow: hidden;
-  }}
-  /* Sidebar */
-  #sidebar {{
-    width: 260px;
-    background: #fff;
-    padding: 16px 12px 8px 12px;
-    border-right: 1px solid #e1e4e8;
-    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
-    display: flex;
-    flex-direction: column;
-  }}
-  #sidebar h2 {{
-    margin: 0 0 6px 0;
-    font-size: 16px;
-    font-weight: 600;
     color: #1a2d5a;
     user-select: none;
   }}
+
+  /* Sidebar transparente e minimalista */
+  #sidebar {{
+    width: 280px;
+    background: rgba(255 255 255 / 0.12);
+    backdrop-filter: saturate(180%) blur(16px);
+    -webkit-backdrop-filter: saturate(180%) blur(16px);
+    border-right: 1px solid rgba(255 255 255 / 0.15);
+    padding: 20px 18px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 0 30px rgba(255 255 255 / 0.25);
+  }}
+  #sidebar h2 {{
+    margin: 0 0 14px 0;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #2a3a72;
+  }}
   #search {{
-    margin-bottom: 10px;
-    padding: 6px 10px;
-    font-size: 13px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    outline-offset: 2px;
-    transition: border-color 0.3s;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255 255 255 / 0.4);
+    background: rgba(255 255 255 / 0.18);
+    color: #283556;
+    outline-offset: 3px;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.4s ease,
+      box-shadow 0.4s ease;
+    font-weight: 500;
+  }}
+  #search::placeholder {{
+    color: #aac0e2;
+    font-style: italic;
   }}
   #search:focus {{
-    border-color: #4d648d;
-    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
+    background-color: rgba(255 255 255 / 0.28);
+    border-color: #4662b8;
+    box-shadow: 0 0 8px rgba(70,98,184,0.48);
+    color: #19294b;
   }}
+
+  /* Lista com scrollbar fina e transparente */
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 4px;
+    padding-right: 6px;
+  }}
+  #list::-webkit-scrollbar {{
+    width: 7px;
+  }}
+  #list::-webkit-scrollbar-track {{
+    background: transparent;
+  }}
+  #list::-webkit-scrollbar-thumb {{
+    background-color: rgba(70, 98, 184, 0.3);
+    border-radius: 5px;
   }}
   #list div {{
-    padding: 6px 10px;
-    margin-bottom: 4px;
-    border-radius: 8px;
+    padding: 8px 14px;
+    margin-bottom: 6px;
+    border-radius: 14px;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: #374b75;
+    background: rgba(255 255 255 / 0.18);
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease,
+      box-shadow 0.25s ease;
+    box-shadow: inset 0 0 10px rgba(255 255 255 / 0.1);
     user-select: none;
-    font-size: 14px;
-    line-height: 1.3;
-    color: #1a2d5a;
-    transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
-    background-color: #e3ecf9;
+    background-color: rgba(70, 98, 184, 0.22);
+    color: #1a2d5a;
+    box-shadow:
+      0 2px 10px rgba(70, 98, 184, 0.45),
+      inset 0 0 15px rgba(255 255 255 / 0.2);
   }}
   #list div.active {{
-    background-color: #4d648d;
-    color: #fff;
-    font-weight: 600;
+    background-color: #4662b8;
+    color: #e3e7f8;
+    box-shadow:
+      0 3px 16px #354a96,
+      inset 0 0 20px #6384f9;
   }}
 
-  /* Mapa */
+  /* Mapa ocupa o restante do espaço */
   #map {{
     flex-grow: 1;
     position: relative;
     overflow: hidden;
+    background: linear-gradient(180deg, #dae1f2 0%, #c4cde3 100%);
+    box-shadow:
+      inset 0 0 40px rgba(255 255 255 / 0.4),
+      inset 0 0 20px rgba(0 0 0 / 0.05);
+    border-radius: 20px;
+    margin: 16px;
   }}
   svg {{
     width: 100%;
     height: 100%;
+    display: block;
   }}
+
+  /* Polígonos com cores suaves e hover elegante */
   .area {{
-    fill: #b6cce5;
-    stroke: #4d648d;
-    stroke-width: 1;
+    fill: #9bb4d6;
+    stroke: #3a4f7d;
+    stroke-width: 1.2;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: fill 0.35s ease, stroke-width 0.35s ease;
+    filter: drop-shadow(0 0 1.5px rgba(30,40,80,0.3));
   }}
   .area:hover {{
-    fill: #8db3dd;
-    stroke-width: 1.5;
+    fill: #617bb9;
+    stroke-width: 2.2;
+    filter: drop-shadow(0 0 5px rgba(70,98,184,0.7));
   }}
   .area.selected {{
-    fill: #4d648d;
-    stroke: #1a2d5a;
+    fill: #3b4a87;
+    stroke: #1e2a54;
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 7px rgba(30,45,90,0.8));
   }}
 
-  /* Tooltip */
+  /* Tooltip translúcido e sofisticado */
   #tooltip {{
     position: fixed;
-    padding: 5px 10px;
-    background: rgba(30, 60, 120, 0.95);
-    color: white;
-    font-size: 13px;
-    border-radius: 5px;
+    padding: 7px 14px;
+    background: rgba(55, 70, 110, 0.85);
+    color: #e0e7ff;
+    font-size: 14px;
+    border-radius: 18px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    z-index: 1000;
+    box-shadow:
+      0 0 12px rgba(50, 70, 120, 0.9);
     user-select: none;
+    z-index: 1100;
+    font-weight: 600;
+    letter-spacing: 0.03em;
   }}
 
-  /* Painel info compacto com ajuste para evitar quebra */
+  /* Painel de informações transparente, clean e elegante */
   #info {{
     position: fixed;
-    right: 24px;
-    top: 40px;
-    background: #f0f3f8;
-    padding: 12px 16px;
-    border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
-    font-size: 13px;
-    line-height: 1.3;
-    color: #1a2d5a;
+    right: 28px;
+    top: 38px;
+    background: rgba(255 255 255 / 0.15);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 20px;
+    border: 1.2px solid rgba(255 255 255 / 0.3);
+    box-shadow:
+      0 8px 25px rgba(20, 30, 60, 0.18),
+      inset 0 0 50px rgba(255 255 255 / 0.35);
+    max-width: 340px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: #1b2c55;
+    padding: 18px 24px 24px 24px;
     user-select: none;
     display: none;
-    border: 1px solid #d9e2f3;
-    z-index: 20;
+    z-index: 1200;
+    font-weight: 600;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
-    margin: 0 0 10px 0;
-    font-size: 18px;
+    margin: 0 0 14px 0;
+    font-size: 22px;
     font-weight: 700;
-    color: #2c3e70;
-    border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 4px;
+    color: #1e2f54;
+    border-bottom: 1.5px solid rgba(70, 98, 184, 0.4);
+    padding-bottom: 8px;
+    letter-spacing: 0.05em;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 6px;
-    column-gap: 20px;
+    row-gap: 10px;
+    column-gap: 22px;
   }}
   #info .label {{
     font-weight: 600;
-    color: #4d648d;
-    white-space: nowrap;  /* não quebra */
+    color: #3e5481;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
   }}
   #info .value {{
     font-weight: 500;
     text-align: right;
-    color: #34495e;
-    white-space: nowrap;  /* não quebra */
+    color: #25355a;
+    white-space: nowrap;
     overflow-wrap: normal;
+    font-variant-numeric: tabular-nums;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 10px;
-    color: #7f8caa;
+    font-size: 11px;
+    color: #7b8bb8;
     font-style: italic;
-    margin-top: 12px;
+    margin-top: 18px;
     text-align: right;
+  }}
+
+  /* Scrollbar da página (sidebar) mais suave */
+  ::-webkit-scrollbar {{
+    width: 8px;
+    height: 8px;
+  }}
+  ::-webkit-scrollbar-track {{
+    background: transparent;
+  }}
+  ::-webkit-scrollbar-thumb {{
+    background-color: rgba(70, 98, 184, 0.28);
+    border-radius: 8px;
   }}
 </style>
 </head>
 <body>
   <div id="sidebar" role="complementary" aria-label="Lista de municípios">
     <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
+    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" autocomplete="off" />
     <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
   <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
@@ -369,4 +450,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=600, scrolling=False)
+st.components.v1.html(html_code, height=620, scrolling=False)
