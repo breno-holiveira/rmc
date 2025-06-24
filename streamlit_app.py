@@ -38,155 +38,158 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Reset e base */
   html, body {{
     margin: 0; padding: 0; height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f9fafa;
+    background: #fafbfc;
     overflow: hidden;
   }}
 
-  /* Container principal - usa flex */
   body {{
     display: flex;
     height: 100vh;
     width: 100vw;
-    gap: 0;
   }}
 
-  /* Sidebar - lista municípios */
+  /* Sidebar */
   #sidebar {{
-    width: 260px;
+    width: 250px;
     background: #fff;
-    border-right: 1px solid #e1e4e8;
-    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
+    border-right: 1px solid #ddd;
+    padding: 16px 14px;
+    box-shadow: 1px 0 8px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
-    padding: 16px 14px 10px 14px;
     overflow-y: auto;
   }}
   #sidebar h2 {{
-    margin: 0 0 10px 0;
-    font-size: 17px;
+    margin: 0 0 14px 0;
+    font-size: 18px;
     font-weight: 600;
-    color: #1a2d5a;
+    color: #253858;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 12px;
-    padding: 7px 12px;
+    margin-bottom: 14px;
+    padding: 8px 14px;
     font-size: 14px;
-    border: 1.5px solid #ccc;
-    border-radius: 8px;
+    border: 1.2px solid #bbb;
+    border-radius: 10px;
     outline-offset: 2px;
     transition: border-color 0.3s ease;
   }}
   #search:focus {{
-    border-color: #4d648d;
-    box-shadow: 0 0 6px rgba(77, 100, 141, 0.55);
+    border-color: #3a56a7;
+    box-shadow: 0 0 6px rgba(58, 86, 167, 0.35);
   }}
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 6px;
   }}
   #list div {{
     padding: 8px 12px;
-    margin-bottom: 5px;
-    border-radius: 10px;
+    margin-bottom: 6px;
+    border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 15px;
-    line-height: 1.4;
-    color: #1a2d5a;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 14px;
+    line-height: 1.35;
+    color: #253858;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }}
   #list div:hover {{
-    background-color: #e3ecf9;
+    background-color: #e5ecfb;
   }}
   #list div.active {{
-    background-color: #4d648d;
+    background-color: #3a56a7;
     color: #fff;
     font-weight: 700;
   }}
 
-  /* Mapa - ocupa o espaço central */
+  /* Mapa ocupa restante do espaço */
   #map {{
     flex-grow: 1;
     position: relative;
     overflow: hidden;
+    background: #e7ecf6;
   }}
   svg {{
     width: 100%;
     height: 100%;
   }}
   .area {{
-    fill: #b6cce5;
-    stroke: #4d648d;
+    fill: #a8badb;
+    stroke: #3a56a7;
     stroke-width: 1;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: fill 0.3s ease, stroke-width 0.3s ease;
   }}
   .area:hover {{
-    fill: #8db3dd;
+    fill: #7090d1;
     stroke-width: 1.5;
   }}
   .area.selected {{
-    fill: #4d648d;
-    stroke: #1a2d5a;
+    fill: #3a56a7;
+    stroke: #1c2e63;
   }}
 
-  /* Tooltip */
+  /* Tooltip simples e leve */
   #tooltip {{
     position: fixed;
-    padding: 5px 11px;
-    background: rgba(30, 60, 120, 0.95);
+    padding: 5px 12px;
+    background: rgba(58, 86, 167, 0.9);
     color: white;
     font-size: 13px;
-    border-radius: 5px;
+    border-radius: 6px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.12);
+    box-shadow: 0 0 8px rgba(0,0,0,0.15);
     z-index: 1000;
     user-select: none;
     white-space: nowrap;
   }}
 
-  /* Coluna de info - dados rápidos */
+  /* Caixa flutuante info minimalista */
   #info {{
-    width: 320px;
-    background: #f0f3f8;
-    padding: 22px 26px;
-    border-radius: 12px 0 0 12px;
-    box-shadow: inset 2px 0 6px rgba(0,0,0,0.04);
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    max-width: 320px;
+    max-height: 400px;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(58, 86, 167, 0.15);
+    padding: 20px 24px;
     font-size: 14px;
-    line-height: 1.5;
-    color: #1a2d5a;
+    line-height: 1.45;
+    color: #253858;
     user-select: none;
-    border-left: 1px solid #d9e2f3;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+    backdrop-filter: saturate(180%) blur(8px);
+    -webkit-backdrop-filter: saturate(180%) blur(8px);
+    display: none;
+    z-index: 50;
+  }}
+  #info.visible {{
+    display: block;
   }}
   #info h3 {{
-    margin: 0 0 20px 0;
-    font-size: 21px;
+    margin: 0 0 16px 0;
+    font-size: 20px;
     font-weight: 700;
-    color: #2c3e70;
-    border-bottom: 1px solid #c3d0e8;
+    color: #1b2a52;
+    border-bottom: 1px solid #d0d8e8;
     padding-bottom: 8px;
-    flex-shrink: 0;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
     row-gap: 10px;
     column-gap: 26px;
-    flex-grow: 1;
   }}
   #info .label {{
     font-weight: 700;
-    color: #4d648d;
+    color: #3a56a7;
     white-space: nowrap;
   }}
   #info .value {{
@@ -204,18 +207,6 @@ html_code = f"""
     margin-top: 24px;
     text-align: right;
   }}
-
-  /* Scrollbar customizado (opcional) */
-  #sidebar::-webkit-scrollbar, #list::-webkit-scrollbar, #info::-webkit-scrollbar {{
-    width: 8px;
-  }}
-  #sidebar::-webkit-scrollbar-thumb, #list::-webkit-scrollbar-thumb, #info::-webkit-scrollbar-thumb {{
-    background-color: rgba(77, 100, 141, 0.3);
-    border-radius: 4px;
-  }}
-  #sidebar::-webkit-scrollbar-track, #list::-webkit-scrollbar-track, #info::-webkit-scrollbar-track {{
-    background-color: transparent;
-  }}
 </style>
 </head>
 <body>
@@ -227,19 +218,20 @@ html_code = f"""
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-  </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Município</h3>
-    <div class="grid">
-      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
-      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
-      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
-      <div class="label">Área:</div> <div class="value" id="area"></div>
-      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
-      <div class="fonte">Fonte: IBGE Cidades</div>
+    <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+      <h3>Município</h3>
+      <div class="grid">
+        <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+        <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+        <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+        <div class="label">População (2022):</div> <div class="value" id="pop"></div>
+        <div class="label">Área:</div> <div class="value" id="area"></div>
+        <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
+        <div class="fonte">Fonte: IBGE Cidades</div>
+      </div>
     </div>
   </div>
+
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
@@ -308,6 +300,7 @@ function showInfo(name) {{
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+  info.classList.add("visible");
 }}
 
 function updateList(filter = "") {{
