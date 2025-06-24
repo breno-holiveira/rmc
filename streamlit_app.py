@@ -38,42 +38,40 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Container geral: 3 colunas lado a lado */
   html, body {{
+    width: 1152px;   /* 1280 * 0.9 */
+    height: 630px;   /* 700 * 0.9 */
     margin: 0;
     padding: 0;
-    width: 1150px; /* largura total fixa */
-    height: 650px; /* altura fixa */
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden;
+    overflow: hidden; /* Evita scroll da página */
   }}
-
-  /* Sidebar (lista municípios) */
+  /* Sidebar com busca e lista */
   #sidebar {{
-    width: 230px; /* cerca de 20% da largura */
-    height: 650px;
+    width: 234px;  /* 260 * 0.9 */
+    height: 630px;
     background: #fff;
-    padding: 18px 15px 12px 15px;
+    padding: 18px 14px 11px 14px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
   }}
   #sidebar h2 {{
-    margin: 0 0 10px 0;
-    font-size: 17px;
+    margin: 0 0 7px 0;
+    font-size: 16.2px; /* 18 * 0.9 */
     font-weight: 600;
     color: #1a2d5a;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 12px;
-    padding: 8px 12px;
-    font-size: 14px;
+    margin-bottom: 10.8px; /* 12 * 0.9 */
+    padding: 7.2px 10.8px; /* 8 * 0.9, 12 * 0.9 */
+    font-size: 12.6px; /* 14 * 0.9 */
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 7.2px; /* 8 * 0.9 */
     outline-offset: 2px;
     transition: border-color 0.3s;
   }}
@@ -84,15 +82,15 @@ html_code = f"""
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 6px;
+    padding-right: 5.4px; /* 6 * 0.9 */
   }}
   #list div {{
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    border-radius: 8px;
+    padding: 7.2px 10.8px; /* 8 * 0.9, 12 * 0.9 */
+    margin-bottom: 5.4px; /* 6 * 0.9 */
+    border-radius: 7.2px; /* 8 * 0.9 */
     cursor: pointer;
     user-select: none;
-    font-size: 15px;
+    font-size: 13.5px; /* 15 * 0.9 */
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
   }}
@@ -105,12 +103,12 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Mapa: maior área, 60% da largura */
+  /* Mapa e SVG */
   #map {{
-    width: 690px; /* cerca de 60% da largura total */
-    height: 650px;
+    width: 728px; /* Reduzido para abrir espaço para o info */
+    height: 630px; /* fixado */
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Impede scroll no mapa */
   }}
   svg {{
     width: 100%;
@@ -135,10 +133,10 @@ html_code = f"""
   /* Tooltip */
   #tooltip {{
     position: fixed;
-    padding: 6px 12px;
+    padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
-    font-size: 13px;
+    font-size: 12px;
     border-radius: 5px;
     pointer-events: none;
     display: none;
@@ -147,36 +145,43 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Caixa flutuante de informações ao lado do mapa */
+  /* Painel de Informações */
   #info {{
-    width: 220px; /* cerca de 20% da largura total */
-    height: 650px;
+    position: fixed;
+    right: 24px;
+    top: 40px;
+    width: 388px; /* aumentei um pouco para evitar cortes */
     background: #f0f3f8;
-    padding: 16px 18px;
-    border-radius: 10px;
+    padding: 14px 18px;
+    border-radius: 9px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 12.6px;
+    line-height: 1.3;
     color: #1a2d5a;
     user-select: none;
+    display: none;
     border: 1px solid #d9e2f3;
+    z-index: 20;
+    white-space: normal; /* permite quebra, evita corte */
     overflow-wrap: break-word;
+  }}
+  #info.visible {{
     display: block;
-    flex-shrink: 0;
   }}
   #info h3 {{
-    margin: 0 0 12px 0;
-    font-size: 20px;
+    margin: 0 0 10.8px 0;
+    font-size: 18px;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 6px;
+    padding-bottom: 5.4px;
+    white-space: nowrap; /* título sem quebra */
   }}
   #info .grid {{
     display: grid;
-    grid-template-columns: auto auto;
-    row-gap: 8px;
-    column-gap: 12px;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 7.2px;
+    column-gap: 21.6px;
   }}
   #info .label {{
     font-weight: 600;
@@ -190,10 +195,10 @@ html_code = f"""
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 9.9px;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 16px;
+    margin-top: 14.4px;
     text-align: right;
   }}
 </style>
@@ -243,8 +248,8 @@ const minX = Math.min(...lons), maxX = Math.max(...lons);
 const minY = Math.min(...lats), maxY = Math.max(...lats);
 
 function project([lon, lat]) {{
-  const x = ((lon - minX) / (maxX - minX)) * 660 + 40; // aumenta para ocupar 690px largura do mapa - padding
-  const y = 600 - ((lat - minY) / (maxY - minY)) * 580;
+  const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
+  const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
   return [x, y];
 }}
 
@@ -263,6 +268,7 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
+        // Scroll customizado para só rolar a barra lateral e não a página
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
@@ -324,9 +330,10 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
+  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 7;
-    const offsetY = -20;
+    const offsetX = 8;
+    const offsetY = -22;
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -341,6 +348,7 @@ geo.features.forEach(f => {{
     select(name);
   }});
 
+  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
@@ -364,6 +372,7 @@ search.addEventListener("input", e => {{
   }}
 }});
 
+// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
@@ -372,4 +381,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=650, width=1150, scrolling=False)
+st.components.v1.html(html_code, height=630, width=1152, scrolling=False)
