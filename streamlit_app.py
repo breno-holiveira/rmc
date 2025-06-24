@@ -147,23 +147,23 @@ html_code = f"""
 
   /* Painel de Informações */
   #info {{
-    position: fixed;
-    right: 24px;
-    top: 40px;
-    width: 388px; /* aumentei um pouco para evitar cortes */
-    background: #f0f3f8;
-    padding: 14px 18px;
-    border-radius: 9px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    font-size: 12.6px;
-    line-height: 1.3;
-    color: #1a2d5a;
-    user-select: none;
-    display: none;
-    border: 1px solid #d9e2f3;
-    z-index: 20;
-    white-space: normal; /* permite quebra, evita corte */
-    overflow-wrap: break-word;
+  position: fixed;
+  right: 24px;
+  top: 40px;
+  width: 320px;  /* largura reduzida para evitar sobreposição */
+  background: #f0f3f8;
+  padding: 14px 18px;
+  border-radius: 9px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+  font-size: 12.6px;
+  line-height: 1.3;
+  color: #1a2d5a;
+  user-select: none;
+  display: none;
+  border: 1px solid #d9e2f3;
+  z-index: 20;
+  white-space: normal;
+  overflow-wrap: break-word;
   }}
   #info.visible {{
     display: block;
