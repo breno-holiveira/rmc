@@ -289,11 +289,11 @@ html_code = f"""
   spans[1].textContent = data.area ? data.area.toFixed(1) + " km²" : "-";
   spans[2].textContent = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A";
 
-spans[3].textContent = data.participacao_rmc
-  ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
-  : "-";
+  spans[3].textContent = data.participacao_rmc
+    ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
+    : "-";
   
-  spans[4].textContent = formatNumber(data.pib_per_capita, 2, true);
+  spans[4].textContent = data.pib_per_capita ? "R$ " + data.pib_per_capita.toFixed(2).toLocaleString('pt-BR') : "-";
   spans[5].textContent = formatNumber(data.densidade_demografica, 2);
 }}
 
