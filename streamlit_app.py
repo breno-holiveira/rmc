@@ -378,4 +378,4 @@ if(geo.features.length > 0) {{
 """
 
 # FIXA a altura e largura total para evitar zoom ou distorção.
-st.components.v1.html(html_code, height=700, width=1280, scrolling=False)
+st.components.v1.html(html_code, height=525, width=960, scrolling=False)
