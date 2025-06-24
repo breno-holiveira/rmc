@@ -9,7 +9,7 @@ st.set_page_config(page_title="RMC Data", layout="wide")
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-# Carregar shapefile e dados
+# Dados shapefile
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
@@ -18,7 +18,6 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construção GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -37,107 +36,123 @@ html_code = f"""
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
+
+<!-- Fonte Inter do Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
-  /* Reset */
+  /* Reset e base */
   *, *::before, *::after {{
     box-sizing: border-box;
   }}
   html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
     font-weight: 300;
     font-size: 16px;
-    line-height: 1.6;
-    color: #222222;
-    background-color: #fff;
+    line-height: 1.5;
+    color: #222;
+    background: linear-gradient(145deg, #f7f9fc 0%, #e8edf3 100%);
     display: flex;
     overflow: hidden;
   }}
 
-  /* Sidebar minimalista */
+  /* Sidebar refinada */
   #sidebar {{
     width: 280px;
-    border-right: 1px solid #ddd;
-    background: #fafafa;
+    background: linear-gradient(180deg, #ffffffcc 0%, #f0f4fcdd 100%);
+    border-right: 1px solid #c1c9d4;
+    box-shadow: 2px 0 8px rgba(140, 150, 180, 0.1);
     display: flex;
     flex-direction: column;
-    padding: 24px 20px 20px 20px;
+    padding: 28px 22px 22px 22px;
+    user-select: none;
   }}
   #sidebar h2 {{
-    margin: 0 0 24px 0;
-    font-weight: 400;
-    font-size: 20px;
-    letter-spacing: 0.05em;
-    color: #444;
+    margin: 0 0 28px 0;
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+    color: #34415e;
+    text-transform: uppercase;
   }}
   #search {{
-    padding: 10px 14px;
+    padding: 12px 16px;
     font-size: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    outline-offset: 2px;
-    outline-color: #999;
-    font-weight: 300;
-    transition: outline-color 0.3s ease;
-    margin-bottom: 24px;
-    color: #333;
+    border-radius: 8px;
+    border: 1.8px solid #9ea9ba;
+    background: #fafbfc;
+    color: #4a5060;
+    font-weight: 400;
+    outline-offset: 3px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 28px;
   }}
   #search::placeholder {{
-    color: #aaa;
+    color: #9fa7b3;
     font-style: italic;
   }}
   #search:focus {{
-    outline-color: #666;
+    border-color: #5773ff;
+    box-shadow: 0 0 6px rgba(87, 115, 255, 0.45);
+    background: #ffffff;
   }}
 
-  /* Lista limpa */
+  /* Lista de municípios */
   #list {{
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #a2aecb transparent;
   }}
   #list::-webkit-scrollbar {{
-    width: 6px;
+    width: 8px;
   }}
   #list::-webkit-scrollbar-track {{
-    background: #f0f0f0;
+    background: transparent;
   }}
   #list::-webkit-scrollbar-thumb {{
-    background: #bbb;
-    border-radius: 3px;
+    background: #a2aecb;
+    border-radius: 5px;
   }}
   #list div {{
-    padding: 10px 14px;
-    margin-bottom: 10px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    font-weight: 400;
+    color: #3b4563;
     cursor: pointer;
-    border-radius: 6px;
-    font-weight: 300;
-    color: #333;
+    border-radius: 10px;
     user-select: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.25s ease, color 0.25s ease, box-shadow 0.3s ease;
     border: 1px solid transparent;
+    box-shadow: inset 0 0 0 0 transparent;
   }}
   #list div:hover {{
-    background-color: #eee;
-    color: #111;
-    border-color: #ccc;
+    background-color: #e5eaff;
+    color: #2f3c7e;
+    border-color: #7b8de0;
+    box-shadow: inset 3px 0 8px rgba(123, 141, 224, 0.3);
   }}
   #list div.active {{
-    background-color: #ddd;
-    color: #000;
-    font-weight: 500;
-    border-color: #bbb;
+    background-color: #5773ff;
+    color: #fff;
+    font-weight: 600;
+    border-color: #4665db;
+    box-shadow: 0 0 12px rgba(87, 115, 255, 0.8);
   }}
 
-  /* Área do mapa */
+  /* Mapa */
   #map {{
     flex-grow: 1;
     position: relative;
+    padding: 28px 48px;
     background: #fff;
+    border-radius: 18px 0 0 18px;
+    box-shadow: 0 8px 18px rgba(61, 78, 125, 0.15);
     overflow: hidden;
-    padding: 20px 40px 20px 40px;
   }}
   svg {{
     width: 100%;
@@ -145,94 +160,103 @@ html_code = f"""
     display: block;
   }}
 
-  /* Polígonos simples, linha fina e cor neutra */
+  /* Polígonos */
   .area {{
-    fill: #c8c8c8;
-    stroke: #999;
-    stroke-width: 1;
+    fill: #b7c3e3;
+    stroke: #5773ff;
+    stroke-width: 1.3;
     cursor: pointer;
-    transition: fill 0.25s ease, stroke-width 0.25s ease;
+    transition: fill 0.3s ease, stroke-width 0.3s ease, filter 0.3s ease;
+    filter: drop-shadow(0 0 0 transparent);
   }}
   .area:hover {{
-    fill: #a0a0a0;
-    stroke-width: 1.5;
+    fill: #4e63b9;
+    stroke-width: 2.3;
+    filter: drop-shadow(0 0 6px rgba(87, 115, 255, 0.35));
   }}
   .area.selected {{
-    fill: #707070;
-    stroke: #555;
-    stroke-width: 1.8;
+    fill: #2f3c7e;
+    stroke: #1b264f;
+    stroke-width: 2.8;
+    filter: drop-shadow(0 0 10px rgba(46, 57, 111, 0.6));
   }}
 
-  /* Tooltip minimalista */
+  /* Tooltip elegante */
   #tooltip {{
     position: fixed;
-    padding: 6px 12px;
-    background: rgba(34, 34, 34, 0.85);
-    color: #fff;
+    padding: 8px 16px;
+    background: rgba(41, 48, 78, 0.85);
+    color: #edf1f7;
     font-size: 14px;
-    border-radius: 4px;
+    border-radius: 12px;
     pointer-events: none;
     display: none;
-    z-index: 1000;
     user-select: none;
-    font-weight: 300;
+    font-weight: 500;
+    box-shadow: 0 0 12px rgba(41, 48, 78, 0.65);
+    z-index: 1100;
   }}
 
-  /* Painel de informação ultraleve */
+  /* Painel info */
   #info {{
     position: fixed;
-    right: 28px;
-    top: 28px;
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 20px 28px;
-    border-radius: 8px;
-    box-shadow: none;
-    max-width: 300px;
-    font-weight: 300;
-    color: #222;
-    display: none;
+    right: 36px;
+    top: 36px;
+    max-width: 360px;
+    background: linear-gradient(145deg, #f4f7ff, #dce4fb);
+    border-radius: 20px;
+    padding: 28px 32px;
+    box-shadow: 0 14px 38px rgba(31, 48, 75, 0.15);
+    color: #2c3459;
+    font-weight: 400;
+    font-size: 15px;
     line-height: 1.5;
     user-select: none;
-    z-index: 1100;
+    display: none;
+    border: 1px solid #a2a9bf;
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    transition: opacity 0.3s ease;
+    z-index: 1200;
   }}
   #info.visible {{
     display: block;
+    opacity: 1;
   }}
   #info h3 {{
-    margin-top: 0;
-    margin-bottom: 18px;
-    font-weight: 400;
-    font-size: 22px;
+    margin: 0 0 24px 0;
+    font-weight: 600;
+    font-size: 24px;
     letter-spacing: 0.04em;
-    color: #111;
+    color: #1b2341;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 12px;
-    column-gap: 18px;
+    gap: 14px 26px;
   }}
   #info .label {{
-    font-weight: 400;
-    color: #555;
+    font-weight: 600;
+    color: #465387;
     white-space: nowrap;
   }}
   #info .value {{
-    font-weight: 300;
+    font-weight: 500;
     text-align: right;
-    color: #111;
-    white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    color: #2c3459;
+    white-space: nowrap;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 12px;
     font-style: italic;
-    color: #888;
-    margin-top: 20px;
+    font-weight: 300;
+    font-size: 13px;
+    color: #6872a0;
+    margin-top: 24px;
     text-align: right;
   }}
+
 </style>
 </head>
 <body>
@@ -241,10 +265,12 @@ html_code = f"""
     <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" autocomplete="off" />
     <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
+
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
+
   <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
     <div class="grid">
@@ -401,8 +427,9 @@ if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
 </script>
+
 </body>
 </html>
 """
 
-st.components.v1.html(html_code, height=620, scrolling=False)
+st.components.v1.html(html_code, height=660, scrolling=False)
