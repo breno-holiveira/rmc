@@ -3,20 +3,23 @@ import pandas as pd
 import geopandas as gpd
 import json
 
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-# Dados
+# Carregamento dos dados geográficos
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
 gdf = gdf.sort_values(by='NM_MUN')
 
+# Carregamento dos dados tabulares
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
+# Construção do GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -28,92 +31,89 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
+# HTML + CSS + JS
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8"/>
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>Mapa Interativo RMC - UltraFino</title>
+<title>Mapa Interativo RMC - Profissional</title>
 
-<!-- Fonte refinada: Inter -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Fonte refinada -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
 
 <style>
-  /* Reset básico e base */
+  /* Reset e base */
   *, *::before, *::after {{
     box-sizing: border-box;
   }}
   html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background: #fefefe;
-    color: #3a4058;
+    width: 100vw;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background: #fafbfc;
+    color: #374151;
     font-weight: 300;
     font-size: 14px;
-    line-height: 1.42;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    line-height: 1.5;
     display: flex;
     user-select: none;
+    overflow: hidden;
   }}
 
-  /* Sidebar - estrutura assimétrica, leve */
+  /* Sidebar */
   #sidebar {{
-    flex: 0 0 250px;
-    background: linear-gradient(135deg, #ffffffee 0%, #f9fafcee 100%);
-    border-right: 1px solid #e5e8f0;
-    box-shadow: inset 3px 0 6px rgba(60, 70, 90, 0.06);
+    flex: 0 0 260px;
+    background: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    padding: 28px 26px 24px 28px;
     display: flex;
     flex-direction: column;
-    padding: 22px 20px 12px 24px;
-    gap: 14px;
+    gap: 16px;
   }}
 
-  /* Título sidebar, delicado, com tracking */
   #sidebar h2 {{
     font-weight: 500;
     font-size: 16px;
-    letter-spacing: 0.18em;
-    color: #667088;
-    margin: 0 0 6px 2px;
+    letter-spacing: 0.16em;
+    color: #6b7280;
+    margin: 0 0 10px 2px;
     user-select: text;
+    text-transform: uppercase;
   }}
 
-  /* Input busca minimalista */
+  /* Busca */
   #search {{
     padding: 10px 14px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 300;
-    color: #5a6278;
-    background: #fafbfd;
-    border: 1.5px solid #c8d0e7;
+    color: #4b5563;
+    border: 1.5px solid #d1d5db;
     border-radius: 12px;
     outline-offset: 2px;
     outline-color: transparent;
-    transition: outline-color 0.2s ease, border-color 0.3s ease;
-    user-select: text;
+    transition: border-color 0.25s ease;
   }}
   #search::placeholder {{
-    color: #abb2c2;
+    color: #9ca3af;
     font-style: italic;
   }}
   #search:focus {{
-    border-color: #6c7bd1;
-    outline-color: #a7b1e3;
-    background: #fff;
+    border-color: #2563eb;
+    outline-color: #bfdbfe;
+    background-color: #ffffff;
   }}
 
-  /* Lista de municípios com espaçamento e scroll suavizado */
+  /* Lista municípios */
   #list {{
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 8px;
     scrollbar-width: thin;
-    scrollbar-color: #a0a8b3 transparent;
+    scrollbar-color: #cbd5e1 transparent;
   }}
   #list::-webkit-scrollbar {{
     width: 6px;
@@ -122,164 +122,147 @@ html_code = f"""
     background: transparent;
   }}
   #list::-webkit-scrollbar-thumb {{
-    background: #a0a8b3;
-    border-radius: 5px;
-  }}
-  #list div {{
-    font-weight: 300;
-    font-size: 13px;
-    line-height: 1.4;
-    color: #5b6077;
-    padding: 8px 14px;
-    border-radius: 16px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    user-select: none;
-    border: 1px solid transparent;
-    transition:
-      color 0.22s ease,
-      background-color 0.22s ease,
-      box-shadow 0.3s ease,
-      border-color 0.22s ease;
-  }}
-  #list div:hover {{
-    background-color: #f3f5fa;
-    color: #404f7a;
-    border-color: #8a94c1;
-    box-shadow: inset 4px 0 8px rgba(138, 148, 193, 0.25);
-  }}
-  #list div.active {{
-    background-color: #6671f0;
-    color: #fff;
-    font-weight: 400;
-    box-shadow: 0 0 14px rgba(102, 113, 240, 0.9);
-    border-color: #565fbe;
+    background-color: #cbd5e1;
+    border-radius: 10px;
   }}
 
-  /* Mapa flexível, espaçoso, com padding para área */
+  #list div {{
+    font-weight: 300;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #374151;
+    padding: 10px 16px;
+    margin-bottom: 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    user-select: none;
+    border: 1.5px solid transparent;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }}
+  #list div:hover {{
+    background-color: #eff6ff;
+    border-color: #2563eb;
+  }}
+  #list div.active {{
+    background-color: #2563eb;
+    color: #fff;
+    font-weight: 500;
+    border-color: #1e40af;
+  }}
+
+  /* Mapa container */
   #map {{
     flex-grow: 1;
-    background: #ffffff;
-    border-radius: 20px 0 0 20px;
-    box-shadow: 0 10px 32px rgba(70, 80, 110, 0.12);
-    padding: 32px 48px 48px 48px;
+    background: #fff;
+    border-radius: 0 20px 20px 0;
+    padding: 44px 52px;
+    box-shadow: 0 4px 12px rgb(55 65 81 / 0.07);
     position: relative;
     display: flex;
     flex-direction: column;
   }}
 
-  /* SVG mapa responsivo */
   svg {{
     width: 100%;
     height: 100%;
-    display: block;
     border-radius: 12px;
   }}
 
-  /* Polígonos estilo refinado */
+  /* Polígonos */
   .area {{
-    fill: #dde1f7;
-    stroke: #6977b8;
-    stroke-width: 1;
+    fill: #cbd5e1;
+    stroke: #64748b;
+    stroke-width: 1.2;
     cursor: pointer;
-    transition: fill 0.33s cubic-bezier(0.4, 0, 0.2, 1),
-                stroke-width 0.3s ease,
-                filter 0.3s ease;
-    filter: drop-shadow(0 0 0 transparent);
+    transition: fill 0.3s ease, stroke-width 0.3s ease;
   }}
   .area:hover {{
-    fill: #6671f0;
-    stroke-width: 2;
-    filter: drop-shadow(0 0 10px rgba(102, 113, 240, 0.4));
+    fill: #3b82f6;
+    stroke-width: 2.2;
   }}
   .area.selected {{
-    fill: #505fb7;
-    stroke: #404d99;
+    fill: #2563eb;
+    stroke: #1e40af;
     stroke-width: 2.5;
-    filter: drop-shadow(0 0 15px rgba(80, 95, 183, 0.7));
   }}
 
-  /* Tooltip minimalista */
+  /* Tooltip */
   #tooltip {{
     position: fixed;
-    background: rgba(80, 95, 183, 0.9);
-    color: white;
-    font-weight: 400;
-    font-size: 12px;
-    padding: 6px 12px;
-    border-radius: 14px;
     pointer-events: none;
+    background: #2563eb;
+    color: white;
+    padding: 5px 14px;
+    font-size: 12px;
+    border-radius: 10px;
+    font-weight: 400;
     user-select: none;
-    box-shadow: 0 0 12px rgba(80, 95, 183, 0.5);
     display: none;
-    z-index: 9000;
-    transition: opacity 0.3s ease;
+    z-index: 1000;
+    white-space: nowrap;
+    box-shadow: 0 2px 10px rgb(37 99 235 / 0.5);
   }}
 
-  /* Caixa flutuante info com blur e leve transparência */
+  /* Caixa flutuante info */
   #info {{
     position: fixed;
     top: 40px;
-    right: 36px;
-    max-width: 300px;
-    background: rgba(255, 255, 255, 0.88);
-    border-radius: 24px;
-    box-shadow:
-      0 16px 28px rgba(102, 113, 240, 0.16),
-      0 6px 12px rgba(102, 113, 240, 0.12);
-    backdrop-filter: saturate(180%) blur(18px);
-    -webkit-backdrop-filter: saturate(180%) blur(18px);
-    padding: 24px 28px;
-    color: #2f3558;
+    right: 40px;
+    max-width: 310px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 12px 24px rgb(99 102 241 / 0.12);
+    padding: 26px 30px;
     font-weight: 300;
     font-size: 14px;
-    line-height: 1.45;
+    line-height: 1.5;
+    color: #374151;
     user-select: text;
     display: none;
-    border: 1px solid #bec6e3;
-    transition: opacity 0.33s ease;
-    z-index: 10000;
+    border: 1.5px solid #e5e7eb;
   }}
   #info.visible {{
     display: block;
-    opacity: 1;
   }}
+
   #info h3 {{
     margin: 0 0 20px 0;
     font-weight: 500;
     font-size: 20px;
-    letter-spacing: 0.04em;
-    color: #4b5278;
+    letter-spacing: 0.02em;
+    color: #1e293b;
     user-select: text;
   }}
 
-  /* Grid info fina e espaçada */
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px 26px;
+    gap: 16px 32px;
   }}
+
   #info .label {{
     font-weight: 400;
-    color: #7882ad;
+    color: #6b7280;
     white-space: nowrap;
     user-select: text;
   }}
+
   #info .value {{
     font-weight: 500;
-    color: #4b5278;
+    color: #1e293b;
     text-align: right;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     user-select: text;
   }}
+
   #info .fonte {{
     grid-column: 1 / -1;
     font-style: italic;
     font-weight: 300;
     font-size: 12px;
-    color: #a6aecf;
-    margin-top: 26px;
+    color: #9ca3af;
+    margin-top: 32px;
     text-align: right;
     user-select: none;
   }}
