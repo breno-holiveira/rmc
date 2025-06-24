@@ -59,7 +59,7 @@ html_code = f"""
   }}
   #sidebar h2 {{
     margin: 0 0 6px 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
     user-select: none;
@@ -67,7 +67,7 @@ html_code = f"""
   #search {{
     margin-bottom: 10px;
     padding: 6px 10px;
-    font-size: 14px;
+    font-size: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
@@ -88,7 +88,7 @@ html_code = f"""
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.3;
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
@@ -154,7 +154,7 @@ html_code = f"""
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     max-width: 320px;
     font-size: 14px;
-    line-height: 1.3;
+    line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
     display: none;
