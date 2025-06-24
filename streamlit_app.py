@@ -214,10 +214,13 @@ html_code = f"""
   </main>
 
   <aside id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Selecione um município</h3>
-    <div><strong>População:</strong> <span>-</span></div>
-    <div><strong>Área:</strong> <span>-</span></div>
-    <div><strong>PIB (2021):</strong> <span>-</span></div>
+  <h3>Selecione um município</h3>
+  <div><strong>População:</strong> <span>-</span></div>
+  <div><strong>Área:</strong> <span>-</span></div>
+  <div><strong>PIB (2021):</strong> <span>-</span></div>
+  <div><strong>Participação na RMC:</strong> <span>-</span></div>
+  <div><strong>PIB per capita (2021):</strong> <span>-</span></div>
+  <div><strong>Densidade demográfica (2022):</strong> <span>-</span></div>
   </aside>
 
 <script>
