@@ -3,22 +3,21 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configurações da página
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
-
 st.title("RMC Data")
-st.markdown("### Dadoss e indicadores da Região Metropolitana de Campinas")
+st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-# Carregamento dos dados
+# Carrega shapefile e dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-if gdf.crs != 'EPSG:4326':
-    gdf = gdf.to_crs('EPSG:4326')
-gdf = gdf.sort_values(by='NM_MUN')
+if gdf.crs != "EPSG:4326":
+    gdf = gdf.to_crs("EPSG:4326")
+gdf = gdf.sort_values(by="NM_MUN")
 
-df = pd.read_excel('dados_rmc.xlsx')
+df = pd.read_excel("dados_rmc.xlsx")
 df.set_index("nome", inplace=True)
 
-# Construção do GeoJSON com dados
+# Gera GeoJSON com propriedades
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -30,7 +29,7 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML incorporado
+# HTML embutido
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -48,6 +47,7 @@ html_code = f"""
     display: flex;
     overflow: hidden;
   }}
+
   #sidebar {{
     width: 260px;
     background: #fff;
@@ -57,12 +57,14 @@ html_code = f"""
     display: flex;
     flex-direction: column;
   }}
+
   #sidebar h2 {{
     margin: 0 0 8px 0;
     font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
   }}
+
   #search {{
     margin-bottom: 12px;
     padding: 8px 12px;
@@ -70,11 +72,18 @@ html_code = f"""
     border: 1px solid #ccc;
     border-radius: 8px;
   }}
+
+  #search:focus {{
+    border-color: #4d648d;
+    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
+  }}
+
   #list {{
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 6px;
   }}
+
   #list div {{
     padding: 8px 12px;
     margin-bottom: 6px;
@@ -83,37 +92,46 @@ html_code = f"""
     font-size: 15px;
     color: #1a2d5a;
   }}
+
   #list div:hover {{
     background-color: #e3ecf9;
   }}
+
   #list div.active {{
     background-color: #4d648d;
     color: #fff;
     font-weight: 600;
   }}
+
   #map {{
     flex-grow: 1;
     position: relative;
     overflow: hidden;
   }}
+
   svg {{
     width: 100%;
     height: 100%;
   }}
+
   .area {{
     fill: #b6cce5;
     stroke: #4d648d;
     stroke-width: 1;
     cursor: pointer;
+    transition: all 0.3s ease;
   }}
+
   .area:hover {{
     fill: #8db3dd;
     stroke-width: 1.5;
   }}
+
   .area.selected {{
     fill: #4d648d;
     stroke: #1a2d5a;
   }}
+
   #tooltip {{
     position: fixed;
     padding: 5px 10px;
@@ -123,31 +141,29 @@ html_code = f"""
     border-radius: 5px;
     pointer-events: none;
     display: none;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
   }}
-  /* NOVO PAINEL INFO */
+
   #info {{
-    position: absolute;
-    top: 24px;
+    position: fixed;
     right: 24px;
-    width: 300px;
-    max-height: 85%;
+    top: 40px;
     background: #f0f3f8;
     padding: 16px 20px;
     border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    max-width: 320px;
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
     display: none;
     border: 1px solid #d9e2f3;
-    overflow-y: auto;
-    box-sizing: border-box;
-    z-index: 10;
+    z-index: 20;
   }}
-  #info.visible {{
-    display: block;
-  }}
+
+  #info.visible {{ display: block; }}
+
   #info h3 {{
     margin: 0 0 12px 0;
     font-size: 20px;
@@ -156,22 +172,27 @@ html_code = f"""
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 6px;
   }}
+
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
     row-gap: 8px;
-    column-gap: 20px;
+    column-gap: 24px;
   }}
+
   #info .label {{
     font-weight: 600;
     color: #4d648d;
+    white-space: nowrap;
   }}
+
   #info .value {{
     font-weight: 500;
     text-align: right;
     color: #34495e;
     overflow-wrap: break-word;
   }}
+
   #info .fonte {{
     grid-column: 1 / -1;
     font-size: 11px;
@@ -191,17 +212,17 @@ html_code = f"""
   <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip"></div>
-    <div id="info">
-      <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-        <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
-        <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
-        <div class="label">População (2022):</div> <div class="value" id="pop"></div>
-        <div class="label">Área:</div> <div class="value" id="area"></div>
-        <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
-        <div class="fonte">Fonte: IBGE Cidades</div>
-      </div>
+  </div>
+  <div id="info">
+    <h3>Município</h3>
+    <div class="grid">
+      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+      <div class="label">PIB per capita:</div> <div class="value" id="percapita"></div>
+      <div class="label">População:</div> <div class="value" id="pop"></div>
+      <div class="label">Área:</div> <div class="value" id="area"></div>
+      <div class="label">Densidade:</div> <div class="value" id="dens"></div>
+      <div class="fonte">Fonte: IBGE Cidades</div>
     </div>
   </div>
 <script>
@@ -211,7 +232,6 @@ const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
-
 let selected = null;
 const paths = {{}};
 
@@ -247,6 +267,15 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
+        const container = list;
+        const containerHeight = container.clientHeight;
+        const containerTop = container.getBoundingClientRect().top;
+        const elementTop = div.getBoundingClientRect().top;
+        const elementHeight = div.offsetHeight;
+        const scrollTop = container.scrollTop;
+        const offset = elementTop - containerTop;
+        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
+        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
     showInfo(name);
@@ -258,7 +287,7 @@ function showInfo(name) {{
   if (!f) return;
   info.querySelector("h3").textContent = name;
   info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace(".", ",") + "%" : "-";
   info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
@@ -299,7 +328,9 @@ geo.features.forEach(f => {{
   path.addEventListener("mouseleave", () => {{
     tooltip.style.display = "none";
   }});
-  path.addEventListener("click", () => {{
+  path.addEventListener("click", e => {{
+    e.preventDefault();
+    e.stopPropagation();
     select(name);
   }});
 
@@ -308,18 +339,24 @@ geo.features.forEach(f => {{
   div.dataset.name = name;
   div.tabIndex = 0;
   div.addEventListener("click", () => select(name));
+  div.addEventListener("keydown", e => {{
+    if (e.key === "Enter" || e.key === " ") {{
+      e.preventDefault();
+      select(name);
+    }}
+  }});
   list.appendChild(div);
 }});
 
 search.addEventListener("input", e => {{
   updateList(e.target.value);
   const visibleItems = [...list.children].filter(d => d.style.display !== "none");
-  if(visibleItems.length === 1) {{
+  if (visibleItems.length === 1) {{
     select(visibleItems[0].dataset.name);
   }}
 }});
 
-if(geo.features.length > 0) {{
+if (geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
 </script>
@@ -327,4 +364,5 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=680, scrolling=False)
+# Renderiza no Streamlit
+st.components.v1.html(html_code, height=650, scrolling=False)
