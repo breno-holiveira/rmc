@@ -376,4 +376,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=650, scrolling=False)
+st.components.v1.html(html_code, height=600, scrolling=False)
