@@ -88,7 +88,7 @@ html_code = f"""
 
   /* Sidebar da legenda */
   #legend {{
-    width: 240px;
+    width: 250px;
     background: #fff;
     padding: 16px 20px;
     box-shadow: 2px 0 8px rgba(0,0,0,0.08);
@@ -101,6 +101,8 @@ html_code = f"""
     font-size: 16px;
     margin-bottom: 12px;
     color: #0b3d91;
+    border-bottom: 1px solid #0b3d91;  /* linha azul abaixo */
+    padding-bottom: 4px;  
   }}
   #legend div {{
     margin-bottom: 8px;
@@ -232,7 +234,7 @@ html_code = f"""
 </head>
 <body>
   <nav id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
-    <strong>Selecione um município:</strong>
+    <strong>Municípios da RMC</strong>
     <div id="mun-list" tabindex="0"></div>
   </nav>
 
