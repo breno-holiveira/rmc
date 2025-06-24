@@ -140,18 +140,18 @@ html_code = f"""
     z-index: 10;
   }}
 
-  /* Info Box refinado e intuitivo */
+  /* Info Box mais espaçado e legível */
   #info {{
     position: fixed;
     right: 30px;
     top: 40px;
     background: #fff;
-    padding: 24px 28px;
+    padding: 28px 32px;
     border-radius: 14px;
-    box-shadow: 0 6px 25px rgba(0,0,0,0.1);
-    max-width: 340px;
-    font-size: 15px;
-    line-height: 1.6;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.12);
+    max-width: 360px;
+    font-size: 16px;
+    line-height: 1.75;
     display: none;
     border: 1px solid #d8dee9;
     z-index: 20;
@@ -163,16 +163,16 @@ html_code = f"""
   }}
   #info h3 {{
     margin-top: 0;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
-    border-bottom: 2px solid #4d648d;
-    padding-bottom: 10px;
+    border-bottom: 2.5px solid #4d648d;
+    padding-bottom: 12px;
     color: #223763;
   }}
   #info .data-row {{
     display: flex;
     justify-content: space-between;
-    margin: 10px 0;
+    margin: 14px 0;
   }}
   #info .label {{
     font-weight: 600;
@@ -181,10 +181,13 @@ html_code = f"""
   #info .value {{
     font-weight: 500;
     color: #334a80;
+    max-width: 160px;
+    text-align: right;
+    word-break: break-word;
   }}
   #info .fonte {{
     font-size: 12px;
-    margin-top: 20px;
+    margin-top: 24px;
     color: #777;
     font-style: italic;
     text-align: right;
@@ -244,8 +247,9 @@ function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
 }}
 
+// Função para formatar valores de forma segura e legível
 function formatValue(value, type) {{
-  if (value === undefined || value === null || value === "" || isNaN(value) && type !== "percent") return "-";
+  if (value === undefined || value === null || value === "" || (isNaN(value) && type !== "percent")) return "-";
   switch(type) {{
     case "currency":
       return "R$ " + Number(value).toLocaleString("pt-BR");
@@ -301,10 +305,10 @@ function showInfo(name) {{
   
   info.querySelector("#pib").textContent = formatValue(f.properties.pib_2021, "currency");
   info.querySelector("#part").textContent = formatValue(f.properties.participacao_rmc, "percent");
-  info.querySelector("#percapita").textContent = formatValue(f.properties.pib_per_capita, "currency");
-  info.querySelector("#pop").textContent = formatValue(f.properties.populacao, "number");
+  info.querySelector("#percapita").textContent = formatValue(f.properties.per_capita_2021, "currency");
+  info.querySelector("#pop").textContent = formatValue(f.properties.populacao_2022, "number");
   info.querySelector("#area").textContent = formatValue(f.properties.area, "area");
-  info.querySelector("#dens").textContent = formatValue(f.properties.densidade_demografica, "density");
+  info.querySelector("#dens").textContent = formatValue(f.properties.densidade_demografica_2022, "density");
 
   info.classList.add("visible");
 }}
