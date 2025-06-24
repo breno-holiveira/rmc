@@ -1,13 +1,12 @@
 import streamlit as st
 import geopandas as gpd
 import json
-from pathlib import Path
 
 st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 st.title("RMC Data")
 st.header("Dados e indicadores da Região Metropolitana de Campinas")
 
-# Dicionário de dados extras
+# Dicionário com dados extras
 dados_extra = {
     "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
     "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
@@ -34,9 +33,9 @@ dados_extra = {
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
-gdf = gdf.sort_values("NM_MUN")
+gdf = gdf.sort_values(by="NM_MUN")
 
-# Constrói GeoJSON
+# Cria GeoJSON com dados extras
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -52,13 +51,19 @@ for _, row in gdf.iterrows():
         },
         "geometry": geom
     })
+geojson = {"type": "FeatureCollection", "features": features}
+geojson_str = json.dumps(geojson)
 
-geojson_str = json.dumps({"type": "FeatureCollection", "features": features})
+# Lê o HTML externo
+with open("grafico.html", "r", encoding="utf-8") as f:
+    html = f.read()
 
-# Lê HTML externo e insere GeoJSON no <script data-geojson="">
-html_path = Path("grafico.html")
-html = html_path.read_text(encoding="utf-8")
-html_injetado = html.replace('<script data-geojson=""></script>', f'<script data-geojson=\'{geojson_str}\'></script>')
+# Injeta o GeoJSON como variável JS
+html_injetado = html.replace('<script data-geojson=""></script>', f"""
+<script>
+  const geojson = {geojson_str};
+</script>
+""")
 
 # Exibe no Streamlit
 st.components.v1.html(html_injetado, height=600, scrolling=True)
