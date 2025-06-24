@@ -148,10 +148,10 @@ html_code = f"""
     right: 24px;
     top: 40px;
     background: #f0f3f8;
-    padding: 16px 20px;
+    padding: 14px 16px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
+    max-width: 260px;  /* ← Reduzido de 320px */
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
@@ -159,6 +159,8 @@ html_code = f"""
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
+    word-wrap: break-word;       /* ← Quebra de palavras longas */
+    overflow-wrap: break-word;   /* ← Compatibilidade adicional */
   }}
   #info.visible {{
     display: block;
