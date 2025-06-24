@@ -69,59 +69,57 @@ html_code = f"""
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Mapa Interativo RMC - Transparência</title>
+<title>Mapa Interativo RMC</title>
 <style>
   *, *::before, *::after {
     box-sizing: border-box;
   }
+
   html, body {
-    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0;
     height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background-color: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f9f9f9;
     color: #222;
+    overflow: hidden;
     display: grid;
-    grid-template-columns: 230px 1fr 350px;
-    grid-template-rows: 1fr;
-    gap: 12px;
-    padding: 12px;
-    width: 100vw;
-    height: 100vh;
-    background: #f9f9f9;
+    grid-template-columns: 220px 1fr auto;
+    grid-template-rows: 100vh;
   }
 
   #legend {
     background: #fff;
     padding: 16px 20px;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-    border-radius: 10px;
-    border: 1px solid #e3e6ea;
+    border-right: 1px solid #e0e0e0;
     overflow-y: auto;
-    font-size: 14px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.05);
   }
+
   #legend strong {
     display: block;
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 12px;
+    font-weight: bold;
+    font-size: 16px;
     color: #0b3d91;
-    border-bottom: 2px solid #0b3d91;
+    border-bottom: 1px solid #0b3d91;
     padding-bottom: 6px;
+    margin-bottom: 12px;
   }
+
   #legend div {
     margin-bottom: 8px;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    color: #3a3a3a;
-    white-space: nowrap;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.3s;
   }
+
   #legend div:hover {
-    background-color: #dbe7fd;
-    color: #08318d;
+    background: #eef3fc;
   }
+
   #legend div.active {
     background-color: #0b3d91;
     color: #fff;
@@ -131,80 +129,12 @@ html_code = f"""
   #map {
     position: relative;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    overflow: hidden;
   }
+
   svg {
     width: 100%;
     height: 100vh;
     display: block;
-    user-select: none;
-  }
-
-  #info-panel {
-    background: #fff;
-    padding: 20px 24px 32px 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: #333;
-    font-size: 15px;
-    line-height: 1.5;
-    overflow-y: auto;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  #info-panel.visible {
-    display: flex;
-  }
-  #info-panel h3 {
-    margin-top: 0;
-    font-weight: 700;
-    font-size: 18px;
-    color: #0b3d91;
-    border-bottom: 2px solid #0b3d91;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-  }
-  #info-panel div {
-    margin-bottom: 14px;
-    display: flex;
-    flex-direction: column;
-  }
-  #info-panel div strong {
-    display: block;
-    color: #0b3d91;
-    margin-bottom: 4px;
-    white-space: normal;
-  }
-  #info-panel div span {
-    color: #333;
-    font-weight: 600;
-    font-size: 1rem;
-    white-space: normal;
-  }
-  #info-panel footer {
-    margin-top: auto;
-    font-size: 12px;
-    color: #666;
-    text-align: right;
-    font-style: italic;
-  }
-  #info-panel button#close-info {
-    align-self: flex-end;
-    background: transparent;
-    border: none;
-    font-size: 22px;
-    color: #0b3d91;
-    cursor: pointer;
-    font-weight: 700;
-    margin-bottom: 12px;
-    padding: 0;
-    line-height: 1;
-  }
-  #info-panel button#close-info:hover {
-    color: #08318d;
   }
 
   #tooltip {
@@ -212,15 +142,75 @@ html_code = f"""
     pointer-events: none;
     padding: 6px 12px;
     background: rgba(11, 61, 145, 0.9);
-    color: #fefefe;
+    color: #fff;
     font-weight: 600;
     font-size: 12px;
     border-radius: 5px;
-    white-space: nowrap;
-    box-shadow: 0 0 6px rgba(11, 61, 145, 0.5);
+    box-shadow: 0 0 6px rgba(11, 61, 145, 0.4);
     display: none;
-    user-select: none;
     z-index: 1000;
+  }
+
+  #info-panel {
+    background: #fff;
+    padding: 20px 24px;
+    width: 330px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.08);
+    border-left: 1px solid #e0e0e0;
+    overflow-y: auto;
+    font-size: 15px;
+    display: none;
+    position: relative;
+  }
+
+  #info-panel.visible {
+    display: block;
+  }
+
+  #info-panel h3 {
+    margin-top: 0;
+    font-size: 17px;
+    color: #0b3d91;
+    border-bottom: 2px solid #0b3d91;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+  }
+
+  #info-panel div {
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #info-panel div strong {
+    color: #0b3d91;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  #info-panel div span {
+    color: #333;
+    font-weight: 500;
+    white-space: normal;
+  }
+
+  #info-panel button#close-info {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #0b3d91;
+    cursor: pointer;
+  }
+
+  #info-panel .fonte {
+    font-size: 11px;
+    color: #666;
+    margin-top: 20px;
+    text-align: right;
+    font-style: italic;
   }
 
   .polygon {
@@ -228,16 +218,17 @@ html_code = f"""
     stroke: rgba(11, 61, 145, 0.6);
     stroke-width: 1;
     cursor: pointer;
-    transition: fill 0.25s ease, stroke 0.25s ease;
-    opacity: 0.85;
+    transition: all 0.3s ease;
   }
+
   .polygon:hover {
-    fill: rgba(11, 61, 145, 0.35);
+    fill: rgba(11, 61, 145, 0.3);
     stroke-width: 2;
-    filter: drop-shadow(0 0 6px rgba(11, 61, 145, 0.3));
+    filter: drop-shadow(0 0 6px rgba(11, 61, 145, 0.25));
   }
+
   .polygon.selected {
-    fill: rgba(11, 61, 145, 0.45);
+    fill: rgba(11, 61, 145, 0.4);
     stroke: rgba(11, 61, 145, 0.8);
     stroke-width: 2.5;
     filter: drop-shadow(0 0 10px rgba(11, 61, 145, 0.5));
@@ -245,27 +236,32 @@ html_code = f"""
 </style>
 </head>
 <body>
-  <nav id="legend">
+
+  <nav id="legend" aria-label="Lista de municípios">
     <strong>Municípios da RMC</strong>
     <div id="mun-list"></div>
   </nav>
-  <main id="map">
+
+  <main id="map" aria-label="Mapa dos municípios">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
     <div id="tooltip"></div>
   </main>
-  <aside id="info-panel">
-    <button id="close-info">&times;</button>
+
+  <aside id="info-panel" aria-label="Informações do município">
+    <button id="close-info" aria-label="Fechar painel">&times;</button>
     <h3>Selecione um município</h3>
-    <div><strong>PIB (2021):</strong> <span>-</span></div>
-    <div><strong>Participação na RMC:</strong> <span>-</span></div>
-    <div><strong>PIB per capita (2021):</strong> <span>-</span></div>
-    <div><strong>População:</strong> <span>-</span></div>
-    <div><strong>Área:</strong> <span>-</span></div>
-    <div><strong>Densidade demográfica (2022):</strong> <span>-</span></div>
-    <footer>Fonte: IBGE Cidades</footer>
+    <div><strong>PIB (2021):</strong><span>-</span></div>
+    <div><strong>Participação na RMC:</strong><span>-</span></div>
+    <div><strong>PIB per capita (2021):</strong><span>-</span></div>
+    <div><strong>População:</strong><span>-</span></div>
+    <div><strong>Área:</strong><span>-</span></div>
+    <div><strong>Densidade demográfica (2022):</strong><span>-</span></div>
+    <div class="fonte">Fonte: IBGE Cidades</div>
   </aside>
+
 </body>
 </html>
+
 """
 
 # Renderiza o HTML no Streamlit
