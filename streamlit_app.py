@@ -5,7 +5,7 @@ from pathlib import Path
 
 # CONFIGURAÇÕES DA PÁGINA INICIAL
 st.set_page_config(
-    page_title='RMC Data',
+    page_title='MC Data',
     page_icon='📊',
     layout='wide',
     initial_sidebar_state='expanded'
