@@ -3,13 +3,13 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configurações da página
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-# Carregamento dos dados
+# Carregar shapefile e dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
@@ -18,7 +18,7 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construção do GeoJSON com dados
+# Construção GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -39,124 +39,105 @@ html_code = f"""
 <title>Mapa Interativo RMC</title>
 <style>
   /* Reset */
-  * {{
+  *, *::before, *::after {{
     box-sizing: border-box;
   }}
   html, body {{
-    height: 100vh;
     margin: 0; padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, rgba(250,250,252,0.95) 0%, rgba(230,235,240,0.9) 100%);
+    height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #222222;
+    background-color: #fff;
     display: flex;
     overflow: hidden;
-    color: #1a2d5a;
-    user-select: none;
   }}
 
-  /* Sidebar transparente e minimalista */
+  /* Sidebar minimalista */
   #sidebar {{
     width: 280px;
-    background: rgba(255 255 255 / 0.12);
-    backdrop-filter: saturate(180%) blur(16px);
-    -webkit-backdrop-filter: saturate(180%) blur(16px);
-    border-right: 1px solid rgba(255 255 255 / 0.15);
-    padding: 20px 18px 16px 18px;
+    border-right: 1px solid #ddd;
+    background: #fafafa;
     display: flex;
     flex-direction: column;
-    box-shadow: inset 0 0 30px rgba(255 255 255 / 0.25);
+    padding: 24px 20px 20px 20px;
   }}
   #sidebar h2 {{
-    margin: 0 0 14px 0;
+    margin: 0 0 24px 0;
+    font-weight: 400;
     font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #2a3a72;
+    letter-spacing: 0.05em;
+    color: #444;
   }}
   #search {{
-    margin-bottom: 14px;
     padding: 10px 14px;
     font-size: 15px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(255 255 255 / 0.4);
-    background: rgba(255 255 255 / 0.18);
-    color: #283556;
-    outline-offset: 3px;
-    transition:
-      background-color 0.3s ease,
-      border-color 0.4s ease,
-      box-shadow 0.4s ease;
-    font-weight: 500;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline-offset: 2px;
+    outline-color: #999;
+    font-weight: 300;
+    transition: outline-color 0.3s ease;
+    margin-bottom: 24px;
+    color: #333;
   }}
   #search::placeholder {{
-    color: #aac0e2;
+    color: #aaa;
     font-style: italic;
   }}
   #search:focus {{
-    background-color: rgba(255 255 255 / 0.28);
-    border-color: #4662b8;
-    box-shadow: 0 0 8px rgba(70,98,184,0.48);
-    color: #19294b;
+    outline-color: #666;
   }}
 
-  /* Lista com scrollbar fina e transparente */
+  /* Lista limpa */
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 6px;
+    padding-right: 8px;
   }}
   #list::-webkit-scrollbar {{
-    width: 7px;
+    width: 6px;
   }}
   #list::-webkit-scrollbar-track {{
-    background: transparent;
+    background: #f0f0f0;
   }}
   #list::-webkit-scrollbar-thumb {{
-    background-color: rgba(70, 98, 184, 0.3);
-    border-radius: 5px;
+    background: #bbb;
+    border-radius: 3px;
   }}
   #list div {{
-    padding: 8px 14px;
-    margin-bottom: 6px;
-    border-radius: 14px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
     cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: #374b75;
-    background: rgba(255 255 255 / 0.18);
-    transition:
-      background-color 0.35s ease,
-      color 0.35s ease,
-      box-shadow 0.25s ease;
-    box-shadow: inset 0 0 10px rgba(255 255 255 / 0.1);
+    border-radius: 6px;
+    font-weight: 300;
+    color: #333;
     user-select: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border: 1px solid transparent;
   }}
   #list div:hover {{
-    background-color: rgba(70, 98, 184, 0.22);
-    color: #1a2d5a;
-    box-shadow:
-      0 2px 10px rgba(70, 98, 184, 0.45),
-      inset 0 0 15px rgba(255 255 255 / 0.2);
+    background-color: #eee;
+    color: #111;
+    border-color: #ccc;
   }}
   #list div.active {{
-    background-color: #4662b8;
-    color: #e3e7f8;
-    box-shadow:
-      0 3px 16px #354a96,
-      inset 0 0 20px #6384f9;
+    background-color: #ddd;
+    color: #000;
+    font-weight: 500;
+    border-color: #bbb;
   }}
 
-  /* Mapa ocupa o restante do espaço */
+  /* Área do mapa */
   #map {{
     flex-grow: 1;
     position: relative;
+    background: #fff;
     overflow: hidden;
-    background: linear-gradient(180deg, #dae1f2 0%, #c4cde3 100%);
-    box-shadow:
-      inset 0 0 40px rgba(255 255 255 / 0.4),
-      inset 0 0 20px rgba(0 0 0 / 0.05);
-    border-radius: 20px;
-    margin: 16px;
+    padding: 20px 40px 20px 40px;
   }}
   svg {{
     width: 100%;
@@ -164,120 +145,93 @@ html_code = f"""
     display: block;
   }}
 
-  /* Polígonos com cores suaves e hover elegante */
+  /* Polígonos simples, linha fina e cor neutra */
   .area {{
-    fill: #9bb4d6;
-    stroke: #3a4f7d;
-    stroke-width: 1.2;
+    fill: #c8c8c8;
+    stroke: #999;
+    stroke-width: 1;
     cursor: pointer;
-    transition: fill 0.35s ease, stroke-width 0.35s ease;
-    filter: drop-shadow(0 0 1.5px rgba(30,40,80,0.3));
+    transition: fill 0.25s ease, stroke-width 0.25s ease;
   }}
   .area:hover {{
-    fill: #617bb9;
-    stroke-width: 2.2;
-    filter: drop-shadow(0 0 5px rgba(70,98,184,0.7));
+    fill: #a0a0a0;
+    stroke-width: 1.5;
   }}
   .area.selected {{
-    fill: #3b4a87;
-    stroke: #1e2a54;
-    stroke-width: 2.5;
-    filter: drop-shadow(0 0 7px rgba(30,45,90,0.8));
+    fill: #707070;
+    stroke: #555;
+    stroke-width: 1.8;
   }}
 
-  /* Tooltip translúcido e sofisticado */
+  /* Tooltip minimalista */
   #tooltip {{
     position: fixed;
-    padding: 7px 14px;
-    background: rgba(55, 70, 110, 0.85);
-    color: #e0e7ff;
+    padding: 6px 12px;
+    background: rgba(34, 34, 34, 0.85);
+    color: #fff;
     font-size: 14px;
-    border-radius: 18px;
+    border-radius: 4px;
     pointer-events: none;
     display: none;
-    box-shadow:
-      0 0 12px rgba(50, 70, 120, 0.9);
+    z-index: 1000;
     user-select: none;
-    z-index: 1100;
-    font-weight: 600;
-    letter-spacing: 0.03em;
+    font-weight: 300;
   }}
 
-  /* Painel de informações transparente, clean e elegante */
+  /* Painel de informação ultraleve */
   #info {{
     position: fixed;
     right: 28px;
-    top: 38px;
-    background: rgba(255 255 255 / 0.15);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-    border-radius: 20px;
-    border: 1.2px solid rgba(255 255 255 / 0.3);
-    box-shadow:
-      0 8px 25px rgba(20, 30, 60, 0.18),
-      inset 0 0 50px rgba(255 255 255 / 0.35);
-    max-width: 340px;
-    font-size: 14px;
-    line-height: 1.45;
-    color: #1b2c55;
-    padding: 18px 24px 24px 24px;
-    user-select: none;
+    top: 28px;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 20px 28px;
+    border-radius: 8px;
+    box-shadow: none;
+    max-width: 300px;
+    font-weight: 300;
+    color: #222;
     display: none;
-    z-index: 1200;
-    font-weight: 600;
+    line-height: 1.5;
+    user-select: none;
+    z-index: 1100;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
-    margin: 0 0 14px 0;
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-weight: 400;
     font-size: 22px;
-    font-weight: 700;
-    color: #1e2f54;
-    border-bottom: 1.5px solid rgba(70, 98, 184, 0.4);
-    padding-bottom: 8px;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
+    color: #111;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 10px;
-    column-gap: 22px;
+    row-gap: 12px;
+    column-gap: 18px;
   }}
   #info .label {{
-    font-weight: 600;
-    color: #3e5481;
+    font-weight: 400;
+    color: #555;
     white-space: nowrap;
-    letter-spacing: 0.02em;
   }}
   #info .value {{
-    font-weight: 500;
+    font-weight: 300;
     text-align: right;
-    color: #25355a;
+    color: #111;
     white-space: nowrap;
-    overflow-wrap: normal;
     font-variant-numeric: tabular-nums;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
-    color: #7b8bb8;
+    font-size: 12px;
     font-style: italic;
-    margin-top: 18px;
+    color: #888;
+    margin-top: 20px;
     text-align: right;
-  }}
-
-  /* Scrollbar da página (sidebar) mais suave */
-  ::-webkit-scrollbar {{
-    width: 8px;
-    height: 8px;
-  }}
-  ::-webkit-scrollbar-track {{
-    background: transparent;
-  }}
-  ::-webkit-scrollbar-thumb {{
-    background-color: rgba(70, 98, 184, 0.28);
-    border-radius: 8px;
   }}
 </style>
 </head>
@@ -303,6 +257,7 @@ html_code = f"""
       <div class="fonte">Fonte: IBGE Cidades</div>
     </div>
   </div>
+
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
