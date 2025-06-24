@@ -3,12 +3,13 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configurações da página
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
+
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-# Carregamento dos dados
+# Carregamento do shapefile e dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
@@ -17,7 +18,7 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construção do GeoJSON com dados
+# GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -29,7 +30,7 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML COMPLETO
+# HTML
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -61,7 +62,6 @@ html_code = f"""
     font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
-    user-select: none;
   }}
   #search {{
     margin-bottom: 12px;
@@ -69,7 +69,6 @@ html_code = f"""
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    outline-offset: 2px;
   }}
   #list {{
     flex-grow: 1;
@@ -81,10 +80,8 @@ html_code = f"""
     margin-bottom: 6px;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
     font-size: 14px;
     color: #1a2d5a;
-    transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
     background-color: #e3ecf9;
@@ -97,7 +94,6 @@ html_code = f"""
   #map {{
     flex-grow: 1;
     position: relative;
-    overflow: hidden;
   }}
   svg {{
     width: 100%;
@@ -125,9 +121,7 @@ html_code = f"""
     color: white;
     font-size: 13px;
     border-radius: 5px;
-    pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
   }}
   #info {{
@@ -135,18 +129,15 @@ html_code = f"""
     right: 24px;
     top: 40px;
     background: #f0f3f8;
-    padding: 14px 18px;
+    padding: 16px 20px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    width: 240px;
-    font-size: 13px;
-    line-height: 1.5;
+    max-width: 320px;
+    font-size: 14px;
     color: #1a2d5a;
-    user-select: none;
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
-    overflow-wrap: break-word;
   }}
   #info.visible {{
     display: block;
@@ -161,8 +152,10 @@ html_code = f"""
   }}
   #info .grid {{
     display: grid;
-    grid-template-columns: 1fr;
-    row-gap: 8px;
+    grid-template-columns: auto 1fr;
+    row-gap: 6px;
+    column-gap: 12px;
+    align-items: center;
   }}
   #info .label {{
     font-weight: 600;
@@ -172,10 +165,12 @@ html_code = f"""
   }}
   #info .value {{
     font-weight: 500;
-    text-align: right;
     color: #34495e;
     font-size: 13px;
-    word-break: break-word;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
@@ -202,7 +197,7 @@ html_code = f"""
     <div class="grid">
       <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
       <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
-      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+      <div class="label">PIB per capita:</div> <div class="value" id="percapita"></div>
       <div class="label">População (2022):</div> <div class="value" id="pop"></div>
       <div class="label">Área:</div> <div class="value" id="area"></div>
       <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
@@ -251,15 +246,6 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        const container = list;
-        const containerHeight = container.clientHeight;
-        const containerTop = container.getBoundingClientRect().top;
-        const elementTop = div.getBoundingClientRect().top;
-        const elementHeight = div.offsetHeight;
-        const scrollTop = container.scrollTop;
-        const offset = elementTop - containerTop;
-        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
     showInfo(name);
@@ -309,12 +295,9 @@ geo.features.forEach(f => {{
     tooltip.style.display = "block";
     tooltip.textContent = name;
   }});
-  path.addEventListener("mouseleave", () => {{
-    tooltip.style.display = "none";
-  }});
+  path.addEventListener("mouseleave", () => tooltip.style.display = "none");
   path.addEventListener("click", e => {{
     e.preventDefault();
-    e.stopPropagation();
     select(name);
   }});
 
@@ -322,7 +305,6 @@ geo.features.forEach(f => {{
   div.textContent = name;
   div.dataset.name = name;
   div.tabIndex = 0;
-  div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
   div.addEventListener("keydown", e => {{
     if (e.key === "Enter" || e.key === " ") {{
@@ -336,7 +318,7 @@ geo.features.forEach(f => {{
 search.addEventListener("input", e => {{
   updateList(e.target.value);
   const visibleItems = [...list.children].filter(d => d.style.display !== "none");
-  if(visibleItems.length === 1) {{
+  if (visibleItems.length === 1) {{
     select(visibleItems[0].dataset.name);
   }}
 }});
@@ -349,5 +331,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-# Exibe no Streamlit
 st.components.v1.html(html_code, height=600, scrolling=False)
