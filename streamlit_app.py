@@ -292,8 +292,8 @@ spans[1].textContent = data.participacao_rmc
 spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumber(data.pib_per_capita) : "-";
 spans[3].textContent = data.populacao ? formatNumber(data.populacao, 0) : "-";
 spans[4].textContent = data.area ? data.area.toFixed(1).replace('.', ',') + " km²" : "-";
-spans[5].textContent = data.densidade_demografica 
-  ? data.densidade_demografica.toFixed(2).replace('.', ',') + " hab/km²" 
+spans[5].textContent = data.densidade_demografica
+  ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
   : "-";
 }}
 
