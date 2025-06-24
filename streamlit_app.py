@@ -25,9 +25,6 @@ dados_path = "./planilhas/dados_rmc.xlsx"  # ajuste para o local correto
 df_dados = pd.read_excel(dados_path)
 df_dados.set_index("nome", inplace=True)
 
-# Normalizar nome para index (ajuste a coluna que tem o nome dos municípios)
-df_dados.set_index("nome", inplace=True)
-
 # --- Construir GeoJSON com propriedades dos dados ---
 features = []
 for _, row in gdf.iterrows():
