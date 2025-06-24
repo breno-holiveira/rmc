@@ -77,7 +77,7 @@ html_code = f"""
     height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background-color: #F9FAFB;
+    background-color: transparent;
     color: #222;
     display: flex;
     overflow: hidden;
@@ -394,4 +394,4 @@ html_code = f"""
 """
 
 # Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=700, scrolling=True)
+st.components.v1.html(html_code, height=600, scrolling=True)
