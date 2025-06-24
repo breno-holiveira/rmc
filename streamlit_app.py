@@ -3,28 +3,28 @@ import geopandas as gpd
 import pandas as pd
 import json
 
-# Configurações da página
 st.set_page_config(page_title="Mapa Interativo RMC", layout="wide", initial_sidebar_state="expanded")
 
 st.title("Mapa Interativo da Região Metropolitana de Campinas (RMC)")
 st.markdown("Clique no município para ver detalhes. Passe o mouse para ver nome.")
 
-# --- Carregar shapefile ---
-shp_path = "./shapefile_rmc/RMC_municipios.shp"  # ajuste seu caminho local
+shp_path = "./shapefile_rmc/RMC_municipios.shp"
 gdf = gpd.read_file(shp_path)
 
-# Garantir CRS EPSG:4326 para GeoJSON funcionar bem
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
 
 gdf = gdf.sort_values("NM_MUN")
 
-# --- Carregar dados ---
-dados_path = "dados_rmc.xlsx"  # arquivo na pasta raiz
+st.write("Shapefile head:", gdf.head())
+st.write("CRS:", gdf.crs)
+st.write("Geometrias válidas:", gdf.geometry.is_valid.all())
+st.write("Número de feições:", len(gdf))
+
+dados_path = "dados_rmc.xlsx"
 df_dados = pd.read_excel(dados_path)
 df_dados.set_index("nome", inplace=True)
 
-# --- Construir GeoJSON com propriedades dos dados ---
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -55,8 +55,7 @@ for _, row in gdf.iterrows():
 geojson_obj = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson_obj)
 
-# --- HTML + CSS + JS ---
-# OBS: Todas as chaves { e } no JS/CSS foram escapadas para {{ e }} para não conflitar com f-string Python
+st.write("GeoJSON sample:", geojson_obj["features"][0])
 
 html_code = f"""
 <!DOCTYPE html>
@@ -162,7 +161,10 @@ html_code = f"""
 </nav>
 
 <div id="map-container" role="main" aria-label="Mapa dos municípios">
-  <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+  <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <!-- Teste SVG círculo vermelho -->
+    <!-- <circle cx="100" cy="100" r="50" fill="red" /> -->
+  </svg>
   <div id="tooltip"></div>
 </div>
 
@@ -186,13 +188,10 @@ html_code = f"""
   const infoPanel = document.getElementById("info-panel");
   const closeBtn = document.getElementById("close-btn");
 
-  // Projeção simples para coordenadas geo para SVG (proj linear)
-  // Ajustar para encaixar bem no viewBox 1000x950
   const margin = 20;
-  let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
+  let bounds = [Infinity, Infinity, -Infinity, -Infinity];
 
   geojson.features.forEach(f => {{
-    // Função para aplanar recursivamente as coordenadas (multipolygon pode ter vários níveis)
     function flattenCoords(coords) {{
       if (typeof coords[0] === 'number') return [coords];
       return coords.flatMap(flattenCoords);
@@ -214,27 +213,41 @@ html_code = f"""
   function proj(x, y) {{
     return [
       margin + (x - bounds[0]) * scaleX,
-      margin + height - (y - bounds[1]) * scaleY // inverter Y para SVG
+      margin + height - (y - bounds[1]) * scaleY
     ];
   }}
 
-  // Criar path SVG para polígonos
   function polygonPath(coords) {{
     let path = "";
-    coords.forEach(ring => {{
-      path += "M";
-      ring.forEach((point, i) => {{
-        const [x,y] = proj(point[0], point[1]);
-        path += (i === 0 ? "" : "L") + x.toFixed(2) + "," + y.toFixed(2);
+    if (typeof coords[0][0][0] === "number") {{
+      // Polygon
+      coords.forEach(ring => {{
+        path += "M";
+        ring.forEach((point, i) => {{
+          const [x, y] = proj(point[0], point[1]);
+          path += (i === 0 ? "" : "L") + x.toFixed(2) + "," + y.toFixed(2);
+        }});
+        path += "Z ";
       }});
-      path += "Z ";
-    }});
+    }} else {{
+      // MultiPolygon
+      coords.forEach(polygon => {{
+        polygon.forEach(ring => {{
+          path += "M";
+          ring.forEach((point, i) => {{
+            const [x, y] = proj(point[0], point[1]);
+            path += (i === 0 ? "" : "L") + x.toFixed(2) + "," + y.toFixed(2);
+          }});
+          path += "Z ";
+        }});
+      }});
+    }}
     return path.trim();
   }}
 
-  // Desenhar polígonos
   geojson.features.forEach((feature, i) => {{
     const pathData = polygonPath(feature.geometry.coordinates);
+    console.log("Feature", i, "pathData length:", pathData.length);
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     path.setAttribute("d", pathData);
     path.classList.add("municipio");
@@ -244,7 +257,6 @@ html_code = f"""
 
   const municipiosList = document.getElementById("municipios-list");
 
-  // Criar lista lateral
   geojson.features.forEach((feature, i) => {{
     const div = document.createElement("div");
     div.textContent = feature.properties.name;
@@ -254,7 +266,6 @@ html_code = f"""
 
   let selectedIndex = null;
 
-  // Função para formatar números grandes
   function fmtNum(n) {{
     if (n === null || n === undefined) return "-";
     if (typeof n === "number") {{
@@ -263,7 +274,6 @@ html_code = f"""
     return n;
   }}
 
-  // Evento mouseover para tooltip e highlight
   function onMouseOver(e) {{
     const idx = e.target.dataset.index;
     if (idx === undefined) return;
@@ -272,27 +282,22 @@ html_code = f"""
     tooltip.textContent = feature.properties.name;
   }}
 
-  // Evento mousemove para posicionar tooltip
   function onMouseMove(e) {{
     tooltip.style.left = (e.pageX + 15) + "px";
     tooltip.style.top = (e.pageY + 15) + "px";
   }}
 
-  // Evento mouseout para esconder tooltip
   function onMouseOut(e) {{
     tooltip.style.display = "none";
   }}
 
-  // Atualiza painel info
   function showInfo(idx) {{
     const f = geojson.features[idx];
     selectedIndex = idx;
 
-    // Remove selected de todos
     document.querySelectorAll(".municipio").forEach(p => p.classList.remove("selected"));
     document.querySelectorAll("#municipios-list > div").forEach(d => d.classList.remove("active"));
 
-    // Seleciona o clicado
     svg.querySelector(`path[data-index='${{idx}}']`).classList.add("selected");
     municipiosList.querySelector(`div[data-index='${{idx}}']`).classList.add("active");
 
@@ -306,7 +311,6 @@ html_code = f"""
     document.getElementById("info-densidade").textContent = fmtNum(f.properties.densidade_demografica);
   }}
 
-  // Clique nos polígonos
   svg.querySelectorAll(".municipio").forEach(path => {{
     path.addEventListener("mouseover", onMouseOver);
     path.addEventListener("mousemove", onMouseMove);
@@ -316,14 +320,12 @@ html_code = f"""
     }});
   }});
 
-  // Clique na lista lateral
   municipiosList.querySelectorAll("div").forEach(div => {{
     div.addEventListener("click", e => {{
       showInfo(e.target.dataset.index);
     }});
   }});
 
-  // Fechar painel info
   closeBtn.addEventListener("click", () => {{
     infoPanel.hidden = true;
     selectedIndex = null;
@@ -336,5 +338,4 @@ html_code = f"""
 </html>
 """
 
-# Exibe no Streamlit com altura suficiente
 st.components.v1.html(html_code, height=750, scrolling=True)
