@@ -287,7 +287,7 @@ html_code = f"""
 
   spans[0].textContent = formatNumber(data.populacao, 0);
   spans[1].textContent = data.area ? data.area.toFixed(1) + " km²" : "-";
-  spans[2].textContent = formatNumber(data.pib_2021, 2, true);
+  spans[2].textContent = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A";
 
 spans[3].textContent = data.participacao_rmc
   ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
