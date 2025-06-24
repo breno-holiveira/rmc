@@ -552,4 +552,4 @@ html_code = f"""
 """
 
 # === Renderiza no Streamlit ===
-st.components.v1.html(html_code, height=920, scrolling=True)
+st.components.v1.html(html_code, height=600, scrolling=True)
