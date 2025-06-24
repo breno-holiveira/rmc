@@ -268,7 +268,7 @@ html_code = f"""
     }}).join(" ");
   }}
 
-// Formata número para o padrão pt-BR
+  // Formata número para o padrão pt-BR
   function formatNumberBR(num, decimals = 2) {{
     if (num === null || num === undefined) return "-";
     return num.toLocaleString('pt-BR', {{ minimumFractionDigits: decimals, maximumFractionDigits: decimals }});
@@ -295,6 +295,7 @@ html_code = f"""
     spans[5].textContent = data.densidade_demografica
       ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
       : "-";
+  }}
 
   // Limpa realce de todos polígonos
   function clearHighlight() {{
