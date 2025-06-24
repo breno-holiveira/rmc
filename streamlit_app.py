@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 # Configurações da página Streamlit
-st.set_page_config(page_title="RMC Ddata", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 
 # Título e descrição
 st.title("RMC Data")
@@ -136,7 +136,7 @@ html_code = f"""
     width: 280px;
     background: #fff;
     padding: 20px 24px;
-    border-left: 1px solid #transparent;
+    border-left: 1px solid #e3e6ea;
     box-shadow: -2px 0 8px rgba(0,0,0,0.05);
     color: #333;
     font-size: 15px;
