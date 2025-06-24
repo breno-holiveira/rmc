@@ -42,13 +42,12 @@ html_code = f"""
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
     overflow: hidden;
   }}
-
-  /* Sidebar */
+  /* Sidebar com busca e lista */
   #sidebar {{
     width: 260px;
     background: #fff;
@@ -141,23 +140,22 @@ html_code = f"""
     z-index: 10;
   }}
 
-  /* Painel de Informações minimalista e eficiente */
+  /* Painel de Informações mais integrado */
   #info {{
     position: fixed;
     right: 24px;
     top: 40px;
-    background: #ffffffdd;
-    backdrop-filter: blur(12px);
+    background: #f0f3f8;
     padding: 16px 20px;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     max-width: 320px;
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
     display: none;
-    border: 1px solid #cfd8e7;
+    border: 1px solid #d9e2f3;
     z-index: 20;
   }}
   #info.visible {{
@@ -168,7 +166,7 @@ html_code = f"""
     font-size: 20px;
     font-weight: 700;
     color: #2c3e70;
-    border-bottom: 1px solid #d1d9e6;
+    border-bottom: 1px solid #c3d0e8;
     padding-bottom: 6px;
   }}
   #info .grid {{
@@ -208,13 +206,13 @@ html_code = f"""
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Painel de Informações do município selecionado">
+  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
     <div class="grid">
       <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-      <div class="label">Participação RMC:</div> <div class="value" id="part"></div>
-      <div class="label">PIB per capita:</div> <div class="value" id="percapita"></div>
-      <div class="label">População:</div> <div class="value" id="pop"></div>
+      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
       <div class="label">Área:</div> <div class="value" id="area"></div>
       <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
       <div class="fonte">Fonte: IBGE Cidades</div>
@@ -236,7 +234,7 @@ let coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-  else g.geometry.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+  else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
 }});
 const lons = coords.map(c => c[0]);
 const lats = coords.map(c => c[1]);
@@ -253,25 +251,6 @@ function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
 }}
 
-// Função para formatar valores
-function formatValue(value, type) {{
-  if (value === undefined || value === null || value === "" || (isNaN(value) && type !== "percent")) return "-";
-  switch(type) {{
-    case "currency":
-      return "R$ " + Number(value).toLocaleString("pt-BR");
-    case "percent":
-      return (Number(value) * 100).toFixed(2).replace('.', ',') + "%";
-    case "number":
-      return Number(value).toLocaleString("pt-BR");
-    case "area":
-      return Number(value).toFixed(2).replace(".", ",") + " km²";
-    case "density":
-      return Number(value).toLocaleString("pt-BR") + " hab/km²";
-    default:
-      return value;
-  }}
-}}
-
 function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
@@ -280,24 +259,11 @@ function select(name) {{
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-
-    // Scroll da barra lateral (não da tela)
+    // Ativa item na legenda sem rolar a janela, apenas a barra da legenda rola:
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        const container = list;
-        const containerHeight = container.clientHeight;
-        const containerTop = container.getBoundingClientRect().top;
-
-        const elementTop = div.getBoundingClientRect().top;
-        const elementHeight = div.offsetHeight;
-
-        const scrollTop = container.scrollTop;
-        const offset = elementTop - containerTop;
-
-        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-
-        container.scrollTo({{ top: scrollTo, behavior: 'smooth' }});
+        div.scrollIntoView({{behavior: "smooth", block: "center"}});
       }}
     }});
     showInfo(name);
@@ -308,14 +274,12 @@ function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
   info.querySelector("h3").textContent = name;
-  
-  info.querySelector("#pib").textContent = formatValue(f.properties.pib_2021, "currency");
-  info.querySelector("#part").textContent = formatValue(f.properties.participacao_rmc, "percent");
-  info.querySelector("#percapita").textContent = formatValue(f.properties.per_capita_2021, "currency");
-  info.querySelector("#pop").textContent = formatValue(f.properties.populacao_2022, "number");
-  info.querySelector("#area").textContent = formatValue(f.properties.area, "area");
-  info.querySelector("#dens").textContent = formatValue(f.properties.densidade_demografica_2022, "density");
-
+  info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+  info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+  info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
+  info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
   info.classList.add("visible");
 }}
 
@@ -378,7 +342,7 @@ geo.features.forEach(f => {{
 
 search.addEventListener("input", e => {{
   updateList(e.target.value);
-  // Se só 1 item visível, seleciona automaticamente
+  // Se um só item visível, seleciona ele automaticamente
   const visibleItems = [...list.children].filter(d => d.style.display !== "none");
   if(visibleItems.length === 1) {{
     select(visibleItems[0].dataset.name);
