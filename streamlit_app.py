@@ -232,8 +232,8 @@ function formatBR(val, prefix='') {{
 function selectMunicipio(f) {{
   document.querySelectorAll(".polygon").forEach(p => p.classList.remove("selected"));
   document.querySelectorAll("#sidebar div").forEach(d => d.classList.remove("active"));
-  const sel = svg.querySelector(`[data-name="{f.properties.name}"]`);
-  const div = sidebar.querySelector(`[data-name="{f.properties.name}"]`);
+const sel = svg.querySelector(`[data-name="${{f.properties.name}}"]`);
+const div = sidebar.querySelector(`[data-name="${{f.properties.name}}"]`);
   if (sel) sel.classList.add("selected");
   if (div) div.classList.add("active");
 
