@@ -143,7 +143,6 @@ html_code = f"""
     font-size: 15px;
     line-height: 1.5;
     overflow-y: auto;
-    text-align: center;
   }}
   #info-panel h3 {{
     margin-top: 0;
@@ -153,7 +152,6 @@ html_code = f"""
     border-bottom: 2px solid #0b3d91;
     padding-bottom: 8px;
     margin-bottom: 16px;
-    text-align: center;
   }}
   #info-panel div {{
     margin-bottom: 14px;
