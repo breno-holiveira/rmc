@@ -88,7 +88,7 @@ html_code = f"""
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 15px;
+    font-size: 14px;
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
   }}
