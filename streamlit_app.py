@@ -142,40 +142,47 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de Informações mais integrado */
+  /* Painel de Informações mais integrado e responsivo */
   #info {{
     position: fixed;
-    right: 24px;
-    top: 40px;
+    right: 1.5vw;
+    top: 3vh;
     background: #f0f3f8;
-    padding: 16px 20px;
-    border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
-    font-size: 14px;
+    padding: 1.1em 1.4em;
+    border-radius: 0.625rem;
+    box-shadow: 0 0.125rem 0.375rem rgba(0,0,0,0.1);
+    max-width: 22vw;
+    width: 20vw;
+    max-height: 80vh;
+    font-size: 1rem;
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
     display: none;
-    border: 1px solid #d9e2f3;
+    border: 0.0625rem solid #d9e2f3;
     z-index: 20;
+    overflow-wrap: break-word;
+    overflow-y: auto;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
-    margin: 0 0 12px 0;
-    font-size: 20px;
+    margin: 0 0 0.75rem 0;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #2c3e70;
-    border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 6px;
+    border-bottom: 0.0625rem solid #c3d0e8;
+    padding-bottom: 0.4rem;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
-    column-gap: 24px;
+    row-gap: 0.5rem;
+    column-gap: 1.5rem;
   }}
   #info .label {{
     font-weight: 600;
@@ -190,10 +197,10 @@ html_code = f"""
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 0.75rem;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 16px;
+    margin-top: 1rem;
     text-align: right;
   }}
 </style>
@@ -327,8 +334,8 @@ geo.features.forEach(f => {{
 
   // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
+    const offsetX = 8;
+    const offsetY = -22;
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -338,8 +345,8 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", e => {{
-    e.preventDefault();  // previne scroll da página ao clicar no município
-    e.stopPropagation(); // evita propagação para scroll do container pai
+    e.preventDefault();
+    e.stopPropagation();
     select(name);
   }});
 
@@ -367,7 +374,6 @@ search.addEventListener("input", e => {{
   }}
 }});
 
-// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
