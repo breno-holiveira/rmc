@@ -102,7 +102,7 @@ html_code = f"""
     margin-bottom: 12px;
     color: #0b3d91;
     border-bottom: 1px solid #0b3d91;  /* linha azul abaixo */
-    padding-bottom: 4px;  
+    padding-bottom: 6px;  
   }}
   #legend div {{
     margin-bottom: 8px;
