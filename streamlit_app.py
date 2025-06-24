@@ -229,7 +229,6 @@ const search = document.getElementById("search");
 let selected = null;
 const paths = {{}};
 
-// Coordenadas para projeção simples
 let coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
@@ -259,7 +258,6 @@ function select(name) {{
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    // Somente a barra lateral rola para o município ativo:
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
@@ -313,24 +311,21 @@ geo.features.forEach(f => {{
   paths[name] = path;
 
   // Eventos do mapa
-  path.addEventListener("mousemove", e => {
+  path.addEventListener("mousemove", e => {{
     const offsetX = 12;  // distância horizontal do mouse para o tooltip
-    const offsetY = -28; // distância vertical do mouse para o tooltip (acima)
-
-    // Ajusta posição do tooltip para ficar próximo, acima e à direita do cursor
+    const offsetY = -28; // distância vertical do mouse para o tooltip (acima do cursor)
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
-
     tooltip.style.display = "block";
     tooltip.textContent = name;
-  });
-  path.addEventListener("mouseleave", () => {
+  }});
+  path.addEventListener("mouseleave", () => {{
     tooltip.style.display = "none";
-  });
-  path.addEventListener("click", e => {
-    e.preventDefault();  // previne scroll da página ao clicar
+  }});
+  path.addEventListener("click", e => {{
+    e.preventDefault();  // previne scroll da página ao clicar no município
     select(name);
-  });
+  }});
 
   // Item da legenda
   const div = document.createElement("div");
@@ -339,28 +334,27 @@ geo.features.forEach(f => {{
   div.tabIndex = 0;
   div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
-  div.addEventListener("keydown", e => {
-    if (e.key === "Enter" || e.key === " ") {
+  div.addEventListener("keydown", e => {{
+    if (e.key === "Enter" || e.key === " ") {{
       e.preventDefault();
       select(name);
-    }
-  });
+    }}
+  }});
   list.appendChild(div);
 }});
 
-search.addEventListener("input", e => {
+search.addEventListener("input", e => {{
   updateList(e.target.value);
-  // Se um só item visível, seleciona ele automaticamente
   const visibleItems = [...list.children].filter(d => d.style.display !== "none");
-  if(visibleItems.length === 1) {
+  if(visibleItems.length === 1) {{
     select(visibleItems[0].dataset.name);
-  }
+  }}
 }});
 
 // Seleciona primeiro município ao carregar
-if(geo.features.length > 0) {
+if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
-}
+}}
 </script>
 </body>
 </html>
