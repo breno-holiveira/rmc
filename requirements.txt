@@ -6,3 +6,4 @@ pydeck
 folium
 streamlit-folium
 plotly
+openpyxl
