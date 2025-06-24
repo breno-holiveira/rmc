@@ -89,7 +89,7 @@ html_code = f"""
     background: #fff;
     padding: 16px 20px;
     box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-    border-right: 1px solid #e3e6ea;
+    border-right: none;
     overflow-y: auto;
   }}
   #legend strong {{
