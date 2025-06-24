@@ -167,14 +167,25 @@ html_code = f"""
     padding-bottom: 8px;
     margin-bottom: 16px;
   }}
+
+  /* AQUI o ajuste pedido: coloca label e valor em linhas separadas */
   #info-panel div {{
     margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;  /* coloca em coluna */
   }}
   #info-panel div strong {{
-    display: inline-block;
-    width: 140px;
+    display: block;
     color: #0b3d91;
-    white-space: nowrap; /* evita quebra nos labels */
+    margin-bottom: 4px;      /* espaço entre label e valor */
+    width: auto;
+    white-space: normal;    /* permite quebra natural */
+  }}
+  #info-panel div span {{
+    color: #333;
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: normal;    /* permite quebra natural */
   }}
 
   /* Polígonos */
