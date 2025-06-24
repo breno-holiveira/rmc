@@ -148,7 +148,7 @@ html_code = f"""
     right: 24px;
     top: 40px;
     background: #f0f3f8;
-    padding: 16px 20px;
+    padding: 18px 20px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     max-width: 320px;
