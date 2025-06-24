@@ -532,4 +532,4 @@ html_code = f"""
 </html>
 """
 
-st.components.v1.html(html_code, height=900, scrolling=True)
+st.components.v1.html(html_code, height=700, scrolling=True)
