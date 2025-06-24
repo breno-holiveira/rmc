@@ -215,11 +215,11 @@ html_code = f"""
 
   <aside id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
   <h3>Selecione um município</h3>
-  <div><strong>População:</strong> <span>-</span></div>
-  <div><strong>Área:</strong> <span>-</span></div>
   <div><strong>PIB (2021):</strong> <span>-</span></div>
   <div><strong>Participação na RMC:</strong> <span>-</span></div>
   <div><strong>PIB per capita (2021):</strong> <span>-</span></div>
+  <div><strong>População:</strong> <span>-</span></div>
+  <div><strong>Área:</strong> <span>-</span></div>
   <div><strong>Densidade demográfica (2022):</strong> <span>-</span></div>
   </aside>
 
@@ -285,16 +285,14 @@ html_code = f"""
 
   const spans = infoPanel.querySelectorAll('div span');
 
-  spans[0].textContent = formatNumber(data.populacao, 0);
-  spans[1].textContent = data.area ? data.area.toFixed(1) + " km²" : "-";
-  spans[2].textContent = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A";
-
-  spans[3].textContent = data.participacao_rmc
-    ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
-    : "-";
-  
-  spans[4].textContent = data.pib_per_capita ? "R$ " + formatNumber(data.pib_per_capita) : "-";
-  spans[5].textContent = formatNumber(data.densidade_demografica, 2);
+spans[0].textContent = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "-";
+spans[1].textContent = data.participacao_rmc
+  ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
+  : "-";
+spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumber(data.pib_per_capita) : "-";
+spans[3].textContent = data.populacao ? formatNumber(data.populacao, 0) : "-";
+spans[4].textContent = data.area ? data.area.toFixed(1).replace('.', ',') + " km²" : "-";
+spans[5].textContent = data.densidade_demografica ? data.densidade_demografica.toFixed(2).replace('.', ',') : "-";
 }}
 
   // Limpa realce de todos polígonos
