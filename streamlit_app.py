@@ -314,8 +314,8 @@ geo.features.forEach(f => {{
 
   // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    tooltip.style.left = (e.clientX + 10) + "px";
-    tooltip.style.top = (e.clientY + 10) + "px";
+    tooltip.style.left = (e.clientX + 3) + "px";
+    tooltip.style.top = (e.clientY + 3) + "px";
     tooltip.style.display = "block";
     tooltip.textContent = name;
   }});
