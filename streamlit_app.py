@@ -3,553 +3,292 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# === Configurações da página ===
-st.set_page_config(
-    page_title='RMC Data - Mapa Interativo',
-    page_icon='📊',
-    layout='wide',
-    initial_sidebar_state='expanded'
-)
+# Configurações da página
+st.set_page_config(page_title="RMC Data", layout="wide")
 
-# === Cabeçalhos ===
-st.markdown('# RMC Data')
-st.markdown('## Indicadores da Região Metropolitana de Campinas')
+st.title("📍 Mapa Interativo da RMC")
+st.markdown("**Explore os municípios da Região Metropolitana de Campinas com dados confiáveis.**")
 
-# === Carregar shapefile e dados ===
-gdf = gpd.read_file('./shapefile_rmc/RMC_municipios.shp')
+# Carregamento dos dados
+gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
 gdf = gdf.sort_values(by='NM_MUN')
 
-df_dados = pd.read_excel('dados_rmc.xlsx')
-df_dados.set_index("nome", inplace=True)
+df = pd.read_excel('dados_rmc.xlsx')
+df.set_index("nome", inplace=True)
 
+# Construção do GeoJSON com dados
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
     geom = row["geometry"].__geo_interface__
-
-    if nome in df_dados.index:
-        dados = df_dados.loc[nome]
-        feature_props = {
-            "name": nome,
-            "pib_2021": dados["pib_2021"],
-            "participacao_rmc": dados["participacao_rmc"],
-            "pib_per_capita": dados["per_capita_2021"],
-            "populacao": dados["populacao_2022"],
-            "area": dados["area"],
-            "densidade_demografica": dados["densidade_demografica_2022"]
-        }
-    else:
-        feature_props = {
-            "name": nome,
-            "pib_2021": None,
-            "participacao_rmc": None,
-            "pib_per_capita": None,
-            "populacao": None,
-            "area": None,
-            "densidade_demografica": None
-        }
-
-    features.append({
-        "type": "Feature",
-        "properties": feature_props,
-        "geometry": geom
-    })
+    props = df.loc[nome].to_dict() if nome in df.index else {}
+    props["name"] = nome
+    features.append({"type": "Feature", "geometry": geom, "properties": props})
 
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# === HTML + CSS + JS ===
+# HTML e JavaScript embutido
 html_code = f"""
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang=\"pt-BR\">
 <head>
-<meta charset="UTF-8" />
-<title>Mapa Interativo RMC - Transparência</title>
+<meta charset=\"UTF-8\">
+<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<title>Mapa Interativo RMC</title>
 <style>
-  /* RESET */
-  *, *::before, *::after {{
+  html, body {{
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9fafa;
+    display: flex;
+    overflow: hidden;
+  }}
+  nav#sidebar {{
+    width: 250px;
+    background: #f1f3f6;
+    padding: 16px;
+    border-right: 1px solid #d4dbe4;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
+  }}
+  nav h2 {{
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #ccd3db;
+    color: #1a2d5a;
+  }}
+  #search-mun {{
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    border: 1px solid #c3cfd9;
+    border-radius: 8px;
     box-sizing: border-box;
   }}
-  html, body {{
-    margin: 0; padding: 0;
-    height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f7f9fc;
-    color: #2c3e50;
-    overflow: hidden;
-    display: flex;
-    gap: 18px;
-    padding: 16px 22px;
-  }}
-
-  /* === LEGEND === */
-  #legend {{
-    width: 280px;
-    background: #ffffffdd;
-    padding: 22px 24px 22px 24px;
-    box-shadow: 0 1px 12px rgb(44 62 80 / 0.07);
-    border-radius: 14px;
-    overflow-y: auto;
-    user-select: none;
-    flex-shrink: 0;
+  #mun-list {{
     display: flex;
     flex-direction: column;
-    font-size: 15px;
-    color: #34495e;
-    backdrop-filter: saturate(180%) blur(8px);
-  }}
-  #legend strong {{
-    font-weight: 700;
-    font-size: 22px;
-    color: #2980b9;
-    margin-bottom: 14px;
-    border-bottom: 2.5px solid #2980b9aa;
-    padding-bottom: 6px;
-  }}
-  #search-box {{
-    margin-bottom: 16px;
-    padding: 9px 14px;
-    font-size: 15px;
-    border: 1.4px solid #a3b1c6;
-    border-radius: 10px;
-    outline-offset: 2px;
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
-    background: #fefefe;
-    color: #34495e;
-    font-weight: 600;
-  }}
-  #search-box::placeholder {{
-    color: #a3b1c6;
-    font-weight: 500;
-  }}
-  #search-box:focus {{
-    box-shadow: 0 0 10px #5dade2cc;
-    border-color: #2980b9;
-  }}
-  #mun-list {{
-    flex-grow: 1;
+    gap: 4px;
     overflow-y: auto;
+    max-height: 80vh;
   }}
-  #mun-list div {{
-    padding: 10px 18px;
-    border-radius: 10px;
+  #mun-list button {{
+    background: #ffffff;
+    border: 1px solid #d8dee9;
+    border-radius: 6px;
+    padding: 6px 10px;
+    text-align: left;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    font-weight: 600;
-    color: #34495e;
-    white-space: nowrap;
+    transition: background 0.2s, border 0.2s;
+    font-size: 13px;
+    color: #1a2d5a;
   }}
-  #mun-list div:hover {{
-    background-color: #d6e9ffcc;
-    color: #2980b9;
+  #mun-list button:hover {{
+    background: #e6ecf5;
   }}
-  #mun-list div.active {{
-    background-color: #2980b9;
-    color: #fff;
-    font-weight: 700;
+  #mun-list button.active {{
+    background: #1a2d5a;
+    color: white;
+    border-color: #1a2d5a;
   }}
-
-  /* === MAP CONTAINER === */
   #map {{
     flex-grow: 1;
     position: relative;
-    background: #fefefe;
-    box-shadow: 0 3px 18px rgb(41 128 185 / 0.10);
-    border-radius: 14px;
-    overflow: hidden;
-    user-select: none;
   }}
   svg {{
     width: 100%;
-    height: 100vh;
-    display: block;
+    height: 100%;
   }}
-
-  /* === INFO PANEL === */
-  #info-panel {{
-    width: 340px;
-    max-height: 100vh;
-    background: #ffffffdd;
-    padding: 26px 30px 42px 30px;
-    box-shadow: 0 6px 28px rgb(41 128 185 / 0.12);
-    color: #34495e;
-    font-size: 16px;
-    line-height: 1.5;
-    overflow-y: auto;
-    border-radius: 14px;
-    position: relative;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    transform: translateX(32px);
-    pointer-events: none;
-    transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1), transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: saturate(180%) blur(10px);
-  }}
-  #info-panel.visible {{
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-  }}
-  #info-panel h3 {{
-    margin-top: 0;
-    font-weight: 900;
-    font-size: 24px;
-    color: #2471a3;
-    border-bottom: 2.5px solid #2471a3aa;
-    padding-bottom: 12px;
-    margin-bottom: 26px;
-    user-select: text;
-  }}
-
-  /* Label e valor */
-  #info-panel div.info-row {{
-    margin-bottom: 18px;
-    display: flex;
-    flex-direction: column;
-  }}
-  #info-panel div.info-row strong {{
-    color: #2471a3;
-    margin-bottom: 7px;
-    user-select: text;
-    font-weight: 700;
-  }}
-  #info-panel div.info-row span {{
-    color: #34495e;
-    font-weight: 600;
-    font-size: 1.08rem;
-    user-select: text;
-  }}
-
-  /* Botão fechar painel info */
-  #info-panel button#close-info {{
-    position: absolute;
-    top: 18px;
-    right: 22px;
-    background: transparent;
-    border: none;
-    font-size: 28px;
-    color: #2471a3;
+  .area {{
+    fill: #b6cce5;
+    stroke: #4d648d;
+    stroke-width: 1;
     cursor: pointer;
-    font-weight: 900;
-    line-height: 1;
-    padding: 0;
-    transition: color 0.25s ease;
+    transition: all 0.3s ease;
   }}
-  #info-panel button#close-info:hover {{
-    color: #1b4f72;
+  .area:hover {{
+    fill: #8db3dd;
+    stroke-width: 1.5;
   }}
-
-  /* Fonte discreta rodapé painel info */
-  #info-panel footer {{
-    margin-top: auto;
-    font-size: 13px;
-    font-weight: 400;
-    color: #7f8c8d;
-    opacity: 0.6;
-    text-align: right;
-    font-style: italic;
-    user-select: none;
+  .area.selected {{
+    fill: #4d648d;
+    stroke: #1a2d5a;
   }}
-
-  /* === Polígonos do mapa === */
-  .polygon {{
-    fill: rgba(41, 128, 185, 0.15);
-    stroke: rgba(41, 128, 185, 0.7);
-    stroke-width: 1.1;
-    cursor: pointer;
-    transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
-    opacity: 0.85;
-  }}
-  .polygon:hover {{
-    fill: rgba(41, 128, 185, 0.35);
-    stroke-width: 2.1;
-    filter: drop-shadow(0 0 8px rgba(41, 128, 185, 0.3));
-  }}
-  .polygon.selected {{
-    fill: rgba(41, 128, 185, 0.52);
-    stroke: rgba(41, 128, 185, 0.95);
-    stroke-width: 2.8;
-    filter: drop-shadow(0 0 14px rgba(41, 128, 185, 0.5));
-  }}
-
-  /* Tooltip */
   #tooltip {{
     position: absolute;
-    pointer-events: none;
-    padding: 7px 16px;
-    background: rgba(41, 128, 185, 0.85);
-    color: #fdfefe;
-    font-weight: 600;
+    padding: 5px 10px;
+    background: rgba(30, 60, 120, 0.95);
+    color: white;
     font-size: 13px;
-    border-radius: 8px;
-    white-space: nowrap;
-    box-shadow: 0 0 12px rgba(41, 128, 185, 0.65);
+    border-radius: 5px;
+    pointer-events: none;
     display: none;
-    user-select: none;
-    z-index: 1100;
-    transition: opacity 0.24s ease;
-    opacity: 0;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
   }}
-  #tooltip.visible {{
+  #info {{
+    position: fixed;
+    right: 30px;
+    top: 40px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.5;
+    display: none;
+    border: 1px solid #d8dee9;
+  }}
+  #info.visible {{
     display: block;
-    opacity: 1;
   }}
-
-  /* Scroll barras estilizadas para legenda e painel */
-  #legend::-webkit-scrollbar, #info-panel::-webkit-scrollbar {{
-    width: 8px;
+  #info h3 {{
+    margin-top: 0;
+    color: #1a2d5a;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
   }}
-  #legend::-webkit-scrollbar-thumb, #info-panel::-webkit-scrollbar-thumb {{
-    background-color: #a3b1c6aa;
-    border-radius: 4px;
+  #info div {{
+    margin: 6px 0;
   }}
-  #legend::-webkit-scrollbar-track, #info-panel::-webkit-scrollbar-track {{
-    background: transparent;
+  #info .fonte {{
+    font-size: 11px;
+    margin-top: 12px;
+    color: #777;
   }}
 </style>
 </head>
 <body>
-  <nav id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
-    <strong>Municípios da RMC</strong>
-    <input type="search" id="search-box" placeholder="Buscar município..." aria-label="Buscar município" autocomplete="off" />
-    <div id="mun-list" tabindex="0" role="listbox" aria-multiselectable="false"></div>
+  <nav id=\"sidebar\" aria-label=\"Legenda de Municípios\">
+    <h2>Municípios</h2>
+    <input type=\"text\" id=\"search-mun\" placeholder=\"Buscar município...\" aria-label=\"Buscar município\">
+    <div id=\"mun-list\"></div>
   </nav>
-
-  <main id="map" role="region" aria-label="Mapa interativo dos municípios da Região Metropolitana de Campinas">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
-    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-  </main>
-
-  <aside id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <button id="close-info" aria-label="Fechar painel de informações">&times;</button>
-    <h3>Selecione um município</h3>
-    <div class="info-row"><strong>PIB (2021):</strong> <span>-</span></div>
-    <div class="info-row"><strong>Participação na RMC:</strong> <span>-</span></div>
-    <div class="info-row"><strong>PIB per capita (2021):</strong> <span>-</span></div>
-    <div class="info-row"><strong>População:</strong> <span>-</span></div>
-    <div class="info-row"><strong>Área:</strong> <span>-</span></div>
-    <div class="info-row"><strong>Densidade demográfica (2022):</strong> <span>-</span></div>
-    <footer>Fonte: IBGE Cidades</footer>
-  </aside>
-
+  <div id=\"map\">
+    <svg viewBox=\"0 0 1000 950\" preserveAspectRatio=\"xMidYMid meet\"></svg>
+    <div id=\"tooltip\"></div>
+  </div>
+  <div id=\"info\">
+    <h3>Município</h3>
+    <div><strong>PIB 2021:</strong> <span id=\"pib\"></span></div>
+    <div><strong>Participação RMC:</strong> <span id=\"part\"></span></div>
+    <div><strong>PIB per capita:</strong> <span id=\"percapita\"></span></div>
+    <div><strong>População:</strong> <span id=\"pop\"></span></div>
+    <div><strong>Área:</strong> <span id=\"area\"></span></div>
+    <div><strong>Densidade demográfica:</strong> <span id=\"dens\"></span></div>
+    <div class=\"fonte\">Fonte: IBGE Cidades</div>
+  </div>
 <script>
-  (function() {{
-    const geojson = {geojson_str};
-    const svg = document.querySelector("svg");
-    const munList = document.getElementById("mun-list");
-    const tooltip = document.getElementById("tooltip");
-    const infoPanel = document.getElementById("info-panel");
-    const closeBtn = document.getElementById("close-info");
-    const searchBox = document.getElementById("search-box");
+const geo = {geojson_str};
+const svg = document.querySelector("svg");
+const tooltip = document.getElementById("tooltip");
+const info = document.getElementById("info");
+const list = document.getElementById("mun-list");
+const input = document.getElementById("search-mun");
 
-    let selectedName = null;
-    const paths = {{}};
+let selected = null;
+const paths = {};
 
-    // Extrai coordenadas para projeção
-    let allCoords = [];
-    geojson.features.forEach(f => {{
-      const geom = f.geometry;
-      if (geom.type === "Polygon") {{
-        geom.coordinates[0].forEach(c => allCoords.push(c));
-      }} else if (geom.type === "MultiPolygon") {{
-        geom.coordinates.forEach(poly => poly[0].forEach(c => allCoords.push(c)));
-      }}
-    }});
+let coords = [];
+geo.features.forEach(f => {
+  const g = f.geometry;
+  if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
+  else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+});
+const lons = coords.map(c => c[0]);
+const lats = coords.map(c => c[1]);
+const minX = Math.min(...lons), maxX = Math.max(...lons);
+const minY = Math.min(...lats), maxY = Math.max(...lats);
 
-    const lons = allCoords.map(c => c[0]);
-    const lats = allCoords.map(c => c[1]);
-    const minLon = Math.min(...lons);
-    const maxLon = Math.max(...lons);
-    const minLat = Math.min(...lats);
-    const maxLat = Math.max(...lats);
+function project([lon, lat]) {
+  const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
+  const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
+  return [x, y];
+}
 
-    // Projeção geográfica simples para SVG
-    function project(coord) {{
-      const [lon, lat] = coord;
-      const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
-      const y = 900 - ((lat - minLat) / (maxLat - minLat)) * 850;
-      return [x, y];
-    }}
+function polygonToPath(coords) {
+  return coords.map(c => project(c).join(",")).join(" ");
+}
 
-    // Converte array de coordenadas em path SVG
-    function polygonToPath(coords) {{
-      return coords.map(c => {{
-        const [x, y] = project(c);
-        return x + "," + y;
-      }}).join(" ");
-    }}
+function select(name) {
+  if (selected) {
+    paths[selected].classList.remove("selected");
+    [...list.children].forEach(d => d.classList.remove("active"));
+  }
+  selected = name;
+  if (paths[name]) {
+    paths[name].classList.add("selected");
+    document.querySelector(`#mun-list button[data-name='${name}']`).classList.add("active");
+    showInfo(name);
+  }
+}
 
-    // Formata número para pt-BR
-    function formatNumberBR(num, decimals = 2) {{
-      if (num === null || num === undefined) return "-";
-      return num.toLocaleString('pt-BR', {{ minimumFractionDigits: decimals, maximumFractionDigits: decimals }});
-    }}
+function showInfo(name) {
+  const f = geo.features.find(f => f.properties.name === name);
+  if (!f) return;
+  info.querySelector("h3").textContent = name;
+  info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+  info.querySelector("#percapita").textContent = f.properties.pib_per_capita ? "R$ " + f.properties.pib_per_capita.toLocaleString("pt-BR") : "-";
+  info.querySelector("#pop").textContent = f.properties.populacao ? f.properties.populacao.toLocaleString("pt-BR") : "-";
+  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
+  info.querySelector("#dens").textContent = f.properties.densidade_demografica ? f.properties.densidade_demografica.toLocaleString("pt-BR") + " hab/km²" : "-";
+  info.classList.add("visible");
+}
 
-    // Atualiza painel de informações
-    function updateInfoPanel(data) {{
-      if(!data) {{
-        infoPanel.querySelector('h3').textContent = "Selecione um município";
-        infoPanel.querySelectorAll('div.info-row span').forEach(span => span.textContent = "-");
-        infoPanel.classList.remove("visible");
-        return;
-      }}
-      infoPanel.querySelector('h3').textContent = data.name || "-";
+geo.features.forEach(f => {
+  const name = f.properties.name;
+  let d = "";
+  if (f.geometry.type === "Polygon") {
+    d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
+  } else {
+    f.geometry.coordinates.forEach(p => {
+      d += "M" + polygonToPath(p[0]) + " Z ";
+    });
+  }
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", d.trim());
+  path.classList.add("area");
+  path.setAttribute("data-name", name);
+  svg.appendChild(path);
+  paths[name] = path;
 
-      const spans = infoPanel.querySelectorAll('div.info-row span');
+  path.addEventListener("mousemove", e => {
+    tooltip.style.left = (e.clientX + 10) + "px";
+    tooltip.style.top = (e.clientY + 10) + "px";
+    tooltip.style.display = "block";
+    tooltip.textContent = name;
+  });
+  path.addEventListener("mouseleave", () => {
+    tooltip.style.display = "none";
+  });
+  path.addEventListener("click", () => select(name));
 
-      spans[0].textContent = data.pib_2021 ? "R$ " + formatNumberBR(data.pib_2021, 0) : "-";
-      spans[1].textContent = data.participacao_rmc
-        ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
-        : "-";
-      spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumberBR(data.pib_per_capita, 2) : "-";
-      spans[3].textContent = data.populacao ? formatNumberBR(data.populacao, 0) : "-";
-      spans[4].textContent = data.area ? data.area.toFixed(1).replace('.', ',') + " km²" : "-";
-      spans[5].textContent = data.densidade_demografica
-        ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
-        : "-";
+  const btn = document.createElement("button");
+  btn.textContent = name;
+  btn.dataset.name = name;
+  btn.setAttribute("aria-label", name);
+  btn.addEventListener("click", () => select(name));
+  list.appendChild(btn);
+});
 
-      infoPanel.classList.add("visible");
-    }}
-
-    // Limpa realce e seleção
-    function clearHighlight() {{
-      Object.values(paths).forEach(p => p.classList.remove("highlight"));
-    }}
-    function clearSelection() {{
-      Object.values(paths).forEach(p => p.classList.remove("selected"));
-    }}
-
-    // Atualiza estilo ativo da legenda
-    function setActiveLegend(name) {{
-      Array.from(munList.children).forEach(child => {{
-        child.classList.toggle("active", child.dataset.name === name);
-      }});
-    }}
-
-    // Seleciona município
-    function selectMunicipio(name) {{
-      clearHighlight();
-      clearSelection();
-      if(paths[name]) paths[name].classList.add("selected");
-      setActiveLegend(name);
-      selectedName = name;
-
-      const data = geojson.features.find(f => f.properties.name === name);
-      if (data) {{
-        updateInfoPanel(data.properties);
-      }}
-    }}
-
-    // Fecha painel info
-    closeBtn.addEventListener("click", () => {{
-      infoPanel.classList.remove("visible");
-      clearSelection();
-      setActiveLegend(null);
-      selectedName = null;
-    }});
-
-    // Criar polígonos SVG e itens da legenda (delegação para performance)
-    geojson.features.forEach(f => {{
-      const name = f.properties.name;
-      const geom = f.geometry;
-
-      let pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      pathEl.classList.add("polygon");
-      pathEl.setAttribute("data-name", name);
-
-      if(geom.type === "Polygon") {{
-        const d = "M" + polygonToPath(geom.coordinates[0]) + " Z";
-        pathEl.setAttribute("d", d);
-      }} else if(geom.type === "MultiPolygon") {{
-        const d = geom.coordinates.map(poly => "M" + polygonToPath(poly[0]) + " Z").join(" ");
-        pathEl.setAttribute("d", d);
-      }}
-
-      svg.appendChild(pathEl);
-      paths[name] = pathEl;
-
-      // Item legenda
-      const div = document.createElement("div");
-      div.textContent = name;
-      div.dataset.name = name;
-      munList.appendChild(div);
-    }});
-
-    // Eventos legenda (click e teclado)
-    munList.addEventListener("click", e => {{
-      if(e.target.dataset.name) {{
-        selectMunicipio(e.target.dataset.name);
-      }}
-    }});
-    munList.addEventListener("keydown", e => {{
-      if(e.key === "Enter" && e.target.dataset.name) {{
-        selectMunicipio(e.target.dataset.name);
-      }}
-    }});
-
-    // Tooltip mousemove sobre polígonos
-    svg.addEventListener("mousemove", e => {{
-      const target = e.target;
-      if(target.classList.contains("polygon")) {{
-        const name = target.dataset.name;
-        tooltip.textContent = name;
-        tooltip.style.left = (e.clientX + 14) + "px";
-        tooltip.style.top = (e.clientY + 14) + "px";
-        tooltip.classList.add("visible");
-        tooltip.setAttribute("aria-hidden", "false");
-
-        clearHighlight();
-        if(name !== selectedName) {{
-          target.classList.add("highlight");
-        }}
-      }} else {{
-        tooltip.classList.remove("visible");
-        tooltip.setAttribute("aria-hidden", "true");
-        clearHighlight();
-      }}
-    }});
-    svg.addEventListener("mouseleave", () => {{
-      tooltip.classList.remove("visible");
-      tooltip.setAttribute("aria-hidden", "true");
-      clearHighlight();
-    }});
-
-    // Clique polígonos
-    svg.addEventListener("click", e => {{
-      const target = e.target;
-      if(target.classList.contains("polygon")) {{
-        selectMunicipio(target.dataset.name);
-      }}
-    }});
-
-    // Busca filtro
-    searchBox.addEventListener("input", () => {{
-      const val = searchBox.value.toLowerCase().trim();
-      Array.from(munList.children).forEach(div => {{
-        const visible = div.dataset.name.toLowerCase().includes(val);
-        div.style.display = visible ? "block" : "none";
-        if(paths[div.dataset.name]) {{
-          paths[div.dataset.name].style.display = visible ? "inline" : "none";
-        }}
-      }});
-    }});
-
-    // Foco inicial na busca
-    searchBox.focus();
-
-    // Inicializa painel info fechado
-    updateInfoPanel(null);
-
-  }})();
+input.addEventListener("input", () => {
+  const val = input.value.toLowerCase();
+  [...list.children].forEach(btn => {
+    btn.style.display = btn.textContent.toLowerCase().includes(val) ? "block" : "none";
+  });
+});
 </script>
-
 </body>
 </html>
 """
 
-# === Renderiza no Streamlit ===
-st.components.v1.html(html_code, height=920, scrolling=True)
+# Renderiza o HTML no app
+st.components.v1.html(html_code, height=720, scrolling=False)
