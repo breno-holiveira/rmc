@@ -39,8 +39,8 @@ html_code = f"""
 <title>Mapa Interativo RMC</title>
 <style>
   html, body {{
-    width: 1152px;   /* 1280 * 0.9 */
-    height: 630px;   /* 700 * 0.9 */
+    width: 1152px;
+    height: 630px;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', sans-serif;
@@ -60,7 +60,7 @@ html_code = f"""
     flex-direction: column;
   }}
   #sidebar h2 {{
-    margin: 0 0 7px 0;
+    margin: 0 0 8px 0;
     font-size: 16.2px; /* 18 * 0.9 */
     font-weight: 600;
     color: #1a2d5a;
@@ -87,7 +87,7 @@ html_code = f"""
   #list div {{
     padding: 7.2px 10.8px; /* 8 * 0.9, 12 * 0.9 */
     margin-bottom: 5.4px; /* 6 * 0.9 */
-    border-radius: 7.2px; /* 8 * 0.9 */
+    border-radius: 7.2px;
     cursor: pointer;
     user-select: none;
     font-size: 13.5px; /* 15 * 0.9 */
@@ -105,10 +105,10 @@ html_code = f"""
 
   /* Mapa e SVG */
   #map {{
-    width: 728px; /* Reduzido para abrir espaço para o info */
-    height: 630px; /* fixado */
+    width: 510px; /* 568 * 0.9 */
+    height: 630px;
     position: relative;
-    overflow: hidden; /* Impede scroll no mapa */
+    overflow: hidden;
   }}
   svg {{
     width: 100%;
@@ -117,13 +117,13 @@ html_code = f"""
   .area {{
     fill: #b6cce5;
     stroke: #4d648d;
-    stroke-width: 1;
+    stroke-width: 0.9;
     cursor: pointer;
     transition: all 0.3s ease;
   }}
   .area:hover {{
     fill: #8db3dd;
-    stroke-width: 1.5;
+    stroke-width: 1.35;
   }}
   .area.selected {{
     fill: #4d648d;
@@ -132,56 +132,50 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: fixed;
-    padding: 5px 10px;
+    position: fixed; /* fixado na tela */
+    padding: 4.5px 9px; /* 5 * 0.9, 10 * 0.9 */
     background: rgba(30, 60, 120, 0.95);
     color: white;
-    font-size: 12px;
-    border-radius: 5px;
+    font-size: 11.7px; /* 13 * 0.9 */
+    border-radius: 4.5px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0 7.2px rgba(0,0,0,0.1);
     z-index: 1000;
     user-select: none;
   }}
 
   /* Painel de Informações */
   #info {{
-    position: fixed;
-    right: 24px;
-    top: 40px;
-    width: 388px; /* aumentei um pouco para evitar cortes */
+    width: 388px; /* 431 * 0.9 */
+    height: 630px;
     background: #f0f3f8;
-    padding: 14px 18px;
+    padding: 14.4px 18px; /* 16 * 0.9, 20 * 0.9 */
     border-radius: 9px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    font-size: 12.6px;
+    font-size: 12.6px; /* 14 * 0.9 */
     line-height: 1.3;
     color: #1a2d5a;
     user-select: none;
-    display: none;
+    display: block; /* Sempre visível e lado a lado */
     border: 1px solid #d9e2f3;
-    z-index: 20;
-    white-space: normal; /* permite quebra, evita corte */
+    white-space: normal;
     overflow-wrap: break-word;
-  }}
-  #info.visible {{
-    display: block;
+    flex-shrink: 0;
   }}
   #info h3 {{
     margin: 0 0 10.8px 0;
-    font-size: 18px;
+    font-size: 18px; /* 20 * 0.9 */
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 5.4px;
-    white-space: nowrap; /* título sem quebra */
   }}
   #info .grid {{
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    row-gap: 7.2px;
-    column-gap: 21.6px;
+    grid-template-columns: auto auto;
+    row-gap: 6.3px; /* 7 * 0.9 */
+    column-gap: 10px; /* reduzido de 24px para 10px para menos espaçamento */
   }}
   #info .label {{
     font-weight: 600;
@@ -195,7 +189,7 @@ html_code = f"""
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 9.9px;
+    font-size: 9.9px; /* 11 * 0.9 */
     color: #7f8caa;
     font-style: italic;
     margin-top: 14.4px;
@@ -248,8 +242,8 @@ const minX = Math.min(...lons), maxX = Math.max(...lons);
 const minY = Math.min(...lats), maxY = Math.max(...lats);
 
 function project([lon, lat]) {{
-  const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
-  const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
+  const x = ((lon - minX) / (maxX - minX)) * 460 + 40;
+  const y = 600 - ((lat - minY) / (maxY - minY)) * 580;
   return [x, y];
 }}
 
@@ -268,7 +262,6 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        // Scroll customizado para só rolar a barra lateral e não a página
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
@@ -330,10 +323,9 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;
-    const offsetY = -22;
+    const offsetX = 7;  
+    const offsetY = -20; 
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -348,7 +340,6 @@ geo.features.forEach(f => {{
     select(name);
   }});
 
-  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
@@ -372,7 +363,6 @@ search.addEventListener("input", e => {{
   }}
 }});
 
-// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
