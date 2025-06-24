@@ -146,7 +146,7 @@ html_code = f"""
   #info-panel h3 {{
     margin-top: 0;
     font-weight: 700;
-    font-size: 20px;
+    font-size: 16px;
     color: #0b3d91;
     border-bottom: 2px solid #0b3d91;
     padding-bottom: 8px;
