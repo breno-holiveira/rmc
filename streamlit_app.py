@@ -45,7 +45,7 @@ html_code = f"""
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden;
+    overflow: hidden; /* Evita scroll da página */
   }}
   /* Sidebar com busca e lista */
   #sidebar {{
@@ -105,6 +105,7 @@ html_code = f"""
   #map {{
     flex-grow: 1;
     position: relative;
+    overflow: hidden; /* Impede scroll no mapa */
   }}
   svg {{
     width: 100%;
@@ -128,7 +129,7 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: absolute;
+    position: fixed; /* fixado na tela */
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -137,7 +138,8 @@ html_code = f"""
     pointer-events: none;
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    z-index: 10;
+    z-index: 1000;
+    user-select: none;
   }}
 
   /* Painel de Informações mais integrado */
@@ -312,8 +314,8 @@ geo.features.forEach(f => {{
 
   // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 12;  // distância horizontal do mouse para o tooltip
-    const offsetY = -28; // distância vertical do mouse para o tooltip (acima do cursor)
+    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
+    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -324,6 +326,7 @@ geo.features.forEach(f => {{
   }});
   path.addEventListener("click", e => {{
     e.preventDefault();  // previne scroll da página ao clicar no município
+    e.stopPropagation(); // evita propagação para scroll do container pai
     select(name);
   }});
 
