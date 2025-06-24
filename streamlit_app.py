@@ -1,8 +1,8 @@
-import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import json
 from pathlib import Path
+import json
+import geopandas as gpd
+import pandas as pd
+import streamlit as st
 
 # CONFIGURAÇÕES DA PÁGINA INICIAL
 st.set_page_config(
@@ -62,20 +62,18 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML/JS para o mapa interativo embutido no Streamlit
-
-html_code = f"""
-<!DOCTYPE html>
+# PREPARA VARIÁVEL HTML
+html_code = f"""<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <title>Mapa Interativo RMC</title>
 <style>
-  *, *::before, *::after {
+  *, *::before, *::after {{
     box-sizing: border-box;
-  }
+  }}
 
-  html, body {
+  html, body {{
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -86,17 +84,17 @@ html_code = f"""
     display: grid;
     grid-template-columns: 220px 1fr auto;
     grid-template-rows: 100vh;
-  }
+  }}
 
-  #legend {
+  #legend {{
     background: #fff;
     padding: 16px 20px;
     border-right: 1px solid #e0e0e0;
     overflow-y: auto;
     box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-  }
+  }}
 
-  #legend strong {
+  #legend strong {{
     display: block;
     font-weight: bold;
     font-size: 16px;
@@ -104,9 +102,9 @@ html_code = f"""
     border-bottom: 1px solid #0b3d91;
     padding-bottom: 6px;
     margin-bottom: 12px;
-  }
+  }}
 
-  #legend div {
+  #legend div {{
     margin-bottom: 8px;
     padding: 6px 10px;
     border-radius: 6px;
@@ -114,30 +112,30 @@ html_code = f"""
     font-size: 14px;
     color: #333;
     transition: background 0.3s;
-  }
+  }}
 
-  #legend div:hover {
+  #legend div:hover {{
     background: #eef3fc;
-  }
+  }}
 
-  #legend div.active {
+  #legend div.active {{
     background-color: #0b3d91;
     color: #fff;
     font-weight: 700;
-  }
+  }}
 
-  #map {
+  #map {{
     position: relative;
     background: #fff;
-  }
+  }}
 
-  svg {
+  svg {{
     width: 100%;
     height: 100vh;
     display: block;
-  }
+  }}
 
-  #tooltip {
+  #tooltip {{
     position: absolute;
     pointer-events: none;
     padding: 6px 12px;
@@ -149,9 +147,9 @@ html_code = f"""
     box-shadow: 0 0 6px rgba(11, 61, 145, 0.4);
     display: none;
     z-index: 1000;
-  }
+  }}
 
-  #info-panel {
+  #info-panel {{
     background: #fff;
     padding: 20px 24px;
     width: 330px;
@@ -161,40 +159,40 @@ html_code = f"""
     font-size: 15px;
     display: none;
     position: relative;
-  }
+  }}
 
-  #info-panel.visible {
+  #info-panel.visible {{
     display: block;
-  }
+  }}
 
-  #info-panel h3 {
+  #info-panel h3 {{
     margin-top: 0;
     font-size: 17px;
     color: #0b3d91;
     border-bottom: 2px solid #0b3d91;
     padding-bottom: 6px;
     margin-bottom: 16px;
-  }
+  }}
 
-  #info-panel div {
+  #info-panel div {{
     margin-bottom: 14px;
     display: flex;
     flex-direction: column;
-  }
+  }}
 
-  #info-panel div strong {
+  #info-panel div strong {{
     color: #0b3d91;
     font-weight: 600;
     margin-bottom: 2px;
-  }
+  }}
 
-  #info-panel div span {
+  #info-panel div span {{
     color: #333;
     font-weight: 500;
     white-space: normal;
-  }
+  }}
 
-  #info-panel button#close-info {
+  #info-panel button#close-info {{
     position: absolute;
     top: 8px;
     right: 12px;
@@ -203,36 +201,36 @@ html_code = f"""
     font-size: 20px;
     color: #0b3d91;
     cursor: pointer;
-  }
+  }}
 
-  #info-panel .fonte {
+  #info-panel .fonte {{
     font-size: 11px;
     color: #666;
     margin-top: 20px;
     text-align: right;
     font-style: italic;
-  }
+  }}
 
-  .polygon {
+  .polygon {{
     fill: rgba(11, 61, 145, 0.15);
     stroke: rgba(11, 61, 145, 0.6);
     stroke-width: 1;
     cursor: pointer;
     transition: all 0.3s ease;
-  }
+  }}
 
-  .polygon:hover {
+  .polygon:hover {{
     fill: rgba(11, 61, 145, 0.3);
     stroke-width: 2;
     filter: drop-shadow(0 0 6px rgba(11, 61, 145, 0.25));
-  }
+  }}
 
-  .polygon.selected {
+  .polygon.selected {{
     fill: rgba(11, 61, 145, 0.4);
     stroke: rgba(11, 61, 145, 0.8);
     stroke-width: 2.5;
     filter: drop-shadow(0 0 10px rgba(11, 61, 145, 0.5));
-  }
+  }}
 </style>
 </head>
 <body>
@@ -260,9 +258,7 @@ html_code = f"""
   </aside>
 
 </body>
-</html>
+</html>"""
 
-"""
-
-# Renderiza o HTML no Streamlit
+# RENDERIZA O HTML NO STREAMLIT
 st.components.v1.html(html_code, height=650, scrolling=True)
