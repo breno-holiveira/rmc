@@ -3,14 +3,10 @@ import geopandas as gpd
 import json
 from pathlib import Path
 
-# Configurações da página Streamlit
 st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
-
-# Título e descrição
 st.title("RMC Data")
 st.header("Dados e indicadores da Região Metropolitana de Campinas")
 
-# Dicionário com dados adicionais
 dados_extra = {
     "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
     "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
@@ -33,365 +29,119 @@ dados_extra = {
     "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
 }
 
-# Carregando shapefile e projetando para WGS84 (EPSG:4326)
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-if gdf.crs != "EPSG:4326":
-    gdf = gdf.to_crs("EPSG:4326")
-
+gdf = gdf.to_crs("EPSG:4326") if gdf.crs != "EPSG:4326" else gdf
 gdf = gdf.sort_values(by="NM_MUN")
 
-# Construindo GeoJSON com dados extras
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
-    geom = row["geometry"].__geo_interface__
-    extra = dados_extra.get(nome, {"populacao": None, "area": None, "pib_2021": None})
+    props = dados_extra.get(nome, {})
     features.append({
         "type": "Feature",
         "properties": {
             "name": nome,
-            "populacao": extra["populacao"],
-            "area": extra["area"],
-            "pib_2021": extra["pib_2021"]
+            "populacao": props.get("populacao"),
+            "area": props.get("area"),
+            "pib_2021": props.get("pib_2021")
         },
-        "geometry": geom
+        "geometry": row["geometry"].__geo_interface__
     })
 
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML/JS para o mapa interativo embutido no Streamlit
-html_code = f"""
+with open("mapa_rmc_simplificado.html", "w", encoding="utf-8") as f:
+    f.write(f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<title>Mapa Interativo RMC - Transparência</title>
+<title>Mapa Interativo RMC</title>
 <style>
-  /* Reset básico */
-  *, *::before, *::after {{
-    box-sizing: border-box;
-  }}
-  html, body {{
-    margin: 0; padding: 0;
-    height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background-color: transparent;
-    color: #222;
-    display: flex;
-    overflow: hidden;
-  }}
-
-  /* Sidebar da legenda */
-  #legend {{
-    width: 210px;
-    background: #fff;
-    padding: 16px 20px;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-    border-right: 1px solid #e3e6ea;
-    overflow-y: auto;
-  }}
-  #legend strong {{
-    display: block;
-    font-weight: 700;
-    font-size: 16px;
-    margin-bottom: 12px;
-    color: #0b3d91;
-  }}
-  #legend div {{
-    margin-bottom: 8px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    color: #3a3a3a;
-    font-size: 14px;
-  }}
-  #legend div:hover {{
-    background-color: ;
-    color: #08318d;
-  }}
-  #legend div.active {{
-    background-color: #0b3d91;
-    color: #fff;
-    font-weight: 700;
-  }}
-
-  /* Container do mapa */
-  #map {{
-    flex-grow: 1;
-    position: relative;
-    background: #fff;
-  }}
-  svg {{
-    width: 100%;
-    height: 100vh;
-    display: block;
-    user-select: none;
-  }}
-
-  /* Painel de informação */
-  #info-panel {{
-    width: 280px;
-    background: #fff;
-    padding: 20px 24px;
-    border-left: 0px solid #e3e6ea;
-    box-shadow: -2px 0 8px rgba(0,0,0,0.05);
-    color: #333;
-    font-size: 15px;
-    line-height: 1.5;
-    overflow-y: auto;
-  }}
-  #info-panel h3 {{
-    margin-top: 0;
-    font-weight: 700;
-    font-size: 16px;
-    color: #0b3d91;
-    border-bottom: 2px solid #0b3d91;
-    padding-bottom: 8px;
-    margin-bottom: 16px;
-  }}
-  #info-panel div {{
-    margin-bottom: 14px;
-  }}
-  #info-panel div strong {{
-    display: inline-block;
-    width: 100px;
-    color: #0b3d91;
-  }}
-
-  /* Polígonos */
-  .polygon {{
-    fill: rgba(11, 61, 145, 0.15);
-    stroke: rgba(11, 61, 145, 0.6);
-    stroke-width: 1;
-    cursor: pointer;
-    transition: fill 0.25s ease, stroke 0.25s ease;
-    opacity: 0.85;
-  }}
-  .polygon:hover {{
-    fill: rgba(11, 61, 145, 0.35);
-    stroke-width: 2;
-    filter: drop-shadow(0 0 6px rgba(11, 61, 145, 0.3));
-  }}
-  .polygon.selected {{
-    fill: rgba(11, 61, 145, 0.45);
-    stroke: rgba(11, 61, 145, 0.8);
-    stroke-width: 2.5;
-    filter: drop-shadow(0 0 10px rgba(11, 61, 145, 0.5));
-  }}
-
-  /* Tooltip */
-  #tooltip {{
-    position: absolute;
-    pointer-events: none;
-    padding: 6px 12px;
-    background: rgba(11, 61, 145, 0.9);
-    color: #fefefe;
-    font-weight: 600;
-    font-size: 12px;
-    border-radius: 5px;
-    white-space: nowrap;
-    box-shadow: 0 0 6px rgba(11, 61, 145, 0.5);
-    display: none;
-    user-select: none;
-    z-index: 1000;
-  }}
+  html, body {{ margin: 0; height: 100%; font-family: sans-serif; background: #fff; display: flex; }}
+  #legend {{ width: 210px; padding: 16px; background: #fff; border-right: 1px solid #ccc; overflow-y: auto; }}
+  #legend strong {{ display: block; font-size: 15px; margin-bottom: 12px; color: #0b3d91; }}
+  #legend div {{ padding: 8px; cursor: pointer; font-size: 14px; border-radius: 4px; transition: 0.2s; }}
+  #legend div:hover:not(.active) {{ background: #eef4ff; color: #0b3d91; }}
+  #legend div.active {{ background: #0b3d91; color: white; font-weight: bold; }}
+  #map {{ flex: 1; position: relative; }}
+  svg {{ width: 100%; height: 100vh; display: block; }}
+  #info-panel {{ width: 260px; padding: 16px; background: #f9f9f9; border-left: 1px solid #ccc; font-size: 14px; }}
+  #info-panel h3 {{ margin: 0 0 10px; font-size: 16px; color: #0b3d91; }}
+  #info-panel div strong {{ display: inline-block; width: 100px; color: #0b3d91; }}
+  .polygon {{ fill: rgba(11,61,145,0.15); stroke: rgba(11,61,145,0.6); stroke-width: 1; cursor: pointer; }}
+  .polygon:hover {{ fill: rgba(11,61,145,0.3); stroke-width: 2; }}
+  .polygon.selected {{ fill: rgba(11,61,145,0.45); stroke-width: 2.5; }}
 </style>
 </head>
 <body>
-  <nav id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
-    <strong>Selecione um município:</strong>
-    <div id="mun-list" tabindex="0"></div>
-  </nav>
-
-  <main id="map" role="region" aria-label="Mapa interativo dos municípios da Região Metropolitana de Campinas">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
-    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-  </main>
-
-  <aside id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Selecione um município</h3>
-    <div><strong>População:</strong> <span>-</span></div>
-    <div><strong>Área:</strong> <span>-</span></div>
-    <div><strong>PIB (2021):</strong> <span>-</span></div>
-  </aside>
-
+<nav id="legend"><strong>Municípios</strong><div id="mun-list"></div></nav>
+<main id="map"><svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg></main>
+<aside id="info-panel"><h3>Selecione um município</h3>
+<div><strong>População:</strong> <span>-</span></div>
+<div><strong>Área:</strong> <span>-</span></div>
+<div><strong>PIB (2021):</strong> <span>-</span></div></aside>
 <script>
-  const geojson = {geojson_str};
-  const svg = document.querySelector("svg");
-  const munList = document.getElementById("mun-list");
-  const tooltip = document.getElementById("tooltip");
-  const infoPanel = document.getElementById("info-panel");
-  const mapDiv = document.getElementById("map");
+const geojson = {geojson_str};
+const svg = document.querySelector("svg");
+const munList = document.getElementById("mun-list");
+const infoPanel = document.getElementById("info-panel");
+let selectedName = null, paths = {{}};
 
-  let selectedName = null;
-  const paths = {{}};
+let coords = [];
+geojson.features.forEach(f => {{
+  const g = f.geometry;
+  (g.type === "Polygon" ? [g.coordinates] : g.coordinates).forEach(poly => 
+    poly[0].forEach(c => coords.push(c)));
+}});
+const [minLon, maxLon] = [Math.min(...coords.map(c => c[0])), Math.max(...coords.map(c => c[0]))];
+const [minLat, maxLat] = [Math.min(...coords.map(c => c[1])), Math.max(...coords.map(c => c[1]))];
 
-  // Extrai coordenadas para projeção
-  let allCoords = [];
-  geojson.features.forEach(f => {{
-    const geom = f.geometry;
-    if (geom.type === "Polygon") {{
-      geom.coordinates[0].forEach(c => allCoords.push(c));
-    }} else if (geom.type === "MultiPolygon") {{
-      geom.coordinates.forEach(poly => poly[0].forEach(c => allCoords.push(c)));
-    }}
-  }});
-
-  const lons = allCoords.map(c => c[0]);
-  const lats = allCoords.map(c => c[1]);
-  const minLon = Math.min(...lons);
-  const maxLon = Math.max(...lons);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-
-  // Função simples de projeção geográfica para coordenadas SVG
-  function project(coord) {{
-    const [lon, lat] = coord;
-    const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
-    const y = 900 - ((lat - minLat) / (maxLat - minLat)) * 850;
-    return [x, y];
+function project([lon, lat]) {{
+  const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
+  const y = 900 - ((lat - minLat) / (maxLat - minLat)) * 850;
+  return [x, y];
+}}
+function polyPath(coords) {{ return coords.map(c => project(c).join(",")).join(" "); }}
+function format(num) {{ return num?.toLocaleString("pt-BR") ?? "N/A"; }}
+function updateInfo(d) {{
+  infoPanel.querySelector("h3").textContent = d?.name || "Selecione um município";
+  const [p, a, pib] = infoPanel.querySelectorAll("span");
+  p.textContent = format(d?.populacao); a.textContent = d?.area ? d.area.toFixed(1)+" km²" : "N/A";
+  pib.textContent = d?.pib_2021 ? "R$ " + format(d.pib_2021) : "N/A";
+}}
+function select(name) {{
+  Object.values(paths).forEach(p => p.classList.remove("selected"));
+  if(paths[name]) paths[name].classList.add("selected");
+  Array.from(munList.children).forEach(div => div.classList.toggle("active", div.dataset.name === name));
+  selectedName = name;
+  updateInfo(geojson.features.find(f => f.properties.name === name)?.properties);
+}}
+geojson.features.forEach(f => {{
+  const n = f.properties.name;
+  let d = "";
+  if(f.geometry.type === "Polygon") {{
+    d = "M" + polyPath(f.geometry.coordinates[0]) + " Z";
+  }} else {{
+    f.geometry.coordinates.forEach(p => d += "M" + polyPath(p[0]) + " Z");
   }}
+  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  path.setAttribute("d", d);
+  path.classList.add("polygon");
+  svg.appendChild(path);
+  paths[n] = path;
+  path.addEventListener("click", () => select(n));
 
-  // Converte array de coordenadas em path SVG
-  function polygonToPath(coords) {{
-    return coords.map(c => {{
-      const [x, y] = project(c);
-      return x + "," + y;
-    }}).join(" ");
-  }}
-
-  // Formata número para o padrão pt-BR
-  function formatNumber(num) {{
-    if(num === null || num === undefined) return "N/A";
-    return num.toLocaleString('pt-BR');
-  }}
-
-  // Atualiza o painel de informações com dados do município
-  function updateInfoPanel(data) {{
-    if(!data) {{
-      infoPanel.querySelector('h3').textContent = "Selecione um município";
-      infoPanel.querySelectorAll('div span').forEach(span => span.textContent = "-");
-      return;
-    }}
-    infoPanel.querySelector('h3').textContent = data.name;
-    const spans = infoPanel.querySelectorAll('div span');
-    spans[0].textContent = formatNumber(data.populacao);
-    spans[1].textContent = data.area ? data.area.toFixed(1) + " km²" : "N/A";
-    spans[2].textContent = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021) : "N/A";
-  }}
-
-  // Limpa realce de todos polígonos
-  function clearHighlight() {{
-    Object.values(paths).forEach(p => p.classList.remove("highlight"));
-  }}
-
-  // Limpa seleção de todos polígonos
-  function clearSelection() {{
-    Object.values(paths).forEach(p => p.classList.remove("selected"));
-  }}
-
-  // Atualiza estilo ativo da legenda
-  function setActiveLegend(name) {{
-    Array.from(munList.children).forEach(child => {{
-      child.classList.toggle("active", child.dataset.name === name);
-    }});
-  }}
-
-  // Seleciona município
-  function selectMunicipio(name) {{
-    clearHighlight();
-    clearSelection();
-    if(paths[name]) paths[name].classList.add("selected");
-    setActiveLegend(name);
-    selectedName = name;
-
-    const data = geojson.features.find(f => f.properties.name === name);
-    if (data) {{
-      updateInfoPanel(data.properties);
-    }}
-  }}
-
-  // Criando polígonos SVG e itens da legenda
-  geojson.features.forEach(f => {{
-    const props = f.properties;
-    const name = props.name;
-    const geom = f.geometry;
-    let pathD = "";
-
-    if (geom.type === "Polygon") {{
-      pathD = "M" + polygonToPath(geom.coordinates[0]) + " Z";
-    }} else if (geom.type === "MultiPolygon") {{
-      geom.coordinates.forEach(poly => {{
-        pathD += "M" + polygonToPath(poly[0]) + " Z";
-      }});
-    }}
-
-    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    pathEl.setAttribute("d", pathD);
-    pathEl.classList.add("polygon");
-    pathEl.setAttribute("data-name", name);
-
-    svg.appendChild(pathEl);
-    paths[name] = pathEl;
-
-    // Eventos para tooltip e seleção
-    pathEl.addEventListener("mousemove", (e) => {{
-      tooltip.style.display = "block";
-      tooltip.textContent = name;
-      const mapRect = mapDiv.getBoundingClientRect();
-      let left = e.clientX - mapRect.left + 10;
-      let top = e.clientY - mapRect.top + 10;
-
-      if(left + tooltip.offsetWidth > mapRect.width) {{
-        left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
-      }}
-      if(top + tooltip.offsetHeight > mapRect.height) {{
-        top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
-      }}
-
-      tooltip.style.left = left + "px";
-      tooltip.style.top = top + "px";
-
-      clearHighlight();
-      if (!pathEl.classList.contains("selected")) {{
-        pathEl.classList.add("highlight");
-      }}
-    }});
-
-    pathEl.addEventListener("mouseleave", () => {{
-      tooltip.style.display = "none";
-      clearHighlight();
-    }});
-
-    pathEl.addEventListener("click", () => {{
-      selectMunicipio(name);
-    }});
-
-    // Cria item da legenda
-    const legendItem = document.createElement("div");
-    legendItem.textContent = name;
-    legendItem.dataset.name = name;
-    munList.appendChild(legendItem);
-
-    legendItem.addEventListener("mouseenter", () => {{
-      clearHighlight();
-      if(paths[name] && !paths[name].classList.contains("selected")) paths[name].classList.add("highlight");
-    }});
-    legendItem.addEventListener("mouseleave", () => {{
-      clearHighlight();
-    }});
-    legendItem.addEventListener("click", () => {{
-      selectMunicipio(name);
-    }});
-  }});
+  const div = document.createElement("div");
+  div.textContent = n; div.dataset.name = n;
+  div.onclick = () => select(n);
+  munList.appendChild(div);
+}});
 </script>
-
 </body>
 </html>
-"""
+""")
 
-# Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=600, scrolling=True)
+# Renderiza no Streamlit
+st.components.v1.html(Path("mapa_rmc_simplificado.html").read_text(encoding="utf-8"), height=620, scrolling=False)
