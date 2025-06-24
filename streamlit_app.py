@@ -153,7 +153,7 @@ html_code = f"""
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     max-width: 320px;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.3;
     color: #1a2d5a;
     user-select: none;
