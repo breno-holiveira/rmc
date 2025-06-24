@@ -45,7 +45,7 @@ html_code = f"""
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden; /* Bloqueia scroll da página */
+    overflow: hidden; /* Evita scroll da página */
   }}
   /* Sidebar com busca e lista */
   #sidebar {{
@@ -105,6 +105,7 @@ html_code = f"""
   #map {{
     flex-grow: 1;
     position: relative;
+    overflow: hidden; /* Impede scroll no mapa */
   }}
   svg {{
     width: 100%;
@@ -128,7 +129,7 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: absolute;
+    position: fixed; /* fixado na tela */
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -137,9 +138,8 @@ html_code = f"""
     pointer-events: none;
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    z-index: 10;
-    /* Aproximar tooltip do mouse */
-    transform: translate(12px, 12px);
+    z-index: 1000;
+    user-select: none;
   }}
 
   /* Painel de Informações mais integrado */
@@ -231,7 +231,6 @@ const search = document.getElementById("search");
 let selected = null;
 const paths = {{}};
 
-// Coordenadas para projeção simples
 let coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
@@ -261,7 +260,6 @@ function select(name) {{
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    // Ativa item na legenda sem rolar a janela, apenas a barra da legenda rola:
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
@@ -316,9 +314,8 @@ geo.features.forEach(f => {{
 
   // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    // Aproxima o tooltip do mouse, reduzindo distância:
-    const offsetX = 12;
-    const offsetY = 12;
+    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
+    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -327,7 +324,11 @@ geo.features.forEach(f => {{
   path.addEventListener("mouseleave", () => {{
     tooltip.style.display = "none";
   }});
-  path.addEventListener("click", () => select(name));
+  path.addEventListener("click", e => {{
+    e.preventDefault();  // previne scroll da página ao clicar no município
+    e.stopPropagation(); // evita propagação para scroll do container pai
+    select(name);
+  }});
 
   // Item da legenda
   const div = document.createElement("div");
@@ -347,7 +348,6 @@ geo.features.forEach(f => {{
 
 search.addEventListener("input", e => {{
   updateList(e.target.value);
-  // Se um só item visível, seleciona ele automaticamente
   const visibleItems = [...list.children].filter(d => d.style.display !== "none");
   if(visibleItems.length === 1) {{
     select(visibleItems[0].dataset.name);
@@ -358,23 +358,6 @@ search.addEventListener("input", e => {{
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
-
-// Bloqueia scroll da página quando mouse está sobre o mapa para evitar scroll indesejado
-const body = document.body;
-const mapDiv = document.getElementById("map");
-
-// Bloqueia scroll da página ao entrar no mapa
-mapDiv.addEventListener("mouseenter", () => {{
-  body.style.overflow = "hidden";
-}});
-// Libera scroll da página ao sair do mapa
-mapDiv.addEventListener("mouseleave", () => {{
-  body.style.overflow = "auto";
-}});
-// Previne scroll da roda do mouse sobre o mapa
-mapDiv.addEventListener("wheel", e => {{
-  e.preventDefault();
-}}, {{ passive: false }});
 </script>
 </body>
 </html>
