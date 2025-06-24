@@ -5,7 +5,7 @@ import json
 
 # CONFIGURAÇÃO DA PÁGINA
 st.set_page_config(
-    page_title='RC Data',
+    page_title='RCM Data',
     page_icon='📊',
     layout='wide',
     initial_sidebar_state='expanded'
