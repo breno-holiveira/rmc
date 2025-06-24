@@ -67,7 +67,7 @@ html_code = f"""
   #search {{
     margin-bottom: 10px;
     padding: 6px 10px;
-    font-size: 15px;
+    font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
@@ -83,7 +83,7 @@ html_code = f"""
     padding-right: 4px;
   }}
   #list div {{
-    padding: 4px 8px;
+    padding: 6px 10px;
     margin-bottom: 4px;
     border-radius: 8px;
     cursor: pointer;
