@@ -35,42 +35,38 @@ html_code = f"""
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=1280" />  <!-- FIXA a viewport para desktop -->
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Container fixo para página */
   html, body {{
+    height: 100vh;
     margin: 0;
     padding: 0;
-    width: 1000px;  /* fixo para evitar scroll horizontal */
-    height: 700px;  /* fixo para evitar scroll vertical */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
-    overflow: hidden;
     display: flex;
-    flex-direction: row;
+    overflow: hidden; /* Evita scroll geral */
   }}
-
   /* Sidebar fixa */
   #sidebar {{
     width: 260px;
-    height: 700px;
     background: #fff;
     padding: 20px 16px 12px 16px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
-    user-select: none;
+    flex-shrink: 0;
+    height: 100vh;
+    overflow-y: auto;
   }}
-
   #sidebar h2 {{
     margin: 0 0 8px 0;
     font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
+    user-select: none;
   }}
-
   #search {{
     margin-bottom: 12px;
     padding: 8px 12px;
@@ -84,13 +80,10 @@ html_code = f"""
     border-color: #4d648d;
     box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
   }}
-
   #list {{
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 6px;
-    font-size: 15px;
-    color: #1a2d5a;
   }}
   #list div {{
     padding: 8px 12px;
@@ -98,6 +91,8 @@ html_code = f"""
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
+    font-size: 15px;
+    color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
@@ -109,16 +104,17 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Mapa fixo */
+  /* Área do mapa - fixo */
   #map {{
+    width: 720px;   /* largura fixa para evitar distorção */
+    height: 650px;  /* altura fixa */
     position: relative;
-    width: 640px;
-    height: 700px;
-    overflow: hidden;
+    overflow: hidden; /* sem scroll no mapa */
+    flex-shrink: 0;
   }}
   svg {{
-    width: 640px;
-    height: 700px;
+    width: 100%;
+    height: 100%;
   }}
   .area {{
     fill: #b6cce5;
@@ -151,13 +147,14 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Caixa de informações fixa e não sobrepõe */
+  /* Caixa de informações fixa e sem scroll */
   #info {{
     position: fixed;
     right: 16px;
-    top: 16px;
-    width: 280px;
-    max-height: 660px;
+    top: 40px;
+    width: 260px;
+    height: auto;
+    max-height: none;
     background: #f0f3f8;
     padding: 16px 20px;
     border-radius: 10px;
@@ -166,10 +163,15 @@ html_code = f"""
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
-    overflow-y: auto;
     border: 1px solid #d9e2f3;
     display: none;
     z-index: 20;
+    overflow: visible;
+    white-space: nowrap;
+  }}
+  #info .value {{
+    white-space: normal;
+    overflow-wrap: break-word;
   }}
   #info.visible {{
     display: block;
@@ -195,13 +197,6 @@ html_code = f"""
     font-weight: 600;
     color: #4d648d;
     white-space: nowrap;
-  }}
-
-  #info .value {{
-    font-weight: 500;
-    text-align: right;
-    color: #34495e;
-    overflow-wrap: break-word;
   }}
 
   #info .fonte {{
@@ -279,7 +274,7 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        // Scroll customizado para só rolar a barra lateral e não a página
+        // Scroll customizado só na lista lateral
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
@@ -323,7 +318,6 @@ function updateList(filter = "") {{
   }});
 }}
 
-// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -341,10 +335,9 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
+    const offsetX = 8;
+    const offsetY = -22;
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -359,7 +352,6 @@ geo.features.forEach(f => {{
     select(name);
   }});
 
-  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
