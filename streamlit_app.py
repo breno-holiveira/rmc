@@ -188,15 +188,22 @@ html_code = f"""
   // Projeção simples para coordenadas geo para SVG (proj linear)
   // Ajustar para encaixar bem no viewBox 1000x950
   const margin = 20;
-  let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
-  geojson.features.forEach(f => {{
-    f.geometry.coordinates.flat(Infinity).forEach(coord => {{
-      if (coord[0] < bounds[0]) bounds[0] = coord[0];
-      if (coord[1] < bounds[1]) bounds[1] = coord[1];
-      if (coord[0] > bounds[2]) bounds[2] = coord[0];
-      if (coord[1] > bounds[3]) bounds[3] = coord[1];
-    }});
-  }});
+let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
+geojson.features.forEach(f => {
+  // Função para aplanar recursivamente as coordenadas (multipolygon pode ter vários níveis)
+  function flattenCoords(coords) {
+    if (typeof coords[0] === 'number') return [coords];
+    return coords.flatMap(flattenCoords);
+  }
+  const coords = flattenCoords(f.geometry.coordinates);
+  coords.forEach(coord => {
+    if (coord[0] < bounds[0]) bounds[0] = coord[0];
+    if (coord[1] < bounds[1]) bounds[1] = coord[1];
+    if (coord[0] > bounds[2]) bounds[2] = coord[0];
+    if (coord[1] > bounds[3]) bounds[3] = coord[1];
+  });
+});
+
 
   const width = 1000 - margin*2;
   const height = 950 - margin*2;
