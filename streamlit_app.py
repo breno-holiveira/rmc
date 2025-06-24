@@ -289,7 +289,7 @@ html_code = f"""
   spans[1].textContent = data.area ? data.area.toFixed(1) + " km²" : "-";
   spans[2].textContent = formatNumber(data.pib_2021, 2, true);
 
-  spans[3].textContent = data.participacao_rmc ? data.participacao_rmc : "-";
+  spans[3].textContent = data.participacao_rmc ? formatNumber(data.participacao_rmc, 4, false, true) : "-";
 
   spans[4].textContent = formatNumber(data.pib_per_capita, 2, true);
   spans[5].textContent = formatNumber(data.densidade_demografica, 2);
