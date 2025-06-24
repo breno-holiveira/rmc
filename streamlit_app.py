@@ -49,7 +49,7 @@ html_code = f"""
   }}
   /* Sidebar */
   #sidebar {{
-    width: 260px;
+    width: 230px;
     background: #fff;
     padding: 14px 11px 7px 11px;
     border-right: 1px solid #e1e4e8;
