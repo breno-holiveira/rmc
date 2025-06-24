@@ -394,4 +394,4 @@ html_code = f"""
 """
 
 # Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=600, scrolling=True)
+st.components.v1.html(html_code, height=650, scrolling=True)
