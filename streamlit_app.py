@@ -34,102 +34,49 @@ html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mapa Interativo RMC</title>
 <style>
   html, body {{
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
     overflow: hidden;
-    color: #34495e;
   }}
-  /* LEGENDA REFINADA */
   #sidebar {{
-    width: 260px;
+    width: 240px;
     background: #ffffff;
-    padding: 24px 20px 20px 20px;
-    border-right: 1px solid #dfe6eb;
-    box-shadow: 2px 0 12px rgba(100, 110, 120, 0.06);
-    display: flex;
-    flex-direction: column;
-    font-size: 16px;
-    user-select: none;
-  }}
-  #sidebar > strong {{
-    font-size: 22px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    border-bottom: 3px solid #2980b9;
-    padding-bottom: 10px;
-  }}
-  #search-box {{
-    padding: 12px 16px;
-    font-size: 16px;
-    border: 1.8px solid #b0bec5;
-    border-radius: 14px;
-    outline-offset: 2px;
-    background: #fefefe;
-    font-weight: 600;
-    color: #34495e;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 20px;
-    user-select: text;
-    box-shadow: inset 0 1px 3px #e0e7ed;
-  }}
-  #search-box::placeholder {{
-    color: #90a4ae;
-    font-weight: 500;
-  }}
-  #search-box:focus {{
-    border-color: #2980b9;
-    box-shadow: 0 0 10px #5dade2cc;
-  }}
-  #list {{
+    padding: 20px;
+    border-right: 1px solid #e1e4e8;
+    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     overflow-y: auto;
-    flex-grow: 1;
-    scrollbar-width: thin;
-    scrollbar-color: #b0bec5 transparent;
   }}
-  #list::-webkit-scrollbar {{
-    width: 8px;
+  #sidebar h2 {{
+    font-size: 16px;
+    color: #1a2d5a;
+    margin-top: 0;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
   }}
-  #list::-webkit-scrollbar-thumb {{
-    background-color: #b0bec5;
-    border-radius: 6px;
-  }}
-  #list > div {{
-    padding: 14px 22px;
-    border-radius: 14px;
-    margin-bottom: 10px;
+  #sidebar div {{
+    margin: 6px 0;
+    padding: 6px 10px;
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: 600;
-    color: #34495e;
-    transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    transition: background-color 0.3s;
     user-select: none;
   }}
-  #list > div:hover {{
-    background-color: #d6e6fb;
-    color: #1a4f8a;
-    box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
+  #sidebar div:hover {{
+    background-color: #e3ecf9;
   }}
-  #list > div.active {{
-    background-color: #2980b9;
+  #sidebar div.active {{
+    background-color: #1a2d5a;
     color: #fff;
-    font-weight: 700;
-    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.45);
   }}
-
-  /* MAPA */
   #map {{
     flex-grow: 1;
     position: relative;
@@ -155,65 +102,58 @@ html_code = f"""
   }}
   #tooltip {{
     position: absolute;
-    padding: 6px 12px;
+    padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
     font-size: 13px;
-    border-radius: 7px;
+    border-radius: 5px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.12);
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
   }}
-  /* PAINEL DE INFORMAÇÕES */
   #info {{
     position: fixed;
     right: 30px;
     top: 40px;
     background: #fff;
-    padding: 22px 26px;
-    border-radius: 16px;
-    box-shadow: 0 6px 30px rgba(0,0,0,0.09);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
     max-width: 320px;
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 14px;
+    line-height: 1.5;
     display: none;
     border: 1px solid #d8dee9;
-    color: #2c3e50;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
     margin-top: 0;
-    color: #2c3e50;
-    font-size: 20px;
-    border-bottom: 1.8px solid #ccc;
-    padding-bottom: 10px;
-    font-weight: 700;
+    color: #1a2d5a;
+    font-size: 18px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
   }}
   #info div {{
-    margin: 8px 0;
+    margin: 6px 0;
   }}
   #info .fonte {{
-    font-size: 12px;
-    margin-top: 14px;
+    font-size: 11px;
+    margin-top: 12px;
     color: #777;
-    font-style: italic;
   }}
 </style>
 </head>
 <body>
   <div id="sidebar" role="complementary" aria-label="Lista de municípios">
-    <strong>Municípios</strong>
-    <input type="search" id="search-box" placeholder="Buscar município..." autocomplete="off" aria-label="Buscar município" />
+    <h2>Municípios</h2>
     <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
-
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
-
   <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
     <div><strong>PIB 2021:</strong> <span id="pib"></span></div>
@@ -224,14 +164,12 @@ html_code = f"""
     <div><strong>Densidade demográfica:</strong> <span id="dens"></span></div>
     <div class="fonte">Fonte: IBGE Cidades</div>
   </div>
-
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
 const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("list");
-const searchBox = document.getElementById("search-box");
 
 let selected = null;
 const paths = {{}};
@@ -284,7 +222,7 @@ function showInfo(name) {{
   info.classList.add("visible");
 }}
 
-// Montar polígonos e lista da legenda
+// Construção dos polígonos e legenda interativa
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -302,7 +240,7 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos no mapa
+  // Eventos mapa
   path.addEventListener("mousemove", e => {{
     tooltip.style.left = (e.clientX + 10) + "px";
     tooltip.style.top = (e.clientY + 10) + "px";
@@ -314,35 +252,17 @@ geo.features.forEach(f => {{
   }});
   path.addEventListener("click", () => select(name));
 
-  // Item da legenda
+  // Item legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
-  div.tabIndex = 0;
-  div.setAttribute("role", "option");
   div.addEventListener("click", () => select(name));
-  div.addEventListener("keydown", e => {{
-    if(e.key === "Enter" || e.key === " ") {{
-      e.preventDefault();
-      select(name);
-    }}
-  }});
   list.appendChild(div);
 }});
 
-// Busca dinâmica na legenda
-searchBox.addEventListener("input", e => {{
-  const val = e.target.value.toLowerCase();
-  Array.from(list.children).forEach(div => {{
-    div.style.display = div.textContent.toLowerCase().includes(val) ? "" : "none";
-  }});
-}});
-
-// Seleciona o primeiro município automaticamente
+// Seleciona automaticamente o primeiro município
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
-  const firstActive = list.querySelector("div.active");
-  if(firstActive) firstActive.scrollIntoView({{behavior: "smooth", block: "center"}});
 }}
 </script>
 </body>
