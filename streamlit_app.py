@@ -49,7 +49,7 @@ html_code = f"""
   }}
   /* Sidebar com busca e lista */
   #sidebar {{
-    width: 260px;
+    width: 230px;
     background: #fff;
     padding: 20px 16px 12px 16px;
     border-right: 1px solid #e1e4e8;
