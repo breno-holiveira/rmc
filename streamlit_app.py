@@ -49,12 +49,15 @@ html_code = f"""
     overflow: hidden;
   }}
   #sidebar {{
-    width: 240px;
-    background: #ffffff;
-    padding: 20px;
-    border-right: 1px solid #e1e4e8;
-    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
-    overflow-y: auto;
+  grid-area: sidebar;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 16px;
+  padding: 24px 22px;
+  box-shadow: 0 6px 18px rgba(41, 128, 185, 0.12);
+  display: flex;
+  flex-direction: column;
+  font-size: 16px;
+  color: #34495e;
   }}
   #sidebar h2 {{
     font-size: 16px;
