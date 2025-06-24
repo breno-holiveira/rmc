@@ -88,7 +88,7 @@ html_code = f"""
     width: 220px;
     background: #fff;
     padding: 16px 20px;
-    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 3px 0 6px -3px rgba(0, 0, 0, 0.1);
     border-right: 1px solid #e3e6ea;
     overflow-y: auto;
   }}
