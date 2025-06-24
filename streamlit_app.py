@@ -190,14 +190,14 @@ html_code = f"""
   // Ajustar para encaixar bem no viewBox 1000x950
   const margin = 20;
   let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
-  geojson.features.forEach(f => {
-    f.geometry.coordinates.flat(Infinity).forEach(coord => {
+  geojson.features.forEach(f => {{
+    f.geometry.coordinates.flat(Infinity).forEach(coord => {{
       if (coord[0] < bounds[0]) bounds[0] = coord[0];
       if (coord[1] < bounds[1]) bounds[1] = coord[1];
       if (coord[0] > bounds[2]) bounds[2] = coord[0];
       if (coord[1] > bounds[3]) bounds[3] = coord[1];
-    });
-  });
+    }});
+  }});
 
   const width = 1000 - margin*2;
   const height = 950 - margin*2;
@@ -286,8 +286,8 @@ html_code = f"""
     document.querySelectorAll("#municipios-list > div").forEach(d => d.classList.remove("active"));
 
     // Seleciona o clicado
-    svg.querySelector(`path[data-index='${idx}']`).classList.add("selected");
-    municipiosList.querySelector(`div[data-index='${idx}']`).classList.add("active");
+    svg.querySelector(`path[data-index='${{idx}}']`).classList.add("selected");
+    municipiosList.querySelector(`div[data-index='${{idx}}']`).classList.add("active");
 
     infoPanel.hidden = false;
     document.getElementById("info-name").textContent = f.properties.name;
@@ -313,7 +313,6 @@ html_code = f"""
   municipiosList.querySelectorAll("div").forEach(div => {{
     div.addEventListener("click", e => {{
       showInfo(e.target.dataset.index);
-      // Scroll mapa para exibir claramente (opcional)
     }});
   }});
 
