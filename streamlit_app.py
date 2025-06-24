@@ -129,7 +129,7 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: fixed; /* fixado na tela */
+    position: fixed;
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -142,18 +142,18 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de Informações responsivo e proporcional */
+  /* Caixa flutuante de informações */
   #info {{
     position: fixed;
-    right: 2vw;       /* distância da direita em 2% da largura da viewport */
-    top: 4vh;         /* distância do topo em 4% da altura da viewport */
+    right: 1.5vw;        /* sempre 1.5% da largura da viewport da direita */
+    top: 3vh;            /* sempre 3% da altura da viewport do topo */
     background: #f0f3f8;
-    padding: 1rem 1.25rem;
+    padding: 1em 1.25em; /* padding em em para escalar junto com fonte */
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 22vw;   /* largura máxima de 22% da viewport */
-    width: 20vw;       /* largura base de 20% da viewport */
-    font-size: 0.9rem; /* tamanho da fonte proporcional ao zoom */
+    max-width: 22vw;     /* máximo 22% da largura da viewport */
+    width: 20vw;         /* base 20% da largura da viewport */
+    font-size: 1rem;     /* tamanho relativo da fonte */
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
@@ -172,14 +172,13 @@ html_code = f"""
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 0.375rem;
-    white-space: nowrap; /* título sem quebra */
+    padding-bottom: 0.4em;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 0.5rem;
-    column-gap: 1.5rem;
+    row-gap: 0.5em;
+    column-gap: 1.5em;
   }}
   #info .label {{
     font-weight: 600;
@@ -197,7 +196,7 @@ html_code = f"""
     font-size: 0.75rem;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 1rem;
+    margin-top: 1em;
     text-align: right;
   }}
 </style>
