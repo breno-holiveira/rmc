@@ -3,25 +3,24 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# CONFIGURAÇÕES DA PÁGINA INICIAL
+# === Configurações de página ===
 st.set_page_config(
-    page_title='RMC Data',
+    page_title='RMC Data - Mapa Interativo',
     page_icon='📊',
     layout='wide',
     initial_sidebar_state='expanded'
 )
 
-# TÍTULO
+# === Títulos ===
 st.markdown('# RMC Data')
-st.markdown('## Dados e indicadores da Região Metropolitana de Campinas')
+st.markdown('## Indicadores da Região Metropolitana de Campinas')
 
-# SHAPEFILE
+# === Carregar shapefile e dados ===
 gdf = gpd.read_file('./shapefile_rmc/RMC_municipios.shp')
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
 gdf = gdf.sort_values(by='NM_MUN')
 
-# DADOS DO SHAPEFILE
 df_dados = pd.read_excel('dados_rmc.xlsx')
 df_dados.set_index("nome", inplace=True)
 
@@ -61,7 +60,7 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML/JS para o mapa interativo embutido no Streamlit
+# === HTML + CSS + JS ===
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -69,7 +68,7 @@ html_code = f"""
 <meta charset="UTF-8" />
 <title>Mapa Interativo RMC - Transparência</title>
 <style>
-  /* Reset básico */
+  /* Reset e base */
   *, *::before, *::after {{
     box-sizing: border-box;
   }}
@@ -78,50 +77,67 @@ html_code = f"""
     height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background-color: transparent;
+    background: #f9fafb;
     color: #222;
     overflow: hidden;
     display: flex;
     flex-direction: row;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 16px;
+    padding: 12px 18px;
   }}
 
   /* === LEGEND === */
   #legend {{
-    width: 240px;
+    width: 260px;
     background: #fff;
-    padding: 20px 16px 20px 20px;
-    box-shadow: 2px 2px 8px rgba(0,0,0,0.06);
-    border-radius: 10px;
+    padding: 20px 16px 20px 22px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+    border-radius: 12px;
     overflow-y: auto;
     user-select: none;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
   }}
   #legend strong {{
-    display: block;
-    font-weight: 700;
-    font-size: 18px;
-    margin-bottom: 14px;
+    font-weight: 800;
+    font-size: 20px;
     color: #0b3d91;
-    border-bottom: 2px solid #0b3d91;
-    padding-bottom: 6px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #0b3d91;
+    padding-bottom: 8px;
   }}
-  #legend div {{
-    margin-bottom: 10px;
+  #search-box {{
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    font-size: 15px;
+    border: 1.8px solid #0b3d91;
+    border-radius: 8px;
+    outline-offset: 2px;
+    transition: box-shadow 0.3s ease;
+  }}
+  #search-box:focus {{
+    box-shadow: 0 0 6px #0b3d91aa;
+    border-color: #08318d;
+  }}
+  #mun-list {{
+    flex-grow: 1;
+    overflow-y: auto;
+  }}
+  #mun-list div {{
     padding: 8px 14px;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
+    font-size: 15px;
     color: #3a3a3a;
-    font-size: 14px;
     white-space: nowrap;
   }}
-  #legend div:hover {{
-    background-color: #e3eafc;
+  #mun-list div:hover {{
+    background-color: #d5e1fc;
     color: #08318d;
   }}
-  #legend div.active {{
+  #mun-list div.active {{
     background-color: #0b3d91;
     color: #fff;
     font-weight: 700;
@@ -132,8 +148,8 @@ html_code = f"""
     flex-grow: 1;
     position: relative;
     background: #fff;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.07);
-    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border-radius: 12px;
     overflow: hidden;
     user-select: none;
   }}
@@ -141,72 +157,77 @@ html_code = f"""
     width: 100%;
     height: 100vh;
     display: block;
-    user-select: none;
   }}
 
   /* === INFO PANEL === */
   #info-panel {{
-    width: 320px;
+    width: 340px;
     max-height: 100vh;
     background: #fff;
-    padding: 22px 26px 36px 26px;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+    padding: 24px 30px 42px 30px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.13);
     color: #333;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.5;
     overflow-y: auto;
-    border-radius: 10px;
+    border-radius: 12px;
     position: relative;
     flex-shrink: 0;
-    display: none; /* inicia escondido */
+    display: flex;
     flex-direction: column;
+    opacity: 0;
+    transform: translateX(30px);
+    pointer-events: none;
+    transition: opacity 0.35s ease, transform 0.35s ease;
   }}
   #info-panel.visible {{
-    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
   }}
   #info-panel h3 {{
     margin-top: 0;
-    font-weight: 700;
-    font-size: 20px;
+    font-weight: 900;
+    font-size: 22px;
     color: #0b3d91;
-    border-bottom: 2px solid #0b3d91;
+    border-bottom: 3px solid #0b3d91;
     padding-bottom: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    user-select: text;
   }}
 
   /* Label e valor em coluna */
   #info-panel div.info-row {{
-    margin-bottom: 18px;
+    margin-bottom: 20px;
     display: flex;
     flex-direction: column;
   }}
   #info-panel div.info-row strong {{
-    display: block;
     color: #0b3d91;
-    margin-bottom: 6px;
-    white-space: normal;
+    margin-bottom: 8px;
+    user-select: text;
   }}
   #info-panel div.info-row span {{
     color: #333;
     font-weight: 600;
-    font-size: 1rem;
-    white-space: normal;
+    font-size: 1.05rem;
+    user-select: text;
   }}
 
   /* Botão fechar painel info */
   #info-panel button#close-info {{
     position: absolute;
-    top: 14px;
-    right: 18px;
+    top: 18px;
+    right: 22px;
     background: transparent;
     border: none;
-    font-size: 26px;
+    font-size: 30px;
     color: #0b3d91;
     cursor: pointer;
     font-weight: 900;
     line-height: 1;
     padding: 0;
-    transition: color 0.3s ease;
+    transition: color 0.25s ease;
   }}
   #info-panel button#close-info:hover {{
     color: #08318d;
@@ -215,57 +236,65 @@ html_code = f"""
   /* Fonte discreta rodapé painel info */
   #info-panel footer {{
     margin-top: auto;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
     color: #666;
-    opacity: 0.6;
+    opacity: 0.55;
     text-align: right;
     font-style: italic;
+    user-select: none;
   }}
 
   /* === Polígonos do mapa === */
   .polygon {{
-    fill: rgba(11, 61, 145, 0.15);
-    stroke: rgba(11, 61, 145, 0.6);
-    stroke-width: 1;
+    fill: rgba(11, 61, 145, 0.18);
+    stroke: rgba(11, 61, 145, 0.7);
+    stroke-width: 1.1;
     cursor: pointer;
-    transition: fill 0.25s ease, stroke 0.25s ease;
-    opacity: 0.85;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+    opacity: 0.9;
   }}
   .polygon:hover {{
-    fill: rgba(11, 61, 145, 0.35);
-    stroke-width: 2;
-    filter: drop-shadow(0 0 6px rgba(11, 61, 145, 0.3));
+    fill: rgba(11, 61, 145, 0.4);
+    stroke-width: 2.2;
+    filter: drop-shadow(0 0 7px rgba(11, 61, 145, 0.4));
   }}
   .polygon.selected {{
-    fill: rgba(11, 61, 145, 0.45);
-    stroke: rgba(11, 61, 145, 0.8);
-    stroke-width: 2.5;
-    filter: drop-shadow(0 0 10px rgba(11, 61, 145, 0.5));
+    fill: rgba(11, 61, 145, 0.6);
+    stroke: rgba(11, 61, 145, 0.95);
+    stroke-width: 2.8;
+    filter: drop-shadow(0 0 12px rgba(11, 61, 145, 0.7));
   }}
 
   /* Tooltip */
   #tooltip {{
     position: absolute;
     pointer-events: none;
-    padding: 6px 14px;
-    background: rgba(11, 61, 145, 0.9);
+    padding: 8px 16px;
+    background: rgba(11, 61, 145, 0.92);
     color: #fefefe;
-    font-weight: 600;
-    font-size: 12px;
-    border-radius: 5px;
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 6px;
     white-space: nowrap;
-    box-shadow: 0 0 8px rgba(11, 61, 145, 0.7);
+    box-shadow: 0 0 10px rgba(11, 61, 145, 0.75);
     display: none;
     user-select: none;
-    z-index: 1000;
+    z-index: 1100;
+    transition: opacity 0.2s ease;
+    opacity: 0;
+  }}
+  #tooltip.visible {{
+    display: block;
+    opacity: 1;
   }}
 </style>
 </head>
 <body>
   <nav id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
     <strong>Municípios da RMC</strong>
-    <div id="mun-list" tabindex="0"></div>
+    <input type="search" id="search-box" placeholder="Buscar município..." aria-label="Buscar município" />
+    <div id="mun-list" tabindex="0" role="listbox" aria-multiselectable="false"></div>
   </nav>
 
   <main id="map" role="region" aria-label="Mapa interativo dos municípios da Região Metropolitana de Campinas">
@@ -286,200 +315,221 @@ html_code = f"""
   </aside>
 
 <script>
-  const geojson = {geojson_str};
-  const svg = document.querySelector("svg");
-  const munList = document.getElementById("mun-list");
-  const tooltip = document.getElementById("tooltip");
-  const infoPanel = document.getElementById("info-panel");
-  const closeBtn = document.getElementById("close-info");
-  const mapDiv = document.getElementById("map");
+  (function() {{
+    const geojson = {geojson_str};
+    const svg = document.querySelector("svg");
+    const munList = document.getElementById("mun-list");
+    const tooltip = document.getElementById("tooltip");
+    const infoPanel = document.getElementById("info-panel");
+    const closeBtn = document.getElementById("close-info");
+    const mapDiv = document.getElementById("map");
+    const searchBox = document.getElementById("search-box");
 
-  let selectedName = null;
-  const paths = {{}};
+    let selectedName = null;
+    const paths = {{}};
 
-  // Extrai coordenadas para projeção
-  let allCoords = [];
-  geojson.features.forEach(f => {{
-    const geom = f.geometry;
-    if (geom.type === "Polygon") {{
-      geom.coordinates[0].forEach(c => allCoords.push(c));
-    }} else if (geom.type === "MultiPolygon") {{
-      geom.coordinates.forEach(poly => poly[0].forEach(c => allCoords.push(c)));
-    }}
-  }});
-
-  const lons = allCoords.map(c => c[0]);
-  const lats = allCoords.map(c => c[1]);
-  const minLon = Math.min(...lons);
-  const maxLon = Math.max(...lons);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
-
-  // Projeção geográfica simples para SVG
-  function project(coord) {{
-    const [lon, lat] = coord;
-    const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
-    const y = 900 - ((lat - minLat) / (maxLat - minLat)) * 850;
-    return [x, y];
-  }}
-
-  // Converte array de coordenadas em path SVG
-  function polygonToPath(coords) {{
-    return coords.map(c => {{
-      const [x, y] = project(c);
-      return x + "," + y;
-    }}).join(" ");
-  }}
-
-  // Formata número para pt-BR
-  function formatNumberBR(num, decimals = 2) {{
-    if (num === null || num === undefined) return "-";
-    return num.toLocaleString('pt-BR', {{ minimumFractionDigits: decimals, maximumFractionDigits: decimals }});
-  }}
-
-  // Atualiza painel de informações
-  function updateInfoPanel(data) {{
-    if(!data) {{
-      infoPanel.querySelector('h3').textContent = "Selecione um município";
-      infoPanel.querySelectorAll('div.info-row span').forEach(span => span.textContent = "-");
-      infoPanel.classList.remove("visible");
-      return;
-    }}
-    infoPanel.querySelector('h3').textContent = data.name || "-";
-
-    const spans = infoPanel.querySelectorAll('div.info-row span');
-
-    spans[0].textContent = data.pib_2021 ? "R$ " + formatNumberBR(data.pib_2021, 0) : "-";
-    spans[1].textContent = data.participacao_rmc
-      ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
-      : "-";
-    spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumberBR(data.pib_per_capita, 2) : "-";
-    spans[3].textContent = data.populacao ? formatNumberBR(data.populacao, 0) : "-";
-    spans[4].textContent = data.area ? data.area.toFixed(1).replace('.', ',') + " km²" : "-";
-    spans[5].textContent = data.densidade_demografica
-      ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
-      : "-";
-
-    infoPanel.classList.add("visible");
-  }}
-
-  // Limpa realce dos polígonos
-  function clearHighlight() {{
-    Object.values(paths).forEach(p => p.classList.remove("highlight"));
-  }}
-
-  // Limpa seleção dos polígonos
-  function clearSelection() {{
-    Object.values(paths).forEach(p => p.classList.remove("selected"));
-  }}
-
-  // Atualiza a legenda com o ativo
-  function setActiveLegend(name) {{
-    Array.from(munList.children).forEach(child => {{
-      child.classList.toggle("active", child.dataset.name === name);
+    // Extrai coordenadas para projeção
+    let allCoords = [];
+    geojson.features.forEach(f => {{
+      const geom = f.geometry;
+      if (geom.type === "Polygon") {{
+        geom.coordinates[0].forEach(c => allCoords.push(c));
+      }} else if (geom.type === "MultiPolygon") {{
+        geom.coordinates.forEach(poly => poly[0].forEach(c => allCoords.push(c)));
+      }}
     }});
-  }}
 
-  // Seleciona município
-  function selectMunicipio(name) {{
-    clearHighlight();
-    clearSelection();
-    if(paths[name]) paths[name].classList.add("selected");
-    setActiveLegend(name);
-    selectedName = name;
+    const lons = allCoords.map(c => c[0]);
+    const lats = allCoords.map(c => c[1]);
+    const minLon = Math.min(...lons);
+    const maxLon = Math.max(...lons);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
 
-    const data = geojson.features.find(f => f.properties.name === name);
-    if (data) {{
-      updateInfoPanel(data.properties);
+    // Projeção geográfica simples para SVG
+    function project(coord) {{
+      const [lon, lat] = coord;
+      const x = ((lon - minLon) / (maxLon - minLon)) * 900 + 50;
+      const y = 900 - ((lat - minLat) / (maxLat - minLat)) * 850;
+      return [x, y];
     }}
-  }}
 
-  // Fecha painel info
-  closeBtn.addEventListener("click", () => {{
-    infoPanel.classList.remove("visible");
-    clearSelection();
-    setActiveLegend(null);
-    selectedName = null;
-  }});
+    // Converte array de coordenadas em path SVG
+    function polygonToPath(coords) {{
+      return coords.map(c => {{
+        const [x, y] = project(c);
+        return x + "," + y;
+      }}).join(" ");
+    }}
 
-  // Cria polígonos e itens da legenda
-  geojson.features.forEach(f => {{
-    const props = f.properties;
-    const name = props.name;
-    const geom = f.geometry;
-    let pathD = "";
+    // Formata número para pt-BR
+    function formatNumberBR(num, decimals = 2) {{
+      if (num === null || num === undefined) return "-";
+      return num.toLocaleString('pt-BR', {{ minimumFractionDigits: decimals, maximumFractionDigits: decimals }});
+    }}
 
-    if (geom.type === "Polygon") {{
-      pathD = "M" + polygonToPath(geom.coordinates[0]) + " Z";
-    }} else if (geom.type === "MultiPolygon") {{
-      geom.coordinates.forEach(poly => {{
-        pathD += "M" + polygonToPath(poly[0]) + " Z";
+    // Atualiza painel de informações
+    function updateInfoPanel(data) {{
+      if(!data) {{
+        infoPanel.querySelector('h3').textContent = "Selecione um município";
+        infoPanel.querySelectorAll('div.info-row span').forEach(span => span.textContent = "-");
+        infoPanel.classList.remove("visible");
+        return;
+      }}
+      infoPanel.querySelector('h3').textContent = data.name || "-";
+
+      const spans = infoPanel.querySelectorAll('div.info-row span');
+
+      spans[0].textContent = data.pib_2021 ? "R$ " + formatNumberBR(data.pib_2021, 0) : "-";
+      spans[1].textContent = data.participacao_rmc
+        ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
+        : "-";
+      spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumberBR(data.pib_per_capita, 2) : "-";
+      spans[3].textContent = data.populacao ? formatNumberBR(data.populacao, 0) : "-";
+      spans[4].textContent = data.area ? data.area.toFixed(1).replace('.', ',') + " km²" : "-";
+      spans[5].textContent = data.densidade_demografica
+        ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
+        : "-";
+
+      infoPanel.classList.add("visible");
+    }}
+
+    // Limpa realce e seleção
+    function clearHighlight() {{
+      Object.values(paths).forEach(p => p.classList.remove("highlight"));
+    }}
+    function clearSelection() {{
+      Object.values(paths).forEach(p => p.classList.remove("selected"));
+    }}
+
+    // Atualiza estilo ativo da legenda
+    function setActiveLegend(name) {{
+      Array.from(munList.children).forEach(child => {{
+        child.classList.toggle("active", child.dataset.name === name);
       }});
     }}
 
-    const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    pathEl.setAttribute("d", pathD);
-    pathEl.classList.add("polygon");
-    pathEl.setAttribute("data-name", name);
+    // Seleciona município
+    function selectMunicipio(name) {{
+      clearHighlight();
+      clearSelection();
+      if(paths[name]) paths[name].classList.add("selected");
+      setActiveLegend(name);
+      selectedName = name;
 
-    svg.appendChild(pathEl);
-    paths[name] = pathEl;
-
-    // Tooltip e seleção
-    pathEl.addEventListener("mousemove", (e) => {{
-      tooltip.style.display = "block";
-      tooltip.textContent = name;
-      const mapRect = mapDiv.getBoundingClientRect();
-      let left = e.clientX - mapRect.left + 10;
-      let top = e.clientY - mapRect.top + 10;
-
-      if(left + tooltip.offsetWidth > mapRect.width) {{
-        left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
+      const data = geojson.features.find(f => f.properties.name === name);
+      if (data) {{
+        updateInfoPanel(data.properties);
       }}
-      if(top + tooltip.offsetHeight > mapRect.height) {{
-        top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
+    }}
+
+    // Fecha painel info
+    closeBtn.addEventListener("click", () => {{
+      infoPanel.classList.remove("visible");
+      clearSelection();
+      setActiveLegend(null);
+      selectedName = null;
+    }});
+
+    // Criar polígonos SVG e itens da legenda (delegação para performance)
+    geojson.features.forEach(f => {{
+      const props = f.properties;
+      const name = props.name;
+      const geom = f.geometry;
+      let pathD = "";
+
+      if (geom.type === "Polygon") {{
+        pathD = "M" + polygonToPath(geom.coordinates[0]) + " Z";
+      }} else if (geom.type === "MultiPolygon") {{
+        geom.coordinates.forEach(poly => {{
+          pathD += "M" + polygonToPath(poly[0]) + " Z";
+        }});
       }}
 
-      tooltip.style.left = left + "px";
-      tooltip.style.top = top + "px";
+      const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      pathEl.setAttribute("d", pathD);
+      pathEl.classList.add("polygon");
+      pathEl.setAttribute("data-name", name);
+      svg.appendChild(pathEl);
+      paths[name] = pathEl;
 
-      clearHighlight();
-      if (!pathEl.classList.contains("selected")) {{
-        pathEl.classList.add("highlight");
+      // Criar item legenda
+      const div = document.createElement("div");
+      div.textContent = name;
+      div.dataset.name = name;
+      munList.appendChild(div);
+    }});
+
+    // Evento click em legenda (delegação)
+    munList.addEventListener("click", (e) => {{
+      if(e.target && e.target.dataset && e.target.dataset.name) {{
+        selectMunicipio(e.target.dataset.name);
+      }}
+    }});
+    munList.addEventListener("keydown", (e) => {{
+      if(e.key === "Enter" && e.target && e.target.dataset && e.target.dataset.name) {{
+        selectMunicipio(e.target.dataset.name);
       }}
     }});
 
-    pathEl.addEventListener("mouseleave", () => {{
-      tooltip.style.display = "none";
+    // Evento mouse nos polígonos
+    svg.addEventListener("mousemove", (e) => {{
+      const target = e.target;
+      if(target && target.classList.contains("polygon")) {{
+        const name = target.dataset.name;
+        if(name) {{
+          tooltip.textContent = name;
+          tooltip.style.left = (e.clientX + 16) + "px";
+          tooltip.style.top = (e.clientY + 16) + "px";
+          tooltip.classList.add("visible");
+          tooltip.setAttribute("aria-hidden", "false");
+          // Sutil realce
+          clearHighlight();
+          if(name !== selectedName) {{
+            target.classList.add("highlight");
+          }}
+        }}
+      }} else {{
+        tooltip.classList.remove("visible");
+        tooltip.setAttribute("aria-hidden", "true");
+        clearHighlight();
+      }}
+    }});
+
+    // Ocultar tooltip ao sair do svg
+    svg.addEventListener("mouseleave", () => {{
+      tooltip.classList.remove("visible");
+      tooltip.setAttribute("aria-hidden", "true");
       clearHighlight();
     }});
 
-    pathEl.addEventListener("click", () => {{
-      selectMunicipio(name);
+    // Clique no mapa - seleciona
+    svg.addEventListener("click", (e) => {{
+      const target = e.target;
+      if(target && target.classList.contains("polygon")) {{
+        selectMunicipio(target.dataset.name);
+      }}
     }});
 
-    // Item legenda
-    const legendItem = document.createElement("div");
-    legendItem.textContent = name;
-    legendItem.dataset.name = name;
-    munList.appendChild(legendItem);
+    // Busca no input - filtro legenda e mapa
+    searchBox.addEventListener("input", () => {{
+      const val = searchBox.value.toLowerCase().trim();
+      Array.from(munList.children).forEach(div => {{
+        const visible = div.dataset.name.toLowerCase().includes(val);
+        div.style.display = visible ? "block" : "none";
+        if(paths[div.dataset.name]) {{
+          paths[div.dataset.name].style.display = visible ? "inline" : "none";
+        }}
+      }});
+    }});
 
-    legendItem.addEventListener("mouseenter", () => {{
-      clearHighlight();
-      if(paths[name] && !paths[name].classList.contains("selected")) paths[name].classList.add("highlight");
-    }});
-    legendItem.addEventListener("mouseleave", () => {{
-      clearHighlight();
-    }});
-    legendItem.addEventListener("click", () => {{
-      selectMunicipio(name);
-    }});
-  }});
+    // Inicializa sem seleção e foco no campo de busca
+    searchBox.focus();
+    updateInfoPanel(null);
+  }})();
 </script>
-
 </body>
 </html>
 """
 
-# Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=680, scrolling=True)
+st.components.v1.html(html_code, height=900, scrolling=True)
