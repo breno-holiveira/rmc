@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configurações da página
+# Configurações da página Streamlit
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
@@ -30,34 +30,39 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
+# HTML e CSS ajustados para layout FIXO e tamanho exato, sem responsividade
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=1280" />  <!-- FIXA a viewport para desktop -->
+<!-- FIXA a viewport para largura 1280 e desabilita zoom -->
+<meta name="viewport" content="width=1280, user-scalable=no" />
 <title>Mapa Interativo RMC</title>
 <style>
+  /* Força layout fixo, tamanho exato */
   html, body {{
-    height: 100vh;
     margin: 0;
     padding: 0;
+    width: 1280px;
+    height: 700px;
+    overflow: hidden;
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden; /* Evita scroll geral */
+    user-select: none;
   }}
-  /* Sidebar fixa */
+
+  /* Sidebar fixo */
   #sidebar {{
     width: 260px;
+    height: 700px;
     background: #fff;
     padding: 20px 16px 12px 16px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
-    height: 100vh;
     overflow-y: auto;
   }}
   #sidebar h2 {{
@@ -65,7 +70,6 @@ html_code = f"""
     font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
-    user-select: none;
   }}
   #search {{
     margin-bottom: 12px;
@@ -74,7 +78,6 @@ html_code = f"""
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
-    transition: border-color 0.3s;
   }}
   #search:focus {{
     border-color: #4d648d;
@@ -90,7 +93,6 @@ html_code = f"""
     margin-bottom: 6px;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
     font-size: 15px;
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
@@ -104,13 +106,12 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Área do mapa - fixo */
+  /* Mapa fixo */
   #map {{
-    width: 720px;   /* largura fixa para evitar distorção */
-    height: 650px;  /* altura fixa */
+    width: 720px;
+    height: 700px;
     position: relative;
-    overflow: hidden; /* sem scroll no mapa */
-    flex-shrink: 0;
+    overflow: hidden;
   }}
   svg {{
     width: 100%;
@@ -144,17 +145,15 @@ html_code = f"""
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
-    user-select: none;
   }}
 
-  /* Caixa de informações fixa e sem scroll */
+  /* Caixa de informações FIXA e com altura AUTOMÁTICA, não corta nada */
   #info {{
     position: fixed;
-    right: 16px;
+    right: 20px;
     top: 40px;
-    width: 260px;
-    height: auto;
-    max-height: none;
+    width: 280px;
+    max-height: 620px;
     background: #f0f3f8;
     padding: 16px 20px;
     border-radius: 10px;
@@ -162,21 +161,14 @@ html_code = f"""
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
-    user-select: none;
+    overflow-y: auto;
     border: 1px solid #d9e2f3;
-    display: none;
     z-index: 20;
-    overflow: visible;
-    white-space: nowrap;
-  }}
-  #info .value {{
-    white-space: normal;
-    overflow-wrap: break-word;
+    display: none;
   }}
   #info.visible {{
     display: block;
   }}
-
   #info h3 {{
     margin: 0 0 12px 0;
     font-size: 20px;
@@ -185,20 +177,23 @@ html_code = f"""
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 6px;
   }}
-
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
     row-gap: 8px;
     column-gap: 24px;
   }}
-
   #info .label {{
     font-weight: 600;
     color: #4d648d;
     white-space: nowrap;
   }}
-
+  #info .value {{
+    font-weight: 500;
+    text-align: right;
+    color: #34495e;
+    overflow-wrap: break-word;
+  }}
   #info .fonte {{
     grid-column: 1 / -1;
     font-size: 11px;
@@ -274,7 +269,6 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        // Scroll customizado só na lista lateral
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
@@ -383,4 +377,5 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=700, scrolling=False)
+# FIXA a altura e largura total para evitar zoom ou distorção.
+st.components.v1.html(html_code, height=700, width=1280, scrolling=False)
