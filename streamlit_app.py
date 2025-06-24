@@ -83,7 +83,7 @@ html_code = f"""
     padding-right: 4px;
   }}
   #list div {{
-    padding: 6px 10px;
+    padding: 4px 8px;
     margin-bottom: 4px;
     border-radius: 8px;
     cursor: pointer;
