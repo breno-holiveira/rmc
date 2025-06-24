@@ -32,20 +32,26 @@ geojson_str = json.dumps(geojson)
 
 html_code = f"""
 <!DOCTYPE html>
-<html lang=\"pt-BR\">
+<html lang="pt-BR">
 <head>
-<meta charset=\"UTF-8\" />
-<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+<meta charset="UTF-8" />
+<!-- Fixar viewport para largura fixa 1280px -->
+<meta name="viewport" content="width=1280" />
 <title>Mapa Interativo RMC</title>
 <style>
   html, body {{
-    height: 100vh;
+    width: 1280px;
+    height: 720px;
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
-    display: flex;
     overflow: hidden;
+    user-select: none;
+  }}
+  body {{
+    display: flex;
+    flex-direction: row;
   }}
   #sidebar {{
     width: 260px;
@@ -55,13 +61,15 @@ html_code = f"""
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
+    flex-shrink: 0;
+    height: 720px;
+    overflow: hidden;
   }}
   #sidebar h2 {{
     margin: 0 0 8px 0;
     font-size: 18px;
     font-weight: 600;
     color: #1a2d5a;
-    user-select: none;
   }}
   #search {{
     margin-bottom: 12px;
@@ -71,6 +79,8 @@ html_code = f"""
     border-radius: 8px;
     outline-offset: 2px;
     transition: border-color 0.3s;
+    width: 100%;
+    box-sizing: border-box;
   }}
   #search:focus {{
     border-color: #4d648d;
@@ -86,7 +96,6 @@ html_code = f"""
     margin-bottom: 6px;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
     font-size: 15px;
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
@@ -98,11 +107,17 @@ html_code = f"""
     font-weight: 600;
   }}
   #map {{
-    flex-grow: 1;
+    width: 920px;
+    height: 720px;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
   }}
-  svg {{ width: 100%; height: 100%; }}
+  svg {{
+    width: 920px;
+    height: 720px;
+    display: block;
+  }}
   .area {{
     fill: #b6cce5;
     stroke: #4d648d;
@@ -110,8 +125,14 @@ html_code = f"""
     cursor: pointer;
     transition: all 0.3s ease;
   }}
-  .area:hover {{ fill: #8db3dd; stroke-width: 1.5; }}
-  .area.selected {{ fill: #4d648d; stroke: #1a2d5a; }}
+  .area:hover {{
+    fill: #8db3dd;
+    stroke-width: 1.5;
+  }}
+  .area.selected {{
+    fill: #4d648d;
+    stroke: #1a2d5a;
+  }}
   #tooltip {{
     position: fixed;
     padding: 5px 10px;
@@ -123,7 +144,6 @@ html_code = f"""
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
-    user-select: none;
   }}
   #info {{
     position: fixed;
@@ -133,16 +153,17 @@ html_code = f"""
     padding: 16px 20px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
+    width: 320px;
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
-    user-select: none;
-    display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
+    display: none;
   }}
-  #info.visible {{ display: block; }}
+  #info.visible {{
+    display: block;
+  }}
   #info h3 {{
     margin: 0 0 12px 0;
     font-size: 20px;
@@ -152,15 +173,25 @@ html_code = f"""
     padding-bottom: 6px;
   }}
   #info .grid {{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    row-gap: 8px;
-    column-gap: 24px;
+    display: table;
+    width: 100%;
   }}
-  #info .label {{ font-weight: 600; color: #4d648d; white-space: nowrap; }}
-  #info .value {{ font-weight: 500; text-align: right; color: #34495e; }}
+  #info .label, #info .value {{
+    display: table-cell;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }}
+  #info .label {{
+    font-weight: 600;
+    color: #4d648d;
+  }}
+  #info .value {{
+    font-weight: 500;
+    text-align: right;
+    color: #34495e;
+  }}
   #info .fonte {{
-    grid-column: 1 / -1;
+    display: block;
     font-size: 11px;
     color: #7f8caa;
     font-style: italic;
@@ -170,17 +201,27 @@ html_code = f"""
 </style>
 </head>
 <body>
-  <div id="sidebar"><h2>Municípios</h2><input id="search" type="search" placeholder="Buscar..."/><div id="list"></div></div>
-  <div id="map"><svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg><div id="tooltip"></div></div>
-  <div id="info"><h3>Município</h3><div class="grid">
-    <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
-    <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
-    <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-    <div class="label">População:</div><div class="value" id="pop"></div>
-    <div class="label">Área:</div><div class="value" id="area"></div>
-    <div class="label">Densidade:</div><div class="value" id="dens"></div>
-    <div class="fonte">Fonte: IBGE Cidades</div>
-  </div></div>
+  <div id="sidebar">
+    <h2>Municípios</h2>
+    <input id="search" type="search" placeholder="Buscar..."/>
+    <div id="list"></div>
+  </div>
+  <div id="map">
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="tooltip"></div>
+  </div>
+  <div id="info">
+    <h3>Município</h3>
+    <div class="grid">
+      <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
+      <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
+      <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
+      <div class="label">População:</div><div class="value" id="pop"></div>
+      <div class="label">Área:</div><div class="value" id="area"></div>
+      <div class="label">Densidade:</div><div class="value" id="dens"></div>
+      <div class="fonte">Fonte: IBGE Cidades</div>
+    </div>
+  </div>
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
@@ -272,4 +313,4 @@ if(geo.features.length > 0) {{ select(geo.features[0].properties.name); }}
 </html>
 """
 
-st.components.v1.html(html_code, height=650, scrolling=False)
+st.components.v1.html(html_code, height=720, scrolling=False)
