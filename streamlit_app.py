@@ -98,6 +98,7 @@ html_code = f"""
     font-size: 16px;
     margin-bottom: 12px;
     color: #0b3d91;
+    text-align: center;
   }}
   #legend div {{
     margin-bottom: 8px;
