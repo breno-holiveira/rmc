@@ -143,7 +143,7 @@
   </aside>
 
 <script>
-  const geojson = JSON.parse(document.currentScript.getAttribute('data-geojson'));
+  const geojson = JSON.parse(document.getElementById("geojson-data").textContent);
   const svg = document.querySelector("svg");
   const munList = document.getElementById("mun-list");
   const tooltip = document.getElementById("tooltip");
@@ -300,6 +300,6 @@
     });
   });
 </script>
-<script data-geojson=""></script>
+<script id="geojson-data" type="application/json"></script>
 </body>
 </html>
