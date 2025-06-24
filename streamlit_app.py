@@ -6,8 +6,6 @@ import json
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-page = st.sidebar.radio("Ir para:", ["Página 1", "Página 2", "Página 3"])
-
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
@@ -47,63 +45,54 @@ html_code = f"""
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
+    flex-direction: column;
     overflow: hidden; /* Evita scroll da página */
   }}
-  /* Sidebar com busca e lista */
-  #sidebar {{
-    width: 260px;
+  /* Barra horizontal topo */
+  #topbar {{
+    height: 48px;
     background: #fff;
-    padding: 20px 16px 12px 16px;
-    border-right: 1px solid #e1e4e8;
-    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
+    border-bottom: 1px solid #e1e4e8;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     display: flex;
-    flex-direction: column;
-  }}
-  #sidebar h2 {{
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #1a2d5a;
+    align-items: center;
+    overflow-x: auto;
+    padding: 0 10px;
     user-select: none;
   }}
-  #search {{
-    margin-bottom: 12px;
-    padding: 8px 12px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    outline-offset: 2px;
-    transition: border-color 0.3s;
+  #topbar::-webkit-scrollbar {{
+    height: 6px;
   }}
-  #search:focus {{
-    border-color: #4d648d;
-    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
+  #topbar::-webkit-scrollbar-thumb {{
+    background-color: #4d648d;
+    border-radius: 3px;
   }}
-  #list {{
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 6px;
-  }}
-  #list div {{
-    padding: 8px 12px;
-    margin-bottom: 6px;
+  #topbar div {{
+    white-space: nowrap;
+    padding: 8px 14px;
+    margin: 0 6px;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
     font-size: 15px;
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
   }}
-  #list div:hover {{
+  #topbar div:hover {{
     background-color: #e3ecf9;
   }}
-  #list div.active {{
+  #topbar div.active {{
     background-color: #4d648d;
-    color: #fff;
+    color: white;
     font-weight: 600;
   }}
 
-  /* Mapa e SVG */
+  /* Área principal - mapa e painel info */
+  #main {{
+    flex-grow: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+  }}
   #map {{
     flex-grow: 1;
     position: relative;
@@ -144,26 +133,23 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de Informações mais integrado */
+  /* Painel de Informações */
   #info {{
-    position: fixed;
-    right: 24px;
-    top: 40px;
+    width: 320px;
     background: #f0f3f8;
     padding: 16px 20px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
     font-size: 14px;
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
-    display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
+    overflow-y: auto;
   }}
-  #info.visible {{
-    display: block;
+  #info.hidden {{
+    display: none;
   }}
   #info h3 {{
     margin: 0 0 12px 0;
@@ -198,28 +184,37 @@ html_code = f"""
     margin-top: 16px;
     text-align: right;
   }}
+
+  /* Scrollbar no painel info */
+  #info::-webkit-scrollbar {{
+    width: 6px;
+  }}
+  #info::-webkit-scrollbar-thumb {{
+    background-color: #4d648d;
+    border-radius: 3px;
+  }}
 </style>
 </head>
 <body>
-  <div id="sidebar" role="complementary" aria-label="Lista de municípios">
-    <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
-    <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
+  <div id="topbar" role="list" aria-label="Lista de municípios">
+    <!-- Itens serão inseridos pelo JS -->
   </div>
-  <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-  </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Município</h3>
-    <div class="grid">
-      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
-      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
-      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
-      <div class="label">Área:</div> <div class="value" id="area"></div>
-      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
-      <div class="fonte">Fonte: IBGE Cidades</div>
+  <div id="main">
+    <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
+      <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="tooltip" role="tooltip" aria-hidden="true"></div>
+    </div>
+    <div id="info" class="hidden" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+      <h3>Município</h3>
+      <div class="grid">
+        <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+        <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+        <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+        <div class="label">População (2022):</div> <div class="value" id="pop"></div>
+        <div class="label">Área:</div> <div class="value" id="area"></div>
+        <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
+        <div class="fonte">Fonte: IBGE Cidades</div>
+      </div>
     </div>
   </div>
 <script>
@@ -227,8 +222,7 @@ const geo = {geojson_str};
 const svg = document.querySelector("svg");
 const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
-const list = document.getElementById("list");
-const search = document.getElementById("search");
+const topbar = document.getElementById("topbar");
 
 let selected = null;
 const paths = {{}};
@@ -257,28 +251,28 @@ function polygonToPath(coords) {{
 function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
-    [...list.children].forEach(d => d.classList.remove("active"));
+    [...topbar.children].forEach(d => d.classList.remove("active"));
   }}
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    [...list.children].forEach(div => {{
-      if(div.dataset.name === name) {{
+    [...topbar.children].forEach(div => {{
+      if(div.textContent === name) {{
         div.classList.add("active");
-        // Scroll customizado para só rolar a barra lateral e não a página
-        const container = list;
-        const containerHeight = container.clientHeight;
-        const containerTop = container.getBoundingClientRect().top;
+        // Scroll horizontal suave para o item ativo na barra horizontal
+        const container = topbar;
+        const containerWidth = container.clientWidth;
+        const containerLeft = container.getBoundingClientRect().left;
 
-        const elementTop = div.getBoundingClientRect().top;
-        const elementHeight = div.offsetHeight;
+        const elementLeft = div.getBoundingClientRect().left;
+        const elementWidth = div.offsetWidth;
 
-        const scrollTop = container.scrollTop;
-        const offset = elementTop - containerTop;
+        const scrollLeft = container.scrollLeft;
+        const offset = elementLeft - containerLeft;
 
-        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
+        const scrollTo = scrollLeft + offset - containerWidth / 2 + elementWidth / 2;
 
-        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
+        container.scrollTo({{ left: scrollTo, behavior: "smooth" }});
       }}
     }});
     showInfo(name);
@@ -288,6 +282,7 @@ function select(name) {{
 function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
+  info.classList.remove("hidden");
   info.querySelector("h3").textContent = name;
   info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
   info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
@@ -295,79 +290,27 @@ function showInfo(name) {{
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-  info.classList.add("visible");
 }}
 
-function updateList(filter = "") {{
-  const filterLower = filter.toLowerCase();
-  [...list.children].forEach(div => {{
-    if(div.textContent.toLowerCase().includes(filterLower)) {{
-      div.style.display = "block";
-    }} else {{
-      div.style.display = "none";
-    }}
-  }});
-}}
-
-// Cria polígonos e itens da legenda
-geo.features.forEach(f => {{
-  const name = f.properties.name;
-  let d = "";
-  if (f.geometry.type === "Polygon") {{
-    d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-  }} else {{
-    f.geometry.coordinates.forEach(p => {{
-      d += "M" + polygonToPath(p[0]) + " Z ";
+function createTopbarItems() {{
+  geo.features.forEach(f => {{
+    const name = f.properties.name;
+    const div = document.createElement("div");
+    div.textContent = name;
+    div.tabIndex = 0;
+    div.setAttribute('role', 'option');
+    div.addEventListener("click", () => select(name));
+    div.addEventListener("keydown", e => {{
+      if (e.key === "Enter" || e.key === " ") {{
+        e.preventDefault();
+        select(name);
+      }}
     }});
-  }}
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", d.trim());
-  path.classList.add("area");
-  path.setAttribute("data-name", name);
-  svg.appendChild(path);
-  paths[name] = path;
+    topbar.appendChild(div);
+  }});
+}}
 
-  // Eventos do mapa
-  path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
-    tooltip.style.left = (e.clientX + offsetX) + "px";
-    tooltip.style.top = (e.clientY + offsetY) + "px";
-    tooltip.style.display = "block";
-    tooltip.textContent = name;
-  }});
-  path.addEventListener("mouseleave", () => {{
-    tooltip.style.display = "none";
-  }});
-  path.addEventListener("click", e => {{
-    e.preventDefault();  // previne scroll da página ao clicar no município
-    e.stopPropagation(); // evita propagação para scroll do container pai
-    select(name);
-  }});
-
-  // Item da legenda
-  const div = document.createElement("div");
-  div.textContent = name;
-  div.dataset.name = name;
-  div.tabIndex = 0;
-  div.setAttribute('role', 'option');
-  div.addEventListener("click", () => select(name));
-  div.addEventListener("keydown", e => {{
-    if (e.key === "Enter" || e.key === " ") {{
-      e.preventDefault();
-      select(name);
-    }}
-  }});
-  list.appendChild(div);
-}});
-
-search.addEventListener("input", e => {{
-  updateList(e.target.value);
-  const visibleItems = [...list.children].filter(d => d.style.display !== "none");
-  if(visibleItems.length === 1) {{
-    select(visibleItems[0].dataset.name);
-  }}
-}});
+createTopbarItems();
 
 // Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
@@ -378,4 +321,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=650, scrolling=False)
+st.components.v1.html(html_code, height=700, scrolling=False)
