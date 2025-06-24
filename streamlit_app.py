@@ -71,111 +71,12 @@ html_code = f"""
     grid-template-rows: 100vh;
     overflow: hidden;
   }}
-  #legend {{
-    background: #fff; border-right: 1px solid #ddd; padding: 20px; overflow-y: auto;
-    box-shadow: 2px 0 6px rgba(0,0,0,0.05);
-  }}
-  #legend strong {{
-    color: #0b3d91; font-size: 18px; border-bottom: 2px solid #0b3d91; display: block; margin-bottom: 10px; font-weight: 700;
-  }}
-  #legend div {{
-    cursor: pointer; padding: 8px 12px; margin-bottom: 4px; border-radius: 6px; transition: background-color 0.3s;
-    font-size: 14px; color: #222;
-  }}
-  #legend div:hover, #legend div.active {{
-    background: #0b3d91; color: #fff;
-    font-weight: 700;
-  }}
-  #map-container {{
-    position: relative; background: white; overflow: hidden;
-  }}
-  svg {{
-    width: 100%; height: 100vh; display: block;
-  }}
-  .municipio {{
-    fill: rgba(11, 61, 145, 0.15);
-    stroke: rgba(11, 61, 145, 0.6);
-    stroke-width: 1;
-    cursor: pointer;
-    transition: all 0.25s ease;
-  }}
-  .municipio:hover {{
-    fill: rgba(11, 61, 145, 0.4);
-    stroke-width: 2;
-    filter: drop-shadow(0 0 6px rgba(11, 61, 145, 0.3));
-  }}
-  .municipio.selected {{
-    fill: rgba(11, 61, 145, 0.6);
-    stroke: rgba(11, 61, 145, 1);
-    stroke-width: 3;
-    filter: drop-shadow(0 0 12px rgba(11, 61, 145, 0.6));
-  }}
-  #tooltip {{
-    position: absolute; pointer-events: none;
-    background: rgba(11,61,145,0.85);
-    color: white; font-size: 13px; font-weight: 600;
-    padding: 6px 12px; border-radius: 6px;
-    display: none;
-    white-space: nowrap;
-    z-index: 1000;
-  }}
-  #info-panel {{
-    background: #fff; border-left: 1px solid #ddd;
-    padding: 24px; font-size: 15px;
-    overflow-y: auto;
-    display: flex; flex-direction: column;
-  }}
-  #info-panel h2 {{
-    margin-top: 0; color: #0b3d91;
-    border-bottom: 2px solid #0b3d91;
-    padding-bottom: 8px;
-  }}
-  #info-panel .field {{
-    margin-bottom: 14px;
-  }}
-  #info-panel .field strong {{
-    color: #0b3d91;
-  }}
-  #info-panel .field span {{
-    margin-left: 6px;
-    color: #222;
-  }}
-  #info-panel #close-btn {{
-    align-self: flex-end;
-    background: none; border: none;
-    font-size: 22px;
-    color: #0b3d91;
-    cursor: pointer;
-    margin-bottom: 12px;
-  }}
-  #info-panel .fonte {{
-    font-size: 12px; color: #666; margin-top: auto; font-style: italic; text-align: right;
-  }}
+  /* ... seu CSS aqui ... */
 </style>
 </head>
 <body>
 
-<nav id="legend" aria-label="Lista de municípios">
-  <strong>Municípios da RMC</strong>
-  <div id="municipios-list"></div>
-</nav>
-
-<div id="map-container" role="main" aria-label="Mapa dos municípios">
-  <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
-  <div id="tooltip"></div>
-</div>
-
-<aside id="info-panel" aria-label="Informações do município" hidden>
-  <button id="close-btn" aria-label="Fechar painel">&times;</button>
-  <h2 id="info-name">Selecione um município</h2>
-  <div class="field"><strong>PIB (2021):</strong> <span id="info-pib">-</span></div>
-  <div class="field"><strong>Participação na RMC:</strong> <span id="info-participacao">-</span></div>
-  <div class="field"><strong>PIB per capita (2021):</strong> <span id="info-percapita">-</span></div>
-  <div class="field"><strong>População:</strong> <span id="info-populacao">-</span></div>
-  <div class="field"><strong>Área (km²):</strong> <span id="info-area">-</span></div>
-  <div class="field"><strong>Densidade demográfica (2022):</strong> <span id="info-densidade">-</span></div>
-  <div class="fonte">Fonte: IBGE Cidades</div>
-</aside>
+<!-- seu HTML aqui -->
 
 <script>
   const geojson = {geojson_str};
@@ -188,22 +89,21 @@ html_code = f"""
   // Projeção simples para coordenadas geo para SVG (proj linear)
   // Ajustar para encaixar bem no viewBox 1000x950
   const margin = 20;
-let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
-geojson.features.forEach(f => {
-  // Função para aplanar recursivamente as coordenadas (multipolygon pode ter vários níveis)
-  function flattenCoords(coords) {
-    if (typeof coords[0] === 'number') return [coords];
-    return coords.flatMap(flattenCoords);
-  }
-  const coords = flattenCoords(f.geometry.coordinates);
-  coords.forEach(coord => {
-    if (coord[0] < bounds[0]) bounds[0] = coord[0];
-    if (coord[1] < bounds[1]) bounds[1] = coord[1];
-    if (coord[0] > bounds[2]) bounds[2] = coord[0];
-    if (coord[1] > bounds[3]) bounds[3] = coord[1];
-  });
-});
-
+  let bounds = [Infinity, Infinity, -Infinity, -Infinity]; // xmin, ymin, xmax, ymax
+  geojson.features.forEach(f => {{
+    // Função para aplanar recursivamente as coordenadas (multipolygon pode ter vários níveis)
+    function flattenCoords(coords) {{
+      if (typeof coords[0] === 'number') return [coords];
+      return coords.flatMap(flattenCoords);
+    }}
+    const coords = flattenCoords(f.geometry.coordinates);
+    coords.forEach(coord => {{
+      if (coord[0] < bounds[0]) bounds[0] = coord[0];
+      if (coord[1] < bounds[1]) bounds[1] = coord[1];
+      if (coord[0] > bounds[2]) bounds[2] = coord[0];
+      if (coord[1] > bounds[3]) bounds[3] = coord[1];
+    }});
+  }});
 
   const width = 1000 - margin*2;
   const height = 950 - margin*2;
@@ -334,7 +234,6 @@ geojson.features.forEach(f => {
 </body>
 </html>
 """
-
 
 # Exibe no Streamlit com altura suficiente
 st.components.v1.html(html_code, height=750, scrolling=True)
