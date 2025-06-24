@@ -293,7 +293,7 @@ html_code = f"""
     ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
     : "-";
   
-  spans[4].textContent = data.pib_per_capita ? "R$ " + formatNumber(data.pib_per_capita) : "-";
+  spans[4].textContent = data.pib_per_capita ? "R$ " + formatNumber(Number(data.pib_per_capita).toFixed(2)) : "-";
   spans[5].textContent = formatNumber(data.densidade_demografica, 2);
 }}
 
