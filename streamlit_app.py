@@ -136,7 +136,7 @@ html_code = f"""
     width: 280px;
     background: #fff;
     padding: 20px 24px;
-    border-left: 1px solid #e3e6ea;
+    border-left: ;
     box-shadow: -2px 0 8px rgba(0,0,0,0.05);
     color: #333;
     font-size: 15px;
