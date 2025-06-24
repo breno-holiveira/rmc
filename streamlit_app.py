@@ -33,10 +33,10 @@ geojson_str = json.dumps(geojson)
 # HTML e JavaScript embutido
 html_code = f"""
 <!DOCTYPE html>
-<html lang=\"pt-BR\">
+<html lang="pt-BR">
 <head>
-<meta charset=\"UTF-8\">
-<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mapa Interativo RMC</title>
 <style>
   html, body {{
@@ -48,54 +48,34 @@ html_code = f"""
     display: flex;
     overflow: hidden;
   }}
-  nav#sidebar {{
-    width: 250px;
-    background: #f1f3f6;
-    padding: 16px;
-    border-right: 1px solid #d4dbe4;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.02);
-  }}
-  nav h2 {{
-    font-size: 16px;
-    margin: 0 0 10px 0;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #ccd3db;
-    color: #1a2d5a;
-  }}
-  #search-mun {{
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    font-size: 14px;
-    border: 1px solid #c3cfd9;
-    border-radius: 8px;
-    box-sizing: border-box;
-  }}
-  #mun-list {{
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    overflow-y: auto;
-    max-height: 80vh;
-  }}
-  #mun-list button {{
+  #sidebar {{
+    width: 240px;
     background: #ffffff;
-    border: 1px solid #d8dee9;
-    border-radius: 6px;
-    padding: 6px 10px;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.2s, border 0.2s;
-    font-size: 13px;
+    padding: 20px;
+    border-right: 1px solid #e1e4e8;
+    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
+    overflow-y: auto;
+  }}
+  #sidebar h2 {{
+    font-size: 16px;
     color: #1a2d5a;
+    margin-top: 0;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
   }}
-  #mun-list button:hover {{
-    background: #e6ecf5;
+  #sidebar div {{
+    margin: 6px 0;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
   }}
-  #mun-list button.active {{
-    background: #1a2d5a;
-    color: white;
-    border-color: #1a2d5a;
+  #sidebar div:hover {{
+    background-color: #e3ecf9;
+  }}
+  #sidebar div.active {{
+    background-color: #1a2d5a;
+    color: #fff;
   }}
   #map {{
     flex-grow: 1;
@@ -163,74 +143,108 @@ html_code = f"""
     margin-top: 12px;
     color: #777;
   }}
+
+  /* Nova legenda, adaptada da segunda configuração */
+  #legend {{
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: #1a2d5a;
+    color: #e3ecf9;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(26, 45, 90, 0.4);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 280px;
+    user-select: none;
+    font-weight: 600;
+  }}
+  #legend div {{
+    margin-bottom: 7px;
+  }}
+  #legend div span {{
+    float: right;
+    font-weight: 400;
+    color: #cbd6f1;
+  }}
 </style>
 </head>
 <body>
-  <nav id=\"sidebar\" aria-label=\"Legenda de Municípios\">
+  <div id="sidebar">
     <h2>Municípios</h2>
-    <input type=\"text\" id=\"search-mun\" placeholder=\"Buscar município...\" aria-label=\"Buscar município\">
-    <div id=\"mun-list\"></div>
-  </nav>
-  <div id=\"map\">
-    <svg viewBox=\"0 0 1000 950\" preserveAspectRatio=\"xMidYMid meet\"></svg>
-    <div id=\"tooltip\"></div>
+    <div id="list"></div>
   </div>
-  <div id=\"info\">
+  <div id="map">
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="tooltip"></div>
+  </div>
+  <div id="info">
     <h3>Município</h3>
-    <div><strong>PIB 2021:</strong> <span id=\"pib\"></span></div>
-    <div><strong>Participação RMC:</strong> <span id=\"part\"></span></div>
-    <div><strong>PIB per capita:</strong> <span id=\"percapita\"></span></div>
-    <div><strong>População:</strong> <span id=\"pop\"></span></div>
-    <div><strong>Área:</strong> <span id=\"area\"></span></div>
-    <div><strong>Densidade demográfica:</strong> <span id=\"dens\"></span></div>
-    <div class=\"fonte\">Fonte: IBGE Cidades</div>
+    <div><strong>PIB 2021:</strong> <span id="pib"></span></div>
+    <div><strong>Participação RMC:</strong> <span id="part"></span></div>
+    <div><strong>PIB per capita:</strong> <span id="percapita"></span></div>
+    <div><strong>População:</strong> <span id="pop"></span></div>
+    <div><strong>Área:</strong> <span id="area"></span></div>
+    <div><strong>Densidade demográfica:</strong> <span id="dens"></span></div>
+    <div class="fonte">Fonte: IBGE Cidades</div>
   </div>
+
+  <!-- Nova legenda -->
+  <div id="legend">
+    Jaguariúna<br>
+    População ............... <span>57.000</span><br>
+    Área ....................... <span>141,2 km²</span><br>
+    PIB (2021) .......... <span>R$ 3.200.000.000</span>
+  </div>
+
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
 const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
-const list = document.getElementById("mun-list");
-const input = document.getElementById("search-mun");
+const list = document.getElementById("list");
 
 let selected = null;
-const paths = {};
+const paths = {{}};  // <-- Aqui está o escape correto para objeto vazio no f-string Python
 
+// Coordenadas para projeção simples
 let coords = [];
-geo.features.forEach(f => {
+geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
   else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
-});
+}});
 const lons = coords.map(c => c[0]);
 const lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
 const minY = Math.min(...lats), maxY = Math.max(...lats);
 
-function project([lon, lat]) {
+function project([lon, lat]) {{
   const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
   const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
   return [x, y];
-}
+}}
 
-function polygonToPath(coords) {
+function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
-}
+}}
 
-function select(name) {
-  if (selected) {
+function select(name) {{
+  if (selected) {{
     paths[selected].classList.remove("selected");
     [...list.children].forEach(d => d.classList.remove("active"));
-  }
+  }}
   selected = name;
-  if (paths[name]) {
+  if (paths[name]) {{
     paths[name].classList.add("selected");
-    document.querySelector(`#mun-list button[data-name='${name}']`).classList.add("active");
+    document.querySelector(`#list div[data-name='${{name}}']`).classList.add("active");
     showInfo(name);
-  }
-}
+    updateLegend(name);
+  }}
+}}
 
-function showInfo(name) {
+function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
   info.querySelector("h3").textContent = name;
@@ -241,18 +255,30 @@ function showInfo(name) {
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica ? f.properties.densidade_demografica.toLocaleString("pt-BR") + " hab/km²" : "-";
   info.classList.add("visible");
-}
+}}
 
-geo.features.forEach(f => {
+function updateLegend(name) {{
+  const f = geo.features.find(f => f.properties.name === name);
+  if (!f) return;
+  const legend = document.getElementById("legend");
+  legend.innerHTML = `
+    ${name}<br>
+    População ............... <span>${f.properties.populacao ? f.properties.populacao.toLocaleString("pt-BR") : "-"}</span><br>
+    Área ....................... <span>${f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-"}</span><br>
+    PIB (2021) .......... <span>${f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-"}</span>
+  `;
+}}
+
+geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
-  if (f.geometry.type === "Polygon") {
+  if (f.geometry.type === "Polygon") {{
     d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-  } else {
-    f.geometry.coordinates.forEach(p => {
+  }} else {{
+    f.geometry.coordinates.forEach(p => {{
       d += "M" + polygonToPath(p[0]) + " Z ";
-    });
-  }
+    }});
+  }}
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d.trim());
   path.classList.add("area");
@@ -260,31 +286,24 @@ geo.features.forEach(f => {
   svg.appendChild(path);
   paths[name] = path;
 
-  path.addEventListener("mousemove", e => {
+  // Eventos
+  path.addEventListener("mousemove", e => {{
     tooltip.style.left = (e.clientX + 10) + "px";
     tooltip.style.top = (e.clientY + 10) + "px";
     tooltip.style.display = "block";
     tooltip.textContent = name;
-  });
-  path.addEventListener("mouseleave", () => {
+  }});
+  path.addEventListener("mouseleave", () => {{
     tooltip.style.display = "none";
-  });
+  }});
   path.addEventListener("click", () => select(name));
 
-  const btn = document.createElement("button");
-  btn.textContent = name;
-  btn.dataset.name = name;
-  btn.setAttribute("aria-label", name);
-  btn.addEventListener("click", () => select(name));
-  list.appendChild(btn);
-});
-
-input.addEventListener("input", () => {
-  const val = input.value.toLowerCase();
-  [...list.children].forEach(btn => {
-    btn.style.display = btn.textContent.toLowerCase().includes(val) ? "block" : "none";
-  });
-});
+  const div = document.createElement("div");
+  div.textContent = name;
+  div.dataset.name = name;
+  div.addEventListener("click", () => select(name));
+  list.appendChild(div);
+}});
 </script>
 </body>
 </html>
