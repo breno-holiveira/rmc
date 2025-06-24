@@ -85,7 +85,7 @@ html_code = f"""
 
   /* Sidebar da legenda */
   #legend {{
-    width: 300px;
+    width: 220px;
     background: #fff;
     padding: 16px 20px;
     box-shadow: 2px 0 8px rgba(0,0,0,0.08);
@@ -136,7 +136,6 @@ html_code = f"""
     width: 280px;
     background: #fff;
     padding: 20px 24px;
-    border-left: ;
     box-shadow: -2px 0 8px rgba(0,0,0,0.05);
     color: #333;
     font-size: 15px;
