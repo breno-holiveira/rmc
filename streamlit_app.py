@@ -263,7 +263,20 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        div.scrollIntoView({{behavior: "smooth", block: "center"}});
+        // Scroll customizado para só rolar a barra lateral e não a página
+        const container = list;
+        const containerHeight = container.clientHeight;
+        const containerTop = container.getBoundingClientRect().top;
+
+        const elementTop = div.getBoundingClientRect().top;
+        const elementHeight = div.offsetHeight;
+
+        const scrollTop = container.scrollTop;
+        const offset = elementTop - containerTop;
+
+        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
+
+        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
     showInfo(name);
