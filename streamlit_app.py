@@ -6,7 +6,7 @@ import json
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-st.title("📍 Mapa Interativo da RMC")
+st.title("RMC em Números")
 st.markdown("**Explore os municípios da Região Metropolitana de Campinas com dados confiáveis.**")
 
 # Carregamento dos dados
