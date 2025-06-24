@@ -170,7 +170,7 @@ html = f"""
 <footer>Fonte: IBGE Cidades</footer></aside>
 <script>
 (function(){
-  const geo = JSON.parse(`{geojson}`);
+  const geo = JSON.parse('{geojson}');
   const svg = document.querySelector("svg");
   const tooltip = document.querySelector(".tooltip");
   const list = document.getElementById("list");
