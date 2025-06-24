@@ -41,8 +41,9 @@ html_code = f"""
   html, body {{
     margin: 0; padding: 0; height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #fafbfc;
+    background: #f8fafc;
     overflow: hidden;
+    color: #2c3e70;
   }}
 
   body {{
@@ -53,182 +54,196 @@ html_code = f"""
 
   /* Sidebar */
   #sidebar {{
-    width: 250px;
+    flex: 0 0 260px;
     background: #fff;
-    border-right: 1px solid #ddd;
-    padding: 16px 14px;
-    box-shadow: 1px 0 8px rgba(0,0,0,0.05);
+    border-right: 1px solid #e0e4eb;
+    padding: 18px 16px;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
   }}
   #sidebar h2 {{
-    margin: 0 0 14px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #253858;
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #223152;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 14px;
-    padding: 8px 14px;
-    font-size: 14px;
-    border: 1.2px solid #bbb;
-    border-radius: 10px;
+    margin-bottom: 16px;
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1.3px solid #c4c9d6;
+    border-radius: 12px;
     outline-offset: 2px;
     transition: border-color 0.3s ease;
   }}
   #search:focus {{
-    border-color: #3a56a7;
-    box-shadow: 0 0 6px rgba(58, 86, 167, 0.35);
+    border-color: #2f54eb;
+    box-shadow: 0 0 8px rgba(47, 84, 235, 0.35);
   }}
   #list {{
     flex-grow: 1;
     overflow-y: auto;
   }}
   #list div {{
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    border-radius: 8px;
+    padding: 9px 14px;
+    margin-bottom: 8px;
+    border-radius: 10px;
     cursor: pointer;
     user-select: none;
-    font-size: 14px;
-    line-height: 1.35;
-    color: #253858;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #223152;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }}
   #list div:hover {{
-    background-color: #e5ecfb;
+    background-color: #ebf0fd;
   }}
   #list div.active {{
-    background-color: #3a56a7;
+    background-color: #2f54eb;
     color: #fff;
     font-weight: 700;
   }}
 
-  /* Mapa ocupa restante do espaço */
+  /* Mapa - ocupa espaço principal */
   #map {{
-    flex-grow: 1;
+    flex: 1 1 auto;
     position: relative;
-    overflow: hidden;
     background: #e7ecf6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
   }}
   svg {{
-    width: 100%;
-    height: 100%;
+    width: 95%;
+    height: 95%;
+    max-width: 950px;
+    max-height: 880px;
   }}
   .area {{
-    fill: #a8badb;
-    stroke: #3a56a7;
+    fill: #a2b4d8;
+    stroke: #2f54eb;
     stroke-width: 1;
     cursor: pointer;
     transition: fill 0.3s ease, stroke-width 0.3s ease;
   }}
   .area:hover {{
-    fill: #7090d1;
+    fill: #5f7edb;
     stroke-width: 1.5;
   }}
   .area.selected {{
-    fill: #3a56a7;
-    stroke: #1c2e63;
+    fill: #2f54eb;
+    stroke: #1b2a5a;
   }}
 
-  /* Tooltip simples e leve */
+  /* Tooltip minimalista */
   #tooltip {{
     position: fixed;
-    padding: 5px 12px;
-    background: rgba(58, 86, 167, 0.9);
+    padding: 5px 10px;
+    background: rgba(47, 84, 235, 0.85);
     color: white;
     font-size: 13px;
     border-radius: 6px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.15);
+    box-shadow: 0 0 10px rgba(0,0,0,0.15);
     z-index: 1000;
     user-select: none;
     white-space: nowrap;
   }}
 
-  /* Caixa flutuante info minimalista */
+  /* Painel info: coluna fixa direita, proporcional e fluida */
   #info {{
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    max-width: 320px;
-    max-height: 400px;
-    background: rgba(255, 255, 255, 0.92);
+    flex: 0 0 300px;
+    background: #ffffffee;
+    margin-left: 12px;
     border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(58, 86, 167, 0.15);
-    padding: 20px 24px;
-    font-size: 14px;
-    line-height: 1.45;
-    color: #253858;
+    box-shadow: 0 12px 30px rgba(47, 84, 235, 0.15);
+    padding: 22px 28px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #223152;
     user-select: none;
     overflow-y: auto;
-    backdrop-filter: saturate(180%) blur(8px);
-    -webkit-backdrop-filter: saturate(180%) blur(8px);
-    display: none;
-    z-index: 50;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
   }}
-  #info.visible {{
-    display: block;
+  #info.hidden {{
+    display: none;
   }}
   #info h3 {{
-    margin: 0 0 16px 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1b2a52;
-    border-bottom: 1px solid #d0d8e8;
+    margin: 0 0 20px 0;
+    font-weight: 800;
+    font-size: 22px;
+    color: #1a264b;
+    border-bottom: 2px solid #d7def9;
     padding-bottom: 8px;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 10px;
-    column-gap: 26px;
+    gap: 12px 30px;
+    flex-grow: 1;
   }}
   #info .label {{
     font-weight: 700;
-    color: #3a56a7;
+    color: #2f54eb;
     white-space: nowrap;
   }}
   #info .value {{
     font-weight: 600;
     text-align: right;
-    color: #34495e;
+    color: #415a9e;
     white-space: nowrap;
     overflow-wrap: normal;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
-    color: #7f8caa;
+    font-size: 12px;
+    color: #8a95b7;
     font-style: italic;
     margin-top: 24px;
     text-align: right;
+  }}
+
+  /* Scrollbar fininho */
+  #sidebar::-webkit-scrollbar,
+  #list::-webkit-scrollbar,
+  #info::-webkit-scrollbar {{
+    width: 6px;
+  }}
+  #sidebar::-webkit-scrollbar-thumb,
+  #list::-webkit-scrollbar-thumb,
+  #info::-webkit-scrollbar-thumb {{
+    background-color: rgba(47, 84, 235, 0.25);
+    border-radius: 3px;
   }}
 </style>
 </head>
 <body>
   <div id="sidebar" role="complementary" aria-label="Lista de municípios">
     <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
+    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" autocomplete="off"/>
     <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-    <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-      <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-        <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
-        <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
-        <div class="label">População (2022):</div> <div class="value" id="pop"></div>
-        <div class="label">Área:</div> <div class="value" id="area"></div>
-        <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
-        <div class="fonte">Fonte: IBGE Cidades</div>
-      </div>
+  </div>
+  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado" class="hidden">
+    <h3>Município</h3>
+    <div class="grid">
+      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
+      <div class="label">Área:</div> <div class="value" id="area"></div>
+      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
+      <div class="fonte">Fonte: IBGE Cidades</div>
     </div>
   </div>
 
@@ -300,7 +315,7 @@ function showInfo(name) {{
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-  info.classList.add("visible");
+  info.classList.remove("hidden");
 }}
 
 function updateList(filter = "") {{
