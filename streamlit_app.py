@@ -172,9 +172,8 @@ html_code = f"""
     padding-bottom: 6px;
   }}
   #info .grid {{
-    display: flex;
-    grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));    row-gap: 8px;
     column-gap: 24px;
   }}
   #info .label {{
