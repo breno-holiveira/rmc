@@ -143,13 +143,13 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel info compacto com ajuste para evitar quebra */
+  /* Painel info compacto otimizado */
   #info {{
     position: fixed;
     right: 21.6px;
     top: 36px;
     background: #f0f3f8;
-    padding: 10.8px 14.4px;
+    padding: 10px 14px;
     border-radius: 9px;
     box-shadow: 0 0.9px 5.4px rgba(0,0,0,0.1);
     max-width: 288px;
@@ -160,6 +160,8 @@ html_code = f"""
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
+    box-sizing: border-box;
+    word-break: break-word;
   }}
   #info.visible {{
     display: block;
@@ -181,14 +183,14 @@ html_code = f"""
   #info .label {{
     font-weight: 600;
     color: #4d648d;
-    white-space: nowrap;  /* não quebra */
+    white-space: nowrap;  /* não quebra o label */
   }}
   #info .value {{
     font-weight: 500;
     text-align: right;
     color: #34495e;
-    white-space: nowrap;  /* não quebra */
-    overflow-wrap: normal;
+    white-space: normal;  /* permite quebra para evitar overflow */
+    overflow-wrap: break-word;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
