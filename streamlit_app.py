@@ -269,10 +269,10 @@ html_code = f"""
   }}
 
   // Formata número para o padrão pt-BR
-  function formatNumber(num) {{
-    if(num === null || num === undefined) return "N/A";
-    return num.toLocaleString('pt-BR');
-  }}
+function formatNumberBR(num, decimals = 2) {
+  if (num === null || num === undefined) return "-";
+  return num.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
 
   // Atualiza o painel de informações com dados do município
  function updateInfoPanel(data) {{
