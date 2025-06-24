@@ -88,7 +88,7 @@ html_code = f"""
     width: 220px;
     background: #fff;
     padding: 16px 20px;
-    box-shadow: 2px 0 8px rgba(0,0,0,1);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.08);
     border-right: 1px solid #e3e6ea;
     overflow-y: auto;
   }}
@@ -397,4 +397,4 @@ html_code = f"""
 """
 
 # Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=700, scrolling=True)
+st.components.v1.html(html_code, height=600, scrolling=True)
