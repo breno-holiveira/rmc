@@ -77,7 +77,7 @@ html_code = f"""
     height: 100vh;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
       Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background-color: #transparent;
+    background-color: #F9FAFB;
     color: #222;
     display: flex;
     overflow: hidden;
@@ -89,7 +89,7 @@ html_code = f"""
     background: #fff;
     padding: 16px 20px;
     box-shadow: 2px 0 8px rgba(0,0,0,0.08);
-    border-right: none;
+    border-right: 1px solid #e3e6ea;
     overflow-y: auto;
   }}
   #legend strong {{
@@ -109,7 +109,7 @@ html_code = f"""
     font-size: 14px;
   }}
   #legend div:hover {{
-    background-color: ;
+    background-color: #d8e4ff;
     color: #08318d;
   }}
   #legend div.active {{
@@ -136,6 +136,7 @@ html_code = f"""
     width: 280px;
     background: #fff;
     padding: 20px 24px;
+    border-left: 1px solid #transparent;
     box-shadow: -2px 0 8px rgba(0,0,0,0.05);
     color: #333;
     font-size: 15px;
@@ -145,7 +146,7 @@ html_code = f"""
   #info-panel h3 {{
     margin-top: 0;
     font-weight: 700;
-    font-size: 16px;
+    font-size: 20px;
     color: #0b3d91;
     border-bottom: 2px solid #0b3d91;
     padding-bottom: 8px;
@@ -393,4 +394,4 @@ html_code = f"""
 """
 
 # Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=650, scrolling=True)
+st.components.v1.html(html_code, height=700, scrolling=True)
