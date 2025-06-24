@@ -189,8 +189,8 @@ html_code = f"""
     font-weight: 500;
     text-align: right;
     color: #34495e;
-    white-space: normal;  /* permite quebra para evitar overflow */
-    overflow-wrap: break-word;
+  white-space: normal;
+  overflow-wrap: break-word;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
