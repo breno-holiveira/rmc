@@ -42,7 +42,7 @@ html_code = f"""
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f9fafa;
     display: flex;
     overflow: hidden;
@@ -140,41 +140,54 @@ html_code = f"""
     z-index: 10;
   }}
 
-  /* Info Box */
+  /* Info Box refinado e intuitivo */
   #info {{
     position: fixed;
     right: 30px;
     top: 40px;
     background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
-    max-width: 320px;
-    font-size: 14px;
-    line-height: 1.5;
+    padding: 24px 28px;
+    border-radius: 14px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+    max-width: 340px;
+    font-size: 15px;
+    line-height: 1.6;
     display: none;
     border: 1px solid #d8dee9;
     z-index: 20;
+    color: #1a2d5a;
+    user-select: none;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
     margin-top: 0;
-    color: #1a2d5a;
-    font-size: 18px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 8px;
-    user-select: none;
+    font-size: 22px;
+    font-weight: 700;
+    border-bottom: 2px solid #4d648d;
+    padding-bottom: 10px;
+    color: #223763;
   }}
-  #info div {{
-    margin: 6px 0;
+  #info .data-row {{
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+  }}
+  #info .label {{
+    font-weight: 600;
+    color: #4d648d;
+  }}
+  #info .value {{
+    font-weight: 500;
+    color: #334a80;
   }}
   #info .fonte {{
-    font-size: 11px;
-    margin-top: 12px;
+    font-size: 12px;
+    margin-top: 20px;
     color: #777;
-    user-select: none;
+    font-style: italic;
+    text-align: right;
   }}
 </style>
 </head>
@@ -190,12 +203,12 @@ html_code = f"""
   </div>
   <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
-    <div><strong>PIB 2021:</strong> <span id="pib"></span></div>
-    <div><strong>Participação RMC:</strong> <span id="part"></span></div>
-    <div><strong>PIB per capita:</strong> <span id="percapita"></span></div>
-    <div><strong>População:</strong> <span id="pop"></span></div>
-    <div><strong>Área:</strong> <span id="area"></span></div>
-    <div><strong>Densidade demográfica:</strong> <span id="dens"></span></div>
+    <div class="data-row"><div class="label">PIB 2021:</div> <div class="value" id="pib"></div></div>
+    <div class="data-row"><div class="label">Participação RMC:</div> <div class="value" id="part"></div></div>
+    <div class="data-row"><div class="label">PIB per capita:</div> <div class="value" id="percapita"></div></div>
+    <div class="data-row"><div class="label">População:</div> <div class="value" id="pop"></div></div>
+    <div class="data-row"><div class="label">Área:</div> <div class="value" id="area"></div></div>
+    <div class="data-row"><div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div></div>
     <div class="fonte">Fonte: IBGE Cidades</div>
   </div>
 <script>
@@ -214,7 +227,7 @@ let coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-  else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+  else g.geometry.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
 }});
 const lons = coords.map(c => c[0]);
 const lats = coords.map(c => c[1]);
@@ -231,6 +244,24 @@ function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
 }}
 
+function formatValue(value, type) {{
+  if (value === undefined || value === null || value === "" || isNaN(value) && type !== "percent") return "-";
+  switch(type) {{
+    case "currency":
+      return "R$ " + Number(value).toLocaleString("pt-BR");
+    case "percent":
+      return (Number(value) * 100).toFixed(2).replace('.', ',') + "%";
+    case "number":
+      return Number(value).toLocaleString("pt-BR");
+    case "area":
+      return Number(value).toFixed(2).replace(".", ",") + " km²";
+    case "density":
+      return Number(value).toLocaleString("pt-BR") + " hab/km²";
+    default:
+      return value;
+  }}
+}}
+
 function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
@@ -239,7 +270,8 @@ function select(name) {{
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    // Atualiza a barra lateral sem rolar a página inteira
+
+    // Barra lateral scroll suave
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
@@ -266,12 +298,14 @@ function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
   info.querySelector("h3").textContent = name;
-  info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-  info.querySelector("#percapita").textContent = f.properties.pib_per_capita ? "R$ " + f.properties.pib_per_capita.toLocaleString("pt-BR") : "-";
-  info.querySelector("#pop").textContent = f.properties.populacao ? f.properties.populacao.toLocaleString("pt-BR") : "-";
-  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
-  info.querySelector("#dens").textContent = f.properties.densidade_demografica ? f.properties.densidade_demografica.toLocaleString("pt-BR") + " hab/km²" : "-";
+  
+  info.querySelector("#pib").textContent = formatValue(f.properties.pib_2021, "currency");
+  info.querySelector("#part").textContent = formatValue(f.properties.participacao_rmc, "percent");
+  info.querySelector("#percapita").textContent = formatValue(f.properties.pib_per_capita, "currency");
+  info.querySelector("#pop").textContent = formatValue(f.properties.populacao, "number");
+  info.querySelector("#area").textContent = formatValue(f.properties.area, "area");
+  info.querySelector("#dens").textContent = formatValue(f.properties.densidade_demografica, "density");
+
   info.classList.add("visible");
 }}
 
@@ -334,14 +368,14 @@ geo.features.forEach(f => {{
 
 search.addEventListener("input", e => {{
   updateList(e.target.value);
-  // Se um só item visível, seleciona ele automaticamente
+  // Se só 1 item visível, seleciona automaticamente
   const visibleItems = [...list.children].filter(d => d.style.display !== "none");
   if(visibleItems.length === 1) {{
     select(visibleItems[0].dataset.name);
   }}
 }});
 
-// Seleciona primeiro município ao carregar
+// Seleciona o primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
