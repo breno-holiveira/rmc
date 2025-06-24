@@ -34,8 +34,8 @@ html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
   html, body {{
@@ -47,36 +47,61 @@ html_code = f"""
     display: flex;
     overflow: hidden;
   }}
+  /* Sidebar com busca e lista */
   #sidebar {{
-    width: 240px;
-    background: #ffffff;
-    padding: 20px;
+    width: 260px;
+    background: #fff;
+    padding: 20px 16px 12px 16px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }}
   #sidebar h2 {{
-    font-size: 16px;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
     color: #1a2d5a;
-    margin-top: 0;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 8px;
-  }}
-  #sidebar div {{
-    margin: 6px 0;
-    padding: 6px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
     user-select: none;
   }}
-  #sidebar div:hover {{
+  #search {{
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline-offset: 2px;
+    transition: border-color 0.3s;
+  }}
+  #search:focus {{
+    border-color: #4d648d;
+    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
+  }}
+  #list {{
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+  }}
+  #list div {{
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 15px;
+    color: #1a2d5a;
+    transition: background-color 0.3s, color 0.3s;
+  }}
+  #list div:hover {{
     background-color: #e3ecf9;
   }}
-  #sidebar div.active {{
-    background-color: #1a2d5a;
+  #list div.active {{
+    background-color: #4d648d;
     color: #fff;
+    font-weight: 600;
   }}
+
+  /* Mapa e SVG */
   #map {{
     flex-grow: 1;
     position: relative;
@@ -100,6 +125,8 @@ html_code = f"""
     fill: #4d648d;
     stroke: #1a2d5a;
   }}
+
+  /* Tooltip */
   #tooltip {{
     position: absolute;
     padding: 5px 10px;
@@ -110,7 +137,10 @@ html_code = f"""
     pointer-events: none;
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    z-index: 10;
   }}
+
+  /* Info Box */
   #info {{
     position: fixed;
     right: 30px;
@@ -124,6 +154,7 @@ html_code = f"""
     line-height: 1.5;
     display: none;
     border: 1px solid #d8dee9;
+    z-index: 20;
   }}
   #info.visible {{
     display: block;
@@ -134,6 +165,7 @@ html_code = f"""
     font-size: 18px;
     border-bottom: 1px solid #ccc;
     padding-bottom: 8px;
+    user-select: none;
   }}
   #info div {{
     margin: 6px 0;
@@ -142,12 +174,14 @@ html_code = f"""
     font-size: 11px;
     margin-top: 12px;
     color: #777;
+    user-select: none;
   }}
 </style>
 </head>
 <body>
   <div id="sidebar" role="complementary" aria-label="Lista de municípios">
     <h2>Municípios</h2>
+    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
     <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </div>
   <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
@@ -170,6 +204,7 @@ const svg = document.querySelector("svg");
 const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("list");
+const search = document.getElementById("search");
 
 let selected = null;
 const paths = {{}};
@@ -204,7 +239,13 @@ function select(name) {{
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    document.querySelector(`#list div[data-name='${{name}}']`).classList.add("active");
+    // Mostrar no sidebar
+    [...list.children].forEach(div => {{
+      if(div.dataset.name === name) {{
+        div.classList.add("active");
+        div.scrollIntoView({{behavior: "smooth", block: "center"}});
+      }}
+    }});
     showInfo(name);
   }}
 }}
@@ -222,7 +263,18 @@ function showInfo(name) {{
   info.classList.add("visible");
 }}
 
-// Construção dos polígonos e legenda interativa
+function updateList(filter = "") {{
+  const filterLower = filter.toLowerCase();
+  [...list.children].forEach(div => {{
+    if(div.textContent.toLowerCase().includes(filterLower)) {{
+      div.style.display = "block";
+    }} else {{
+      div.style.display = "none";
+    }}
+  }});
+}}
+
+// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -240,7 +292,7 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos mapa
+  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
     tooltip.style.left = (e.clientX + 10) + "px";
     tooltip.style.top = (e.clientY + 10) + "px";
@@ -252,15 +304,32 @@ geo.features.forEach(f => {{
   }});
   path.addEventListener("click", () => select(name));
 
-  // Item legenda
+  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
+  div.tabIndex = 0;
+  div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
+  div.addEventListener("keydown", e => {{
+    if (e.key === "Enter" || e.key === " ") {{
+      e.preventDefault();
+      select(name);
+    }}
+  }});
   list.appendChild(div);
 }});
 
-// Seleciona automaticamente o primeiro município
+search.addEventListener("input", e => {{
+  updateList(e.target.value);
+  // Se um só item visível, seleciona ele automaticamente
+  const visibleItems = [...list.children].filter(d => d.style.display !== "none");
+  if(visibleItems.length === 1) {{
+    select(visibleItems[0].dataset.name);
+  }}
+}});
+
+// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
@@ -269,5 +338,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-# Renderiza o HTML no app
 st.components.v1.html(html_code, height=720, scrolling=False)
