@@ -67,7 +67,7 @@ html_code = f"""
   #search {{
     margin-bottom: 10px;
     padding: 6px 10px;
-    font-size: 13px;
+    font-size: 15px;
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
