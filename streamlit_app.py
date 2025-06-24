@@ -142,40 +142,44 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de Informações mais integrado */
+  /* Painel de Informações responsivo e proporcional */
   #info {{
     position: fixed;
-    right: 24px;
-    top: 40px;
+    right: 2vw;       /* distância da direita em 2% da largura da viewport */
+    top: 4vh;         /* distância do topo em 4% da altura da viewport */
     background: #f0f3f8;
-    padding: 16px 20px;
+    padding: 1rem 1.25rem;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
-    font-size: 14px;
+    max-width: 22vw;   /* largura máxima de 22% da viewport */
+    width: 20vw;       /* largura base de 20% da viewport */
+    font-size: 0.9rem; /* tamanho da fonte proporcional ao zoom */
     line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
+    overflow-wrap: break-word;
+    box-sizing: border-box;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
     margin: 0 0 12px 0;
-    font-size: 20px;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 6px;
+    padding-bottom: 0.375rem;
+    white-space: nowrap; /* título sem quebra */
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
-    column-gap: 24px;
+    row-gap: 0.5rem;
+    column-gap: 1.5rem;
   }}
   #info .label {{
     font-weight: 600;
@@ -190,10 +194,10 @@ html_code = f"""
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 0.75rem;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 16px;
+    margin-top: 1rem;
     text-align: right;
   }}
 </style>
@@ -327,8 +331,8 @@ geo.features.forEach(f => {{
 
   // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
+    const offsetX = 8;
+    const offsetY = -22;
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -338,8 +342,8 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", e => {{
-    e.preventDefault();  // previne scroll da página ao clicar no município
-    e.stopPropagation(); // evita propagação para scroll do container pai
+    e.preventDefault();
+    e.stopPropagation();
     select(name);
   }});
 
