@@ -105,10 +105,10 @@ html_code = f"""
 
   /* Mapa e SVG */
   #map {{
-    width: 728px; /* Reduzido para abrir espaço para o info */
-    height: 630px; /* fixado */
-    position: relative;
-    overflow: hidden; /* Impede scroll no mapa */
+   width: 600px;
+  height: 520px;
+  position: relative;
+  overflow: hidden;
   }}
   svg {{
     width: 100%;
