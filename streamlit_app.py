@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# === Configurações de página ===
+# === Configurações da página ===
 st.set_page_config(
     page_title='RMC Data - Mapa Interativo',
     page_icon='📊',
@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state='expanded'
 )
 
-# === Títulos ===
+# === Cabeçalhos ===
 st.markdown('# RMC Data')
 st.markdown('## Indicadores da Região Metropolitana de Campinas')
 
@@ -68,77 +68,85 @@ html_code = f"""
 <meta charset="UTF-8" />
 <title>Mapa Interativo RMC - Transparência</title>
 <style>
-  /* Reset e base */
+  /* RESET */
   *, *::before, *::after {{
     box-sizing: border-box;
   }}
   html, body {{
     margin: 0; padding: 0;
     height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-    background: #f9fafb;
-    color: #222;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f7f9fc;
+    color: #2c3e50;
     overflow: hidden;
     display: flex;
-    flex-direction: row;
-    gap: 16px;
-    padding: 12px 18px;
+    gap: 18px;
+    padding: 16px 22px;
   }}
 
   /* === LEGEND === */
   #legend {{
-    width: 260px;
-    background: #fff;
-    padding: 20px 16px 20px 22px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.07);
-    border-radius: 12px;
+    width: 280px;
+    background: #ffffffdd;
+    padding: 22px 24px 22px 24px;
+    box-shadow: 0 1px 12px rgb(44 62 80 / 0.07);
+    border-radius: 14px;
     overflow-y: auto;
     user-select: none;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
+    font-size: 15px;
+    color: #34495e;
+    backdrop-filter: saturate(180%) blur(8px);
   }}
   #legend strong {{
-    font-weight: 800;
-    font-size: 20px;
-    color: #0b3d91;
+    font-weight: 700;
+    font-size: 22px;
+    color: #2980b9;
     margin-bottom: 14px;
-    border-bottom: 3px solid #0b3d91;
-    padding-bottom: 8px;
+    border-bottom: 2.5px solid #2980b9aa;
+    padding-bottom: 6px;
   }}
   #search-box {{
     margin-bottom: 16px;
-    padding: 8px 12px;
+    padding: 9px 14px;
     font-size: 15px;
-    border: 1.8px solid #0b3d91;
-    border-radius: 8px;
+    border: 1.4px solid #a3b1c6;
+    border-radius: 10px;
     outline-offset: 2px;
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    background: #fefefe;
+    color: #34495e;
+    font-weight: 600;
+  }}
+  #search-box::placeholder {{
+    color: #a3b1c6;
+    font-weight: 500;
   }}
   #search-box:focus {{
-    box-shadow: 0 0 6px #0b3d91aa;
-    border-color: #08318d;
+    box-shadow: 0 0 10px #5dade2cc;
+    border-color: #2980b9;
   }}
   #mun-list {{
     flex-grow: 1;
     overflow-y: auto;
   }}
   #mun-list div {{
-    padding: 8px 14px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
-    font-size: 15px;
-    color: #3a3a3a;
+    font-weight: 600;
+    color: #34495e;
     white-space: nowrap;
   }}
   #mun-list div:hover {{
-    background-color: #d5e1fc;
-    color: #08318d;
+    background-color: #d6e9ffcc;
+    color: #2980b9;
   }}
   #mun-list div.active {{
-    background-color: #0b3d91;
+    background-color: #2980b9;
     color: #fff;
     font-weight: 700;
   }}
@@ -147,9 +155,9 @@ html_code = f"""
   #map {{
     flex-grow: 1;
     position: relative;
-    background: #fff;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    border-radius: 12px;
+    background: #fefefe;
+    box-shadow: 0 3px 18px rgb(41 128 185 / 0.10);
+    border-radius: 14px;
     overflow: hidden;
     user-select: none;
   }}
@@ -163,22 +171,23 @@ html_code = f"""
   #info-panel {{
     width: 340px;
     max-height: 100vh;
-    background: #fff;
-    padding: 24px 30px 42px 30px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.13);
-    color: #333;
+    background: #ffffffdd;
+    padding: 26px 30px 42px 30px;
+    box-shadow: 0 6px 28px rgb(41 128 185 / 0.12);
+    color: #34495e;
     font-size: 16px;
     line-height: 1.5;
     overflow-y: auto;
-    border-radius: 12px;
+    border-radius: 14px;
     position: relative;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(32px);
     pointer-events: none;
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1), transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: saturate(180%) blur(10px);
   }}
   #info-panel.visible {{
     opacity: 1;
@@ -188,29 +197,30 @@ html_code = f"""
   #info-panel h3 {{
     margin-top: 0;
     font-weight: 900;
-    font-size: 22px;
-    color: #0b3d91;
-    border-bottom: 3px solid #0b3d91;
-    padding-bottom: 10px;
-    margin-bottom: 24px;
+    font-size: 24px;
+    color: #2471a3;
+    border-bottom: 2.5px solid #2471a3aa;
+    padding-bottom: 12px;
+    margin-bottom: 26px;
     user-select: text;
   }}
 
-  /* Label e valor em coluna */
+  /* Label e valor */
   #info-panel div.info-row {{
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     display: flex;
     flex-direction: column;
   }}
   #info-panel div.info-row strong {{
-    color: #0b3d91;
-    margin-bottom: 8px;
+    color: #2471a3;
+    margin-bottom: 7px;
     user-select: text;
+    font-weight: 700;
   }}
   #info-panel div.info-row span {{
-    color: #333;
+    color: #34495e;
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.08rem;
     user-select: text;
   }}
 
@@ -221,8 +231,8 @@ html_code = f"""
     right: 22px;
     background: transparent;
     border: none;
-    font-size: 30px;
-    color: #0b3d91;
+    font-size: 28px;
+    color: #2471a3;
     cursor: pointer;
     font-weight: 900;
     line-height: 1;
@@ -230,7 +240,7 @@ html_code = f"""
     transition: color 0.25s ease;
   }}
   #info-panel button#close-info:hover {{
-    color: #08318d;
+    color: #1b4f72;
   }}
 
   /* Fonte discreta rodapé painel info */
@@ -238,8 +248,8 @@ html_code = f"""
     margin-top: auto;
     font-size: 13px;
     font-weight: 400;
-    color: #666;
-    opacity: 0.55;
+    color: #7f8c8d;
+    opacity: 0.6;
     text-align: right;
     font-style: italic;
     user-select: none;
@@ -247,53 +257,65 @@ html_code = f"""
 
   /* === Polígonos do mapa === */
   .polygon {{
-    fill: rgba(11, 61, 145, 0.18);
-    stroke: rgba(11, 61, 145, 0.7);
+    fill: rgba(41, 128, 185, 0.15);
+    stroke: rgba(41, 128, 185, 0.7);
     stroke-width: 1.1;
     cursor: pointer;
-    transition: fill 0.3s ease, stroke 0.3s ease;
-    opacity: 0.9;
+    transition: fill 0.3s ease, stroke 0.3s ease, filter 0.3s ease;
+    opacity: 0.85;
   }}
   .polygon:hover {{
-    fill: rgba(11, 61, 145, 0.4);
-    stroke-width: 2.2;
-    filter: drop-shadow(0 0 7px rgba(11, 61, 145, 0.4));
+    fill: rgba(41, 128, 185, 0.35);
+    stroke-width: 2.1;
+    filter: drop-shadow(0 0 8px rgba(41, 128, 185, 0.3));
   }}
   .polygon.selected {{
-    fill: rgba(11, 61, 145, 0.6);
-    stroke: rgba(11, 61, 145, 0.95);
+    fill: rgba(41, 128, 185, 0.52);
+    stroke: rgba(41, 128, 185, 0.95);
     stroke-width: 2.8;
-    filter: drop-shadow(0 0 12px rgba(11, 61, 145, 0.7));
+    filter: drop-shadow(0 0 14px rgba(41, 128, 185, 0.5));
   }}
 
   /* Tooltip */
   #tooltip {{
     position: absolute;
     pointer-events: none;
-    padding: 8px 16px;
-    background: rgba(11, 61, 145, 0.92);
-    color: #fefefe;
-    font-weight: 700;
+    padding: 7px 16px;
+    background: rgba(41, 128, 185, 0.85);
+    color: #fdfefe;
+    font-weight: 600;
     font-size: 13px;
-    border-radius: 6px;
+    border-radius: 8px;
     white-space: nowrap;
-    box-shadow: 0 0 10px rgba(11, 61, 145, 0.75);
+    box-shadow: 0 0 12px rgba(41, 128, 185, 0.65);
     display: none;
     user-select: none;
     z-index: 1100;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.24s ease;
     opacity: 0;
   }}
   #tooltip.visible {{
     display: block;
     opacity: 1;
   }}
+
+  /* Scroll barras estilizadas para legenda e painel */
+  #legend::-webkit-scrollbar, #info-panel::-webkit-scrollbar {{
+    width: 8px;
+  }}
+  #legend::-webkit-scrollbar-thumb, #info-panel::-webkit-scrollbar-thumb {{
+    background-color: #a3b1c6aa;
+    border-radius: 4px;
+  }}
+  #legend::-webkit-scrollbar-track, #info-panel::-webkit-scrollbar-track {{
+    background: transparent;
+  }}
 </style>
 </head>
 <body>
   <nav id="legend" role="list" aria-label="Lista de municípios da Região Metropolitana de Campinas">
     <strong>Municípios da RMC</strong>
-    <input type="search" id="search-box" placeholder="Buscar município..." aria-label="Buscar município" />
+    <input type="search" id="search-box" placeholder="Buscar município..." aria-label="Buscar município" autocomplete="off" />
     <div id="mun-list" tabindex="0" role="listbox" aria-multiselectable="false"></div>
   </nav>
 
@@ -322,7 +344,6 @@ html_code = f"""
     const tooltip = document.getElementById("tooltip");
     const infoPanel = document.getElementById("info-panel");
     const closeBtn = document.getElementById("close-info");
-    const mapDiv = document.getElementById("map");
     const searchBox = document.getElementById("search-box");
 
     let selectedName = null;
@@ -433,61 +454,57 @@ html_code = f"""
 
     // Criar polígonos SVG e itens da legenda (delegação para performance)
     geojson.features.forEach(f => {{
-      const props = f.properties;
-      const name = props.name;
+      const name = f.properties.name;
       const geom = f.geometry;
-      let pathD = "";
 
-      if (geom.type === "Polygon") {{
-        pathD = "M" + polygonToPath(geom.coordinates[0]) + " Z";
-      }} else if (geom.type === "MultiPolygon") {{
-        geom.coordinates.forEach(poly => {{
-          pathD += "M" + polygonToPath(poly[0]) + " Z";
-        }});
-      }}
-
-      const pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      pathEl.setAttribute("d", pathD);
+      let pathEl = document.createElementNS("http://www.w3.org/2000/svg", "path");
       pathEl.classList.add("polygon");
       pathEl.setAttribute("data-name", name);
+
+      if(geom.type === "Polygon") {{
+        const d = "M" + polygonToPath(geom.coordinates[0]) + " Z";
+        pathEl.setAttribute("d", d);
+      }} else if(geom.type === "MultiPolygon") {{
+        const d = geom.coordinates.map(poly => "M" + polygonToPath(poly[0]) + " Z").join(" ");
+        pathEl.setAttribute("d", d);
+      }}
+
       svg.appendChild(pathEl);
       paths[name] = pathEl;
 
-      // Criar item legenda
+      // Item legenda
       const div = document.createElement("div");
       div.textContent = name;
       div.dataset.name = name;
       munList.appendChild(div);
     }});
 
-    // Evento click em legenda (delegação)
-    munList.addEventListener("click", (e) => {{
-      if(e.target && e.target.dataset && e.target.dataset.name) {{
+    // Eventos legenda (click e teclado)
+    munList.addEventListener("click", e => {{
+      if(e.target.dataset.name) {{
         selectMunicipio(e.target.dataset.name);
       }}
     }});
-    munList.addEventListener("keydown", (e) => {{
-      if(e.key === "Enter" && e.target && e.target.dataset && e.target.dataset.name) {{
+    munList.addEventListener("keydown", e => {{
+      if(e.key === "Enter" && e.target.dataset.name) {{
         selectMunicipio(e.target.dataset.name);
       }}
     }});
 
-    // Evento mouse nos polígonos
-    svg.addEventListener("mousemove", (e) => {{
+    // Tooltip mousemove sobre polígonos
+    svg.addEventListener("mousemove", e => {{
       const target = e.target;
-      if(target && target.classList.contains("polygon")) {{
+      if(target.classList.contains("polygon")) {{
         const name = target.dataset.name;
-        if(name) {{
-          tooltip.textContent = name;
-          tooltip.style.left = (e.clientX + 16) + "px";
-          tooltip.style.top = (e.clientY + 16) + "px";
-          tooltip.classList.add("visible");
-          tooltip.setAttribute("aria-hidden", "false");
-          // Sutil realce
-          clearHighlight();
-          if(name !== selectedName) {{
-            target.classList.add("highlight");
-          }}
+        tooltip.textContent = name;
+        tooltip.style.left = (e.clientX + 14) + "px";
+        tooltip.style.top = (e.clientY + 14) + "px";
+        tooltip.classList.add("visible");
+        tooltip.setAttribute("aria-hidden", "false");
+
+        clearHighlight();
+        if(name !== selectedName) {{
+          target.classList.add("highlight");
         }}
       }} else {{
         tooltip.classList.remove("visible");
@@ -495,23 +512,21 @@ html_code = f"""
         clearHighlight();
       }}
     }});
-
-    // Ocultar tooltip ao sair do svg
     svg.addEventListener("mouseleave", () => {{
       tooltip.classList.remove("visible");
       tooltip.setAttribute("aria-hidden", "true");
       clearHighlight();
     }});
 
-    // Clique no mapa - seleciona
-    svg.addEventListener("click", (e) => {{
+    // Clique polígonos
+    svg.addEventListener("click", e => {{
       const target = e.target;
-      if(target && target.classList.contains("polygon")) {{
+      if(target.classList.contains("polygon")) {{
         selectMunicipio(target.dataset.name);
       }}
     }});
 
-    // Busca no input - filtro legenda e mapa
+    // Busca filtro
     searchBox.addEventListener("input", () => {{
       const val = searchBox.value.toLowerCase().trim();
       Array.from(munList.children).forEach(div => {{
@@ -523,13 +538,18 @@ html_code = f"""
       }});
     }});
 
-    // Inicializa sem seleção e foco no campo de busca
+    // Foco inicial na busca
     searchBox.focus();
+
+    // Inicializa painel info fechado
     updateInfoPanel(null);
+
   }})();
 </script>
+
 </body>
 </html>
 """
 
-st.components.v1.html(html_code, height=700, scrolling=True)
+# === Renderiza no Streamlit ===
+st.components.v1.html(html_code, height=920, scrolling=True)
