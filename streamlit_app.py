@@ -6,7 +6,7 @@ import json
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-st.title("RMCn Data")
+st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
 # Carregamento dos dados
@@ -38,67 +38,68 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
+  /* Reset e base */
   html, body {{
-    height: 100vh;
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0; height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f9fafa;
-    display: flex;
     overflow: hidden;
   }}
 
+  /* Container principal - usa flex */
   body {{
-    display: grid;
-    grid-template-columns: 260px 1fr 320px;
-    grid-template-rows: 100vh;
-    gap: 0 0;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    gap: 0;
   }}
 
-  /* Sidebar */
+  /* Sidebar - lista municípios */
   #sidebar {{
+    width: 260px;
     background: #fff;
-    padding: 16px 12px 8px 12px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
+    padding: 16px 14px 10px 14px;
+    overflow-y: auto;
   }}
   #sidebar h2 {{
-    margin: 0 0 6px 0;
-    font-size: 16px;
+    margin: 0 0 10px 0;
+    font-size: 17px;
     font-weight: 600;
     color: #1a2d5a;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 10px;
-    padding: 6px 10px;
-    font-size: 13px;
-    border: 1px solid #ccc;
+    margin-bottom: 12px;
+    padding: 7px 12px;
+    font-size: 14px;
+    border: 1.5px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s ease;
   }}
   #search:focus {{
     border-color: #4d648d;
-    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
+    box-shadow: 0 0 6px rgba(77, 100, 141, 0.55);
   }}
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 4px;
+    padding-right: 6px;
   }}
   #list div {{
-    padding: 6px 10px;
-    margin-bottom: 4px;
-    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    border-radius: 10px;
     cursor: pointer;
     user-select: none;
-    font-size: 14px;
-    line-height: 1.3;
+    font-size: 15px;
+    line-height: 1.4;
     color: #1a2d5a;
-    transition: background-color 0.3s, color 0.3s;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }}
   #list div:hover {{
     background-color: #e3ecf9;
@@ -106,15 +107,14 @@ html_code = f"""
   #list div.active {{
     background-color: #4d648d;
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
   }}
 
-  /* Mapa */
+  /* Mapa - ocupa o espaço central */
   #map {{
+    flex-grow: 1;
     position: relative;
     overflow: hidden;
-    width: 100%;
-    height: 100vh;
   }}
   svg {{
     width: 100%;
@@ -139,53 +139,58 @@ html_code = f"""
   /* Tooltip */
   #tooltip {{
     position: fixed;
-    padding: 5px 10px;
+    padding: 5px 11px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
     font-size: 13px;
     border-radius: 5px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0 8px rgba(0,0,0,0.12);
     z-index: 1000;
     user-select: none;
+    white-space: nowrap;
   }}
 
-  /* Painel info em coluna fixa */
+  /* Coluna de info - dados rápidos */
   #info {{
+    width: 320px;
     background: #f0f3f8;
-    padding: 16px 20px;
-    border-radius: 10px;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.1);
-    max-width: 320px;
-    font-size: 13px;
-    line-height: 1.4;
+    padding: 22px 26px;
+    border-radius: 12px 0 0 12px;
+    box-shadow: inset 2px 0 6px rgba(0,0,0,0.04);
+    font-size: 14px;
+    line-height: 1.5;
     color: #1a2d5a;
     user-select: none;
-    border: 1px solid #d9e2f3;
+    border-left: 1px solid #d9e2f3;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }}
   #info h3 {{
-    margin: 0 0 14px 0;
-    font-size: 20px;
+    margin: 0 0 20px 0;
+    font-size: 21px;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 8px;
+    flex-shrink: 0;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
-    column-gap: 24px;
+    row-gap: 10px;
+    column-gap: 26px;
+    flex-grow: 1;
   }}
   #info .label {{
-    font-weight: 600;
+    font-weight: 700;
     color: #4d648d;
     white-space: nowrap;
   }}
   #info .value {{
-    font-weight: 500;
+    font-weight: 600;
     text-align: right;
     color: #34495e;
     white-space: nowrap;
@@ -196,8 +201,20 @@ html_code = f"""
     font-size: 11px;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 18px;
+    margin-top: 24px;
     text-align: right;
+  }}
+
+  /* Scrollbar customizado (opcional) */
+  #sidebar::-webkit-scrollbar, #list::-webkit-scrollbar, #info::-webkit-scrollbar {{
+    width: 8px;
+  }}
+  #sidebar::-webkit-scrollbar-thumb, #list::-webkit-scrollbar-thumb, #info::-webkit-scrollbar-thumb {{
+    background-color: rgba(77, 100, 141, 0.3);
+    border-radius: 4px;
+  }}
+  #sidebar::-webkit-scrollbar-track, #list::-webkit-scrollbar-track, #info::-webkit-scrollbar-track {{
+    background-color: transparent;
   }}
 </style>
 </head>
@@ -369,4 +386,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=700, scrolling=False)
+st.components.v1.html(html_code, height=720, scrolling=False)
