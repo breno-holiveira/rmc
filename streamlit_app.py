@@ -105,7 +105,7 @@ html_code = f"""
 
   /* Mapa e SVG */
   #map {{
-    width: 828px; /* 920 * 0.9 */
+    width: 728px; /* Reduzido para abrir espaço para o info */
     height: 630px; /* fixado */
     position: relative;
     overflow: hidden; /* Impede scroll no mapa */
@@ -132,7 +132,7 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: fixed; /* fixado na tela */
+    position: fixed;
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -150,36 +150,38 @@ html_code = f"""
     position: fixed;
     right: 24px;
     top: 40px;
+    width: 388px; /* aumentei um pouco para evitar cortes */
     background: #f0f3f8;
-    padding: 14px 18px; /* reduzido 10% */
-    border-radius: 9px; /* 10 * 0.9 */
+    padding: 14px 18px;
+    border-radius: 9px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 288px; /* 320 * 0.9 */
-    font-size: 12.6px; /* 14 * 0.9 */
-    line-height: 1.3; /* ajustado para caber melhor */
+    font-size: 12.6px;
+    line-height: 1.3;
     color: #1a2d5a;
     user-select: none;
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
-    white-space: nowrap; /* evitar quebra de linha */
+    white-space: normal; /* permite quebra, evita corte */
+    overflow-wrap: break-word;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
     margin: 0 0 10.8px 0;
-    font-size: 18px; /* 20 * 0.9 */
+    font-size: 18px;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 5.4px;
+    white-space: nowrap; /* título sem quebra */
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 7.2px; /* 8 * 0.9 */
-    column-gap: 21.6px; /* 24 * 0.9 */
+    row-gap: 7.2px;
+    column-gap: 21.6px;
   }}
   #info .label {{
     font-weight: 600;
@@ -190,14 +192,13 @@ html_code = f"""
     font-weight: 500;
     text-align: right;
     color: #34495e;
-    overflow-wrap: normal; /* evita quebra inesperada */
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 9.9px; /* 11 * 0.9 */
+    font-size: 9.9px;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 14.4px; /* 16 * 0.9 */
+    margin-top: 14.4px;
     text-align: right;
   }}
 </style>
