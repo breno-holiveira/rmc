@@ -6,6 +6,8 @@ import json
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
+page = st.sidebar.radio("Ir para:", ["Página 1", "Página 2", "Página 3"])
+
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
