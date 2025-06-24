@@ -30,7 +30,6 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML e JavaScript embutido com legenda nova substituindo a antiga
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -43,47 +42,48 @@ html_code = f"""
     height: 100vh;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f9fafa;
     display: flex;
     overflow: hidden;
+    color: #34495e;
   }}
-  /* LEGENDA (SIDEBAR) NOVA */
+  /* LEGENDA REFINADA */
   #sidebar {{
-    width: 240px;
+    width: 260px;
     background: #ffffff;
-    padding: 20px 16px 18px 16px;
-    border-right: 1px solid #e1e4e8;
-    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
+    padding: 24px 20px 20px 20px;
+    border-right: 1px solid #dfe6eb;
+    box-shadow: 2px 0 12px rgba(100, 110, 120, 0.06);
     display: flex;
     flex-direction: column;
     font-size: 16px;
-    color: #34495e;
-  }}
-  #sidebar > strong {{
-    font-size: 20px;
-    font-weight: 700;
-    color: #2980b9;
-    margin-bottom: 16px;
-    border-bottom: 2.8px solid #2980b9cc;
-    padding-bottom: 8px;
     user-select: none;
   }}
+  #sidebar > strong {{
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #2980b9;
+    padding-bottom: 10px;
+  }}
   #search-box {{
-    padding: 10px 14px;
+    padding: 12px 16px;
     font-size: 16px;
-    border: 1.5px solid #a3b1c6;
-    border-radius: 12px;
+    border: 1.8px solid #b0bec5;
+    border-radius: 14px;
     outline-offset: 2px;
     background: #fefefe;
     font-weight: 600;
     color: #34495e;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     user-select: text;
+    box-shadow: inset 0 1px 3px #e0e7ed;
   }}
   #search-box::placeholder {{
-    color: #a3b1c6;
+    color: #90a4ae;
     font-weight: 500;
   }}
   #search-box:focus {{
@@ -94,36 +94,39 @@ html_code = f"""
     overflow-y: auto;
     flex-grow: 1;
     scrollbar-width: thin;
-    scrollbar-color: #a3b1c6 transparent;
+    scrollbar-color: #b0bec5 transparent;
   }}
   #list::-webkit-scrollbar {{
-    width: 7px;
+    width: 8px;
   }}
   #list::-webkit-scrollbar-thumb {{
-    background-color: #a3b1c6;
-    border-radius: 5px;
+    background-color: #b0bec5;
+    border-radius: 6px;
   }}
   #list > div {{
-    padding: 12px 18px;
-    border-radius: 12px;
-    margin-bottom: 8px;
+    padding: 14px 22px;
+    border-radius: 14px;
+    margin-bottom: 10px;
     cursor: pointer;
     font-weight: 600;
     color: #34495e;
-    transition: background-color 0.35s ease, color 0.35s ease;
-    user-select: none;
+    transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+    user-select: none;
   }}
   #list > div:hover {{
-    background-color: #d8e9ffcc;
-    color: #2980b9;
+    background-color: #d6e6fb;
+    color: #1a4f8a;
+    box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
   }}
   #list > div.active {{
     background-color: #2980b9;
     color: #fff;
     font-weight: 700;
+    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.45);
   }}
 
   /* MAPA */
@@ -152,14 +155,14 @@ html_code = f"""
   }}
   #tooltip {{
     position: absolute;
-    padding: 5px 10px;
+    padding: 6px 12px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
     font-size: 13px;
-    border-radius: 5px;
+    border-radius: 7px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    box-shadow: 0 0 8px rgba(0,0,0,0.12);
   }}
   /* PAINEL DE INFORMAÇÕES */
   #info {{
@@ -167,32 +170,35 @@ html_code = f"""
     right: 30px;
     top: 40px;
     background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    padding: 22px 26px;
+    border-radius: 16px;
+    box-shadow: 0 6px 30px rgba(0,0,0,0.09);
     max-width: 320px;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.6;
     display: none;
     border: 1px solid #d8dee9;
+    color: #2c3e50;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
     margin-top: 0;
-    color: #1a2d5a;
-    font-size: 18px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 8px;
+    color: #2c3e50;
+    font-size: 20px;
+    border-bottom: 1.8px solid #ccc;
+    padding-bottom: 10px;
+    font-weight: 700;
   }}
   #info div {{
-    margin: 6px 0;
+    margin: 8px 0;
   }}
   #info .fonte {{
-    font-size: 11px;
-    margin-top: 12px;
+    font-size: 12px;
+    margin-top: 14px;
     color: #777;
+    font-style: italic;
   }}
 </style>
 </head>
@@ -335,7 +341,6 @@ searchBox.addEventListener("input", e => {{
 // Seleciona o primeiro município automaticamente
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
-  // Scroll para ativo
   const firstActive = list.querySelector("div.active");
   if(firstActive) firstActive.scrollIntoView({{behavior: "smooth", block: "center"}});
 }}
