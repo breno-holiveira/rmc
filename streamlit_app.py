@@ -4,7 +4,7 @@ import geopandas as gpd
 import json
 
 # Configurações da página
-st.set_page_config(page_title="RMC mData", layout="wide")
+st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
@@ -49,27 +49,27 @@ html_code = f"""
   }}
   /* Sidebar */
   #sidebar {{
-    width: 220px;
+    width: 260px;
     background: #fff;
-    padding: 14px 11px 7px 11px;
+    padding: 16px 12px 8px 12px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
   }}
   #sidebar h2 {{
-    margin: 0 0 5px 0;
+    margin: 0 0 6px 0;
     font-size: 16px;
     font-weight: 600;
     color: #1a2d5a;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 9px;
-    padding: 5px 9px;
-    font-size: 13.5px;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    font-size: 14px;
     border: 1px solid #ccc;
-    border-radius: 7px;
+    border-radius: 8px;
     outline-offset: 2px;
     transition: border-color 0.3s;
   }}
@@ -80,15 +80,15 @@ html_code = f"""
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 3.6px;
+    padding-right: 4px;
   }}
   #list div {{
-    padding: 5.4px 9px;
-    margin-bottom: 3.6px;
-    border-radius: 7.2px;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 13.5px;
+    font-size: 16px;
     line-height: 1.3;
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
@@ -131,73 +131,71 @@ html_code = f"""
   /* Tooltip */
   #tooltip {{
     position: fixed;
-    padding: 4.5px 9px;
+    padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
-    font-size: 11.7px;
-    border-radius: 4.5px;
+    font-size: 13px;
+    border-radius: 5px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 7.2px rgba(0,0,0,0.1);
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
     user-select: none;
   }}
 
-  /* Painel info compacto otimizado */
+  /* Painel info compacto com ajuste para evitar quebra */
   #info {{
     position: fixed;
-    right: 21.6px;
-    top: 36px;
+    right: 24px;
+    top: 40px;
     background: #f0f3f8;
-    padding: 10px 14px;
-    border-radius: 9px;
-    box-shadow: 0 0.9px 5.4px rgba(0,0,0,0.1);
-    max-width: 288px;
-    font-size: 12px;
-    line-height: 1.4;
+    padding: 12px 16px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.3;
     color: #1a2d5a;
     user-select: none;
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
-    box-sizing: border-box;
-    word-break: break-word;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
-    margin: 0 0 9px 0;
-    font-size: 16.2px;
+    margin: 0 0 10px 0;
+    font-size: 18px;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 3.6px;
+    padding-bottom: 4px;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 5.4px;
-    column-gap: 18px;
+    row-gap: 6px;
+    column-gap: 20px;
   }}
   #info .label {{
     font-weight: 600;
     color: #4d648d;
-    white-space: nowrap;  /* não quebra o label */
+    white-space: nowrap;  /* não quebra */
   }}
   #info .value {{
     font-weight: 500;
     text-align: right;
     color: #34495e;
-  white-space: normal;
-  overflow-wrap: break-word;
+    white-space: nowrap;  /* não quebra */
+    overflow-wrap: normal;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 9px;
+    font-size: 10px;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 10.8px;
+    margin-top: 12px;
     text-align: right;
   }}
 </style>
