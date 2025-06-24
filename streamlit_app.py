@@ -45,13 +45,13 @@ html_code = f"""
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden; /* Evita scroll da página */
+    overflow: hidden;
   }}
-  /* Sidebar com busca e lista */
+  /* Sidebar */
   #sidebar {{
     width: 260px;
     background: #fff;
-    padding: 16px 12px 8px 12px; /* menos padding para deixar menor */
+    padding: 16px 12px 8px 12px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
@@ -59,15 +59,15 @@ html_code = f"""
   }}
   #sidebar h2 {{
     margin: 0 0 6px 0;
-    font-size: 16px;  /* menor */
+    font-size: 16px;
     font-weight: 600;
     color: #1a2d5a;
     user-select: none;
   }}
   #search {{
     margin-bottom: 10px;
-    padding: 6px 10px;  /* menor */
-    font-size: 13px;    /* menor */
+    padding: 6px 10px;
+    font-size: 13px;
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
@@ -80,17 +80,17 @@ html_code = f"""
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 4px; /* menos */
+    padding-right: 4px;
   }}
   #list div {{
-    padding: 6px 10px;  /* menos */
-    margin-bottom: 4px; /* menos */
+    padding: 6px 10px;
+    margin-bottom: 4px;
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 14px;    /* menor */
+    font-size: 14px;
+    line-height: 1.3;
     color: #1a2d5a;
-    line-height: 1.3;   /* compacto */
     transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
@@ -102,11 +102,11 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Mapa e SVG */
+  /* Mapa */
   #map {{
     flex-grow: 1;
     position: relative;
-    overflow: hidden; /* Impede scroll no mapa */
+    overflow: hidden;
   }}
   svg {{
     width: 100%;
@@ -130,7 +130,7 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: fixed; /* fixado na tela */
+    position: fixed;
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -143,18 +143,18 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de Informações mais compacto */
+  /* Painel info compacto com ajuste para evitar quebra */
   #info {{
     position: fixed;
     right: 24px;
     top: 40px;
     background: #f0f3f8;
-    padding: 12px 16px; /* menos padding */
+    padding: 12px 16px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     max-width: 320px;
-    font-size: 13px;    /* menor */
-    line-height: 1.3;   /* compacto */
+    font-size: 13px;
+    line-height: 1.3;
     color: #1a2d5a;
     user-select: none;
     display: none;
@@ -166,7 +166,7 @@ html_code = f"""
   }}
   #info h3 {{
     margin: 0 0 10px 0;
-    font-size: 18px;   /* menor */
+    font-size: 18px;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
@@ -175,26 +175,27 @@ html_code = f"""
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 6px;      /* menor */
-    column-gap: 20px;  /* menor */
+    row-gap: 6px;
+    column-gap: 20px;
   }}
   #info .label {{
     font-weight: 600;
     color: #4d648d;
-    white-space: nowrap;
+    white-space: nowrap;  /* não quebra */
   }}
   #info .value {{
     font-weight: 500;
     text-align: right;
     color: #34495e;
-    overflow-wrap: break-word;
+    white-space: nowrap;  /* não quebra */
+    overflow-wrap: normal;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 10px;   /* menor */
+    font-size: 10px;
     color: #7f8caa;
     font-style: italic;
-    margin-top: 12px;  /* menor */
+    margin-top: 12px;
     text-align: right;
   }}
 </style>
@@ -264,19 +265,14 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        // Scroll customizado para só rolar a barra lateral e não a página
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
-
         const elementTop = div.getBoundingClientRect().top;
         const elementHeight = div.offsetHeight;
-
         const scrollTop = container.scrollTop;
         const offset = elementTop - containerTop;
-
         const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-
         container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
@@ -308,7 +304,6 @@ function updateList(filter = "") {{
   }});
 }}
 
-// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -326,7 +321,6 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
     const offsetX = 8;
     const offsetY = -22;
@@ -344,7 +338,6 @@ geo.features.forEach(f => {{
     select(name);
   }});
 
-  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
@@ -368,7 +361,6 @@ search.addEventListener("input", e => {{
   }}
 }});
 
-// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
