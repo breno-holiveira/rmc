@@ -239,26 +239,23 @@ function select(name) {{
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    // Mostrar no sidebar
-[...list.children].forEach(div => {
-  if(div.dataset.name === name) {
-    div.classList.add("active");
+    // Atualiza a barra lateral sem rolar a página inteira
+    [...list.children].forEach(div => {{
+      if(div.dataset.name === name) {{
+        div.classList.add("active");
+        const container = list;
+        const containerHeight = container.clientHeight;
+        const containerTop = container.getBoundingClientRect().top;
 
-    const container = list;
-    const containerHeight = container.clientHeight;
-    const containerTop = container.getBoundingClientRect().top;
+        const elementTop = div.getBoundingClientRect().top;
+        const elementHeight = div.offsetHeight;
 
-    const elementTop = div.getBoundingClientRect().top;
-    const elementHeight = div.offsetHeight;
+        const scrollTop = container.scrollTop;
+        const offset = elementTop - containerTop;
 
-    const scrollTop = container.scrollTop;
-    const offset = elementTop - containerTop;
+        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
 
-    const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-
-    container.scrollTo({ top: scrollTo, behavior: 'smooth' });
-  }
-});
+        container.scrollTo({{ top: scrollTo, behavior: 'smooth' }});
       }}
     }});
     showInfo(name);
