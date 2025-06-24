@@ -3,11 +3,11 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configurações da página Streamlit
+# Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
-st.markdown("### 1Dados e indicadores da Região Metropolitana de Campinas")
+st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
 # Carregamento dos dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
@@ -30,54 +30,50 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML e CSS ajustados para layout FIXO e tamanho exato, sem responsividade
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<!-- FIXA a viewport para largura 1280 e desabilita zoom -->
-<meta name="viewport" content="width=1280, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Força layout fixo, tamanho exato */
   html, body {{
+    width: 1152px;   /* 1280 * 0.9 */
+    height: 630px;   /* 700 * 0.9 */
     margin: 0;
     padding: 0;
-    width: 1280px;
-    height: 700px;
-    overflow: hidden;
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    user-select: none;
+    overflow: hidden; /* Evita scroll da página */
   }}
-
-  /* Sidebar fixo */
+  /* Sidebar com busca e lista */
   #sidebar {{
-    width: 260px;
-    height: 700px;
+    width: 234px;  /* 260 * 0.9 */
+    height: 630px;
     background: #fff;
-    padding: 20px 16px 12px 16px;
+    padding: 18px 14px 11px 14px;
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
   }}
   #sidebar h2 {{
-    margin: 0 0 8px 0;
-    font-size: 18px;
+    margin: 0 0 7px 0;
+    font-size: 16.2px; /* 18 * 0.9 */
     font-weight: 600;
     color: #1a2d5a;
+    user-select: none;
   }}
   #search {{
-    margin-bottom: 12px;
-    padding: 8px 12px;
-    font-size: 14px;
+    margin-bottom: 10.8px; /* 12 * 0.9 */
+    padding: 7.2px 10.8px; /* 8 * 0.9, 12 * 0.9 */
+    font-size: 12.6px; /* 14 * 0.9 */
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 7.2px; /* 8 * 0.9 */
     outline-offset: 2px;
+    transition: border-color 0.3s;
   }}
   #search:focus {{
     border-color: #4d648d;
@@ -86,14 +82,15 @@ html_code = f"""
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 6px;
+    padding-right: 5.4px; /* 6 * 0.9 */
   }}
   #list div {{
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    border-radius: 8px;
+    padding: 7.2px 10.8px; /* 8 * 0.9, 12 * 0.9 */
+    margin-bottom: 5.4px; /* 6 * 0.9 */
+    border-radius: 7.2px; /* 8 * 0.9 */
     cursor: pointer;
-    font-size: 15px;
+    user-select: none;
+    font-size: 13.5px; /* 15 * 0.9 */
     color: #1a2d5a;
     transition: background-color 0.3s, color 0.3s;
   }}
@@ -106,12 +103,12 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Mapa fixo */
+  /* Mapa e SVG */
   #map {{
-    width: 720px;
-    height: 700px;
+    width: 828px; /* 920 * 0.9 */
+    height: 630px; /* fixado */
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Impede scroll no mapa */
   }}
   svg {{
     width: 100%;
@@ -135,53 +132,54 @@ html_code = f"""
 
   /* Tooltip */
   #tooltip {{
-    position: fixed;
+    position: fixed; /* fixado na tela */
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
-    font-size: 13px;
+    font-size: 12px;
     border-radius: 5px;
     pointer-events: none;
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
+    user-select: none;
   }}
 
-  /* Caixa de informações FIXA e com altura AUTOMÁTICA, não corta nada */
+  /* Painel de Informações */
   #info {{
     position: fixed;
-    right: 20px;
+    right: 24px;
     top: 40px;
-    width: 280px;
-    max-height: 620px;
     background: #f0f3f8;
-    padding: 16px 20px;
-    border-radius: 10px;
+    padding: 14px 18px; /* reduzido 10% */
+    border-radius: 9px; /* 10 * 0.9 */
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    font-size: 14px;
-    line-height: 1.4;
+    max-width: 288px; /* 320 * 0.9 */
+    font-size: 12.6px; /* 14 * 0.9 */
+    line-height: 1.3; /* ajustado para caber melhor */
     color: #1a2d5a;
-    overflow-y: auto;
+    user-select: none;
+    display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
-    display: none;
+    white-space: nowrap; /* evitar quebra de linha */
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
-    margin: 0 0 12px 0;
-    font-size: 20px;
+    margin: 0 0 10.8px 0;
+    font-size: 18px; /* 20 * 0.9 */
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 6px;
+    padding-bottom: 5.4px;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
-    column-gap: 24px;
+    row-gap: 7.2px; /* 8 * 0.9 */
+    column-gap: 21.6px; /* 24 * 0.9 */
   }}
   #info .label {{
     font-weight: 600;
@@ -192,14 +190,14 @@ html_code = f"""
     font-weight: 500;
     text-align: right;
     color: #34495e;
-    overflow-wrap: break-word;
+    overflow-wrap: normal; /* evita quebra inesperada */
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 9.9px; /* 11 * 0.9 */
     color: #7f8caa;
     font-style: italic;
-    margin-top: 16px;
+    margin-top: 14.4px; /* 16 * 0.9 */
     text-align: right;
   }}
 </style>
@@ -269,6 +267,7 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
+        // Scroll customizado para só rolar a barra lateral e não a página
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
@@ -312,6 +311,7 @@ function updateList(filter = "") {{
   }});
 }}
 
+// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -329,6 +329,7 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
+  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
     const offsetX = 8;
     const offsetY = -22;
@@ -346,6 +347,7 @@ geo.features.forEach(f => {{
     select(name);
   }});
 
+  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
@@ -369,6 +371,7 @@ search.addEventListener("input", e => {{
   }}
 }});
 
+// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
@@ -377,5 +380,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-# FIXA a altura e largura total para evitar zoom ou distorção.
-st.components.v1.html(html_code, height=525, width=960, scrolling=False)
+st.components.v1.html(html_code, height=630, width=1152, scrolling=False)
