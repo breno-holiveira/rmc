@@ -268,35 +268,33 @@ html_code = f"""
     }}).join(" ");
   }}
 
-// Função para formatar números no padrão pt-BR com casas decimais variáveis
-function formatNumber(num, decimals = 0) {
-  if (num === null || num === undefined) return "-";
-  return num.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
+// Formata número para o padrão pt-BR
+  function formatNumberBR(num, decimals = 2) {{
+    if (num === null || num === undefined) return "-";
+    return num.toLocaleString('pt-BR', {{ minimumFractionDigits: decimals, maximumFractionDigits: decimals }});
+  }}
 
-// Atualiza o painel de informações com dados do município
-function updateInfoPanel(data) {
-  if (!data) {
-    infoPanel.querySelector('h3').textContent = "Selecione um município";
-    infoPanel.querySelectorAll('div span').forEach(span => span.textContent = "-");
-    return;
-  }
-  infoPanel.querySelector('h3').textContent = data.name || "-";
+  // Atualiza o painel de informações com dados do município
+  function updateInfoPanel(data) {{
+    if(!data) {{
+      infoPanel.querySelector('h3').textContent = "Selecione um município";
+      infoPanel.querySelectorAll('div span').forEach(span => span.textContent = "-");
+      return;
+    }}
+    infoPanel.querySelector('h3').textContent = data.name || "-";
 
-  const spans = infoPanel.querySelectorAll('div span');
+    const spans = infoPanel.querySelectorAll('div span');
 
-  spans[0].textContent = data.pib_2021 ? "R$ " + formatNumber(data.pib_2021, 0) : "-";
-  spans[1].textContent = data.participacao_rmc
-    ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
-    : "-";
-  spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumber(data.pib_per_capita, 2) : "-";
-  spans[3].textContent = data.populacao ? formatNumber(data.populacao, 0) : "-";
-  spans[4].textContent = data.area ? data.area.toFixed(1).toString().replace('.', ',') + " km²" : "-";
-  spans[5].textContent = data.densidade_demografica
-    ? formatNumber(data.densidade_demografica, 2) + " hab/km²"
-    : "-";
-}
-
+    spans[0].textContent = data.pib_2021 ? "R$ " + formatNumberBR(data.pib_2021, 0) : "-";
+    spans[1].textContent = data.participacao_rmc
+      ? (data.participacao_rmc * 100).toFixed(2).replace('.', ',') + '%'
+      : "-";
+    spans[2].textContent = data.pib_per_capita ? "R$ " + formatNumberBR(data.pib_per_capita, 2) : "-";
+    spans[3].textContent = data.populacao ? formatNumberBR(data.populacao, 0) : "-";
+    spans[4].textContent = data.area ? data.area.toFixed(1).replace('.', ',') + " km²" : "-";
+    spans[5].textContent = data.densidade_demografica
+      ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
+      : "-";
 
   // Limpa realce de todos polígonos
   function clearHighlight() {{
