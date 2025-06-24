@@ -5,7 +5,6 @@ import json
 
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
-
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
@@ -30,6 +29,7 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
+# HTML COMPLETO
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -45,9 +45,8 @@ html_code = f"""
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden; /* Evita scroll da página */
+    overflow: hidden;
   }}
-  /* Sidebar com busca e lista */
   #sidebar {{
     width: 230px;
     background: #fff;
@@ -71,11 +70,6 @@ html_code = f"""
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
-    transition: border-color 0.3s;
-  }}
-  #search:focus {{
-    border-color: #4d648d;
-    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
   }}
   #list {{
     flex-grow: 1;
@@ -100,12 +94,10 @@ html_code = f"""
     color: #fff;
     font-weight: 600;
   }}
-
-  /* Mapa e SVG */
   #map {{
     flex-grow: 1;
     position: relative;
-    overflow: hidden; /* Impede scroll no mapa */
+    overflow: hidden;
   }}
   svg {{
     width: 100%;
@@ -126,10 +118,8 @@ html_code = f"""
     fill: #4d648d;
     stroke: #1a2d5a;
   }}
-
-  /* Tooltip */
   #tooltip {{
-    position: fixed; /* fixado na tela */
+    position: fixed;
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -139,35 +129,31 @@ html_code = f"""
     display: none;
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
-    user-select: none;
   }}
-
-  /* Painel de Informações mais integrado */
   #info {{
     position: fixed;
     right: 24px;
     top: 40px;
     background: #f0f3f8;
-    padding: 14px 16px;
+    padding: 14px 18px;
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 260px;  /* ← Reduzido de 320px */
-    font-size: 14px;
-    line-height: 1.4;
+    width: 240px;
+    font-size: 13px;
+    line-height: 1.5;
     color: #1a2d5a;
     user-select: none;
     display: none;
     border: 1px solid #d9e2f3;
     z-index: 20;
-    word-wrap: break-word;       /* ← Quebra de palavras longas */
-    overflow-wrap: break-word;   /* ← Compatibilidade adicional */
+    overflow-wrap: break-word;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
     margin: 0 0 12px 0;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
@@ -175,20 +161,21 @@ html_code = f"""
   }}
   #info .grid {{
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     row-gap: 8px;
-    column-gap: 24px;
   }}
   #info .label {{
     font-weight: 600;
     color: #4d648d;
+    font-size: 13px;
     white-space: nowrap;
   }}
   #info .value {{
     font-weight: 500;
     text-align: right;
     color: #34495e;
-    overflow-wrap: break-word;
+    font-size: 13px;
+    word-break: break-word;
   }}
   #info .fonte {{
     grid-column: 1 / -1;
@@ -201,16 +188,16 @@ html_code = f"""
 </style>
 </head>
 <body>
-  <div id="sidebar" role="complementary" aria-label="Lista de municípios">
+  <div id="sidebar">
     <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
-    <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
+    <input id="search" type="search" placeholder="Buscar município..." />
+    <div id="list"></div>
   </div>
-  <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
+  <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
+    <div id="tooltip"></div>
   </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+  <div id="info">
     <h3>Município</h3>
     <div class="grid">
       <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
@@ -229,7 +216,6 @@ const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
-
 let selected = null;
 const paths = {{}};
 
@@ -265,19 +251,14 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        // Scroll customizado para só rolar a barra lateral e não a página
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
-
         const elementTop = div.getBoundingClientRect().top;
         const elementHeight = div.offsetHeight;
-
         const scrollTop = container.scrollTop;
         const offset = elementTop - containerTop;
-
         const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-
         container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
@@ -301,15 +282,10 @@ function showInfo(name) {{
 function updateList(filter = "") {{
   const filterLower = filter.toLowerCase();
   [...list.children].forEach(div => {{
-    if(div.textContent.toLowerCase().includes(filterLower)) {{
-      div.style.display = "block";
-    }} else {{
-      div.style.display = "none";
-    }}
+    div.style.display = div.textContent.toLowerCase().includes(filterLower) ? "block" : "none";
   }});
 }}
 
-// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -327,12 +303,9 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
-    tooltip.style.left = (e.clientX + offsetX) + "px";
-    tooltip.style.top = (e.clientY + offsetY) + "px";
+    tooltip.style.left = (e.clientX + 8) + "px";
+    tooltip.style.top = (e.clientY - 22) + "px";
     tooltip.style.display = "block";
     tooltip.textContent = name;
   }});
@@ -340,12 +313,11 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", e => {{
-    e.preventDefault();  // previne scroll da página ao clicar no município
-    e.stopPropagation(); // evita propagação para scroll do container pai
+    e.preventDefault();
+    e.stopPropagation();
     select(name);
   }});
 
-  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
@@ -369,7 +341,6 @@ search.addEventListener("input", e => {{
   }}
 }});
 
-// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
@@ -378,4 +349,5 @@ if(geo.features.length > 0) {{
 </html>
 """
 
+# Exibe no Streamlit
 st.components.v1.html(html_code, height=600, scrolling=False)
