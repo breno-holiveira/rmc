@@ -3,12 +3,17 @@ import geopandas as gpd
 import json
 from pathlib import Path
 
-# Configurações da página Streamlit
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
+# CONFIGURAÇÕES DA PÁGINA INICIAL
+st.set_page_config(
+    page_title='RMC Data',
+    page_icon='📊',
+    layout='wide',
+    initial_sidebar_state='expanded'
+)
 
-# Título e descrição
-st.title("RMC Data")
-st.header("Dados e indicadores da Região Metropolitana de Campinas")
+# TÍTULO
+st.markdown('# RMC Data')
+st.markdown('## Dados e indicadores da Região Metropolitana de Campinas')
 
 # Dicionário com dados adicionais
 dados_extra = {
