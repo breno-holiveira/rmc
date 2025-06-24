@@ -51,23 +51,23 @@ html_code = f"""
   #sidebar {{
     width: 260px;
     background: #fff;
-    padding: 20px 16px 12px 16px;
+    padding: 16px 12px 8px 12px; /* menos padding para deixar menor */
     border-right: 1px solid #e1e4e8;
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
   }}
   #sidebar h2 {{
-    margin: 0 0 8px 0;
-    font-size: 18px;
+    margin: 0 0 6px 0;
+    font-size: 16px;  /* menor */
     font-weight: 600;
     color: #1a2d5a;
     user-select: none;
   }}
   #search {{
-    margin-bottom: 12px;
-    padding: 8px 12px;
-    font-size: 14px;
+    margin-bottom: 10px;
+    padding: 6px 10px;  /* menor */
+    font-size: 13px;    /* menor */
     border: 1px solid #ccc;
     border-radius: 8px;
     outline-offset: 2px;
@@ -80,16 +80,17 @@ html_code = f"""
   #list {{
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 6px;
+    padding-right: 4px; /* menos */
   }}
   #list div {{
-    padding: 8px 12px;
-    margin-bottom: 6px;
+    padding: 6px 10px;  /* menos */
+    margin-bottom: 4px; /* menos */
     border-radius: 8px;
     cursor: pointer;
     user-select: none;
-    font-size: 15px;
+    font-size: 14px;    /* menor */
     color: #1a2d5a;
+    line-height: 1.3;   /* compacto */
     transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
@@ -142,18 +143,18 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de Informações mais integrado */
+  /* Painel de Informações mais compacto */
   #info {{
     position: fixed;
     right: 24px;
     top: 40px;
     background: #f0f3f8;
-    padding: 16px 20px;
+    padding: 12px 16px; /* menos padding */
     border-radius: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     max-width: 320px;
-    font-size: 14px;
-    line-height: 1.4;
+    font-size: 13px;    /* menor */
+    line-height: 1.3;   /* compacto */
     color: #1a2d5a;
     user-select: none;
     display: none;
@@ -164,18 +165,18 @@ html_code = f"""
     display: block;
   }}
   #info h3 {{
-    margin: 0 0 12px 0;
-    font-size: 20px;
+    margin: 0 0 10px 0;
+    font-size: 18px;   /* menor */
     font-weight: 700;
     color: #2c3e70;
     border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 6px;
+    padding-bottom: 4px;
   }}
   #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
-    column-gap: 24px;
+    row-gap: 6px;      /* menor */
+    column-gap: 20px;  /* menor */
   }}
   #info .label {{
     font-weight: 600;
@@ -190,10 +191,10 @@ html_code = f"""
   }}
   #info .fonte {{
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 10px;   /* menor */
     color: #7f8caa;
     font-style: italic;
-    margin-top: 16px;
+    margin-top: 12px;  /* menor */
     text-align: right;
   }}
 </style>
@@ -327,8 +328,8 @@ geo.features.forEach(f => {{
 
   // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
+    const offsetX = 8;
+    const offsetY = -22;
     tooltip.style.left = (e.clientX + offsetX) + "px";
     tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
@@ -338,8 +339,8 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", e => {{
-    e.preventDefault();  // previne scroll da página ao clicar no município
-    e.stopPropagation(); // evita propagação para scroll do container pai
+    e.preventDefault();
+    e.stopPropagation();
     select(name);
   }});
 
