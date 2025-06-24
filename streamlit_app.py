@@ -47,7 +47,8 @@ html_code = f"""
     display: flex;
     overflow: hidden;
   }}
-  /* Sidebar com busca e lista */
+
+  /* Sidebar */
   #sidebar {{
     width: 260px;
     background: #fff;
@@ -140,56 +141,59 @@ html_code = f"""
     z-index: 10;
   }}
 
-  /* Info Box mais espaçado e legível */
+  /* Painel de Informações minimalista e eficiente */
   #info {{
     position: fixed;
-    right: 30px;
+    right: 24px;
     top: 40px;
-    background: #fff;
-    padding: 28px 32px;
-    border-radius: 14px;
-    box-shadow: 0 6px 30px rgba(0,0,0,0.12);
-    max-width: 360px;
-    font-size: 16px;
-    line-height: 1.75;
-    display: none;
-    border: 1px solid #d8dee9;
-    z-index: 20;
+    background: #ffffffdd;
+    backdrop-filter: blur(12px);
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    max-width: 320px;
+    font-size: 14px;
+    line-height: 1.4;
     color: #1a2d5a;
     user-select: none;
+    display: none;
+    border: 1px solid #cfd8e7;
+    z-index: 20;
   }}
   #info.visible {{
     display: block;
   }}
   #info h3 {{
-    margin-top: 0;
-    font-size: 24px;
+    margin: 0 0 12px 0;
+    font-size: 20px;
     font-weight: 700;
-    border-bottom: 2.5px solid #4d648d;
-    padding-bottom: 12px;
-    color: #223763;
+    color: #2c3e70;
+    border-bottom: 1px solid #d1d9e6;
+    padding-bottom: 6px;
   }}
-  #info .data-row {{
-    display: flex;
-    justify-content: space-between;
-    margin: 14px 0;
+  #info .grid {{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 8px;
+    column-gap: 24px;
   }}
   #info .label {{
     font-weight: 600;
     color: #4d648d;
+    white-space: nowrap;
   }}
   #info .value {{
     font-weight: 500;
-    color: #334a80;
-    max-width: 160px;
     text-align: right;
-    word-break: break-word;
+    color: #34495e;
+    overflow-wrap: break-word;
   }}
   #info .fonte {{
-    font-size: 12px;
-    margin-top: 24px;
-    color: #777;
+    grid-column: 1 / -1;
+    font-size: 11px;
+    color: #7f8caa;
     font-style: italic;
+    margin-top: 16px;
     text-align: right;
   }}
 </style>
@@ -204,15 +208,17 @@ html_code = f"""
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+  <div id="info" role="region" aria-live="polite" aria-label="Painel de Informações do município selecionado">
     <h3>Município</h3>
-    <div class="data-row"><div class="label">PIB 2021:</div> <div class="value" id="pib"></div></div>
-    <div class="data-row"><div class="label">Participação RMC:</div> <div class="value" id="part"></div></div>
-    <div class="data-row"><div class="label">PIB per capita:</div> <div class="value" id="percapita"></div></div>
-    <div class="data-row"><div class="label">População:</div> <div class="value" id="pop"></div></div>
-    <div class="data-row"><div class="label">Área:</div> <div class="value" id="area"></div></div>
-    <div class="data-row"><div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div></div>
-    <div class="fonte">Fonte: IBGE Cidades</div>
+    <div class="grid">
+      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+      <div class="label">Participação RMC:</div> <div class="value" id="part"></div>
+      <div class="label">PIB per capita:</div> <div class="value" id="percapita"></div>
+      <div class="label">População:</div> <div class="value" id="pop"></div>
+      <div class="label">Área:</div> <div class="value" id="area"></div>
+      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
+      <div class="fonte">Fonte: IBGE Cidades</div>
+    </div>
   </div>
 <script>
 const geo = {geojson_str};
@@ -247,7 +253,7 @@ function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
 }}
 
-// Função para formatar valores de forma segura e legível
+// Função para formatar valores
 function formatValue(value, type) {{
   if (value === undefined || value === null || value === "" || (isNaN(value) && type !== "percent")) return "-";
   switch(type) {{
@@ -275,7 +281,7 @@ function select(name) {{
   if (paths[name]) {{
     paths[name].classList.add("selected");
 
-    // Barra lateral scroll suave
+    // Scroll da barra lateral (não da tela)
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
@@ -379,7 +385,7 @@ search.addEventListener("input", e => {{
   }}
 }});
 
-// Seleciona o primeiro município ao carregar
+// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
