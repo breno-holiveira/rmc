@@ -63,6 +63,7 @@ geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
 # HTML/JS para o mapa interativo embutido no Streamlit
+
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -109,6 +110,7 @@ html_code = f"""
     transition: background-color 0.3s ease, color 0.3s ease;
     color: #3a3a3a;
     font-size: 14px;
+    white-space: nowrap; /* evita quebra */
   }}
   #legend div:hover {{
     background-color: ;
@@ -133,17 +135,26 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Painel de informação */
+  /* Painel de informação - janela flutuante */
   #info-panel {{
+    position: fixed;
+    top: 50px;
+    right: 50px;
     width: 280px;
+    max-height: 80vh;
     background: #fff;
     padding: 20px 24px;
-    border-left: 0px solid #e3e6ea;
-    box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     color: #333;
     font-size: 15px;
     line-height: 1.5;
     overflow-y: auto;
+    border-radius: 10px;
+    display: none; /* inicia escondido */
+    z-index: 10000;
+  }}
+  #info-panel.visible {{
+    display: block;
   }}
   #info-panel h3 {{
     margin-top: 0;
@@ -159,8 +170,9 @@ html_code = f"""
   }}
   #info-panel div strong {{
     display: inline-block;
-    width: 100px;
+    width: 140px;
     color: #0b3d91;
+    white-space: nowrap; /* evita quebra nos labels */
   }}
 
   /* Polígonos */
@@ -200,6 +212,22 @@ html_code = f"""
     user-select: none;
     z-index: 1000;
   }}
+
+  /* Botão fechar painel info */
+  #info-panel button#close-info {{
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: #0b3d91;
+    cursor: pointer;
+    font-weight: 700;
+  }}
+  #info-panel button#close-info:hover {{
+    color: #08318d;
+  }}
 </style>
 </head>
 <body>
@@ -214,13 +242,14 @@ html_code = f"""
   </main>
 
   <aside id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-  <h3>Selecione um município</h3>
-  <div><strong>PIB (2021):</strong> <span>-</span></div>
-  <div><strong>Participação na RMC:</strong> <span>-</span></div>
-  <div><strong>PIB per capita (2021):</strong> <span>-</span></div>
-  <div><strong>População:</strong> <span>-</span></div>
-  <div><strong>Área:</strong> <span>-</span></div>
-  <div><strong>Densidade demográfica (2022):</strong> <span>-</span></div>
+    <button id="close-info" aria-label="Fechar painel de informações">&times;</button>
+    <h3>Selecione um município</h3>
+    <div><strong>PIB (2021):</strong> <span>-</span></div>
+    <div><strong>Participação na RMC:</strong> <span>-</span></div>
+    <div><strong>PIB per capita (2021):</strong> <span>-</span></div>
+    <div><strong>População:</strong> <span>-</span></div>
+    <div><strong>Área:</strong> <span>-</span></div>
+    <div><strong>Densidade demográfica (2022):</strong> <span>-</span></div>
   </aside>
 
 <script>
@@ -229,6 +258,7 @@ html_code = f"""
   const munList = document.getElementById("mun-list");
   const tooltip = document.getElementById("tooltip");
   const infoPanel = document.getElementById("info-panel");
+  const closeBtn = document.getElementById("close-info");
   const mapDiv = document.getElementById("map");
 
   let selectedName = null;
@@ -279,6 +309,7 @@ html_code = f"""
     if(!data) {{
       infoPanel.querySelector('h3').textContent = "Selecione um município";
       infoPanel.querySelectorAll('div span').forEach(span => span.textContent = "-");
+      infoPanel.classList.remove("visible");
       return;
     }}
     infoPanel.querySelector('h3').textContent = data.name || "-";
@@ -295,6 +326,8 @@ html_code = f"""
     spans[5].textContent = data.densidade_demografica
       ? formatNumberBR(data.densidade_demografica, 2) + " hab/km²"
       : "-";
+
+    infoPanel.classList.add("visible");
   }}
 
   // Limpa realce de todos polígonos
@@ -327,6 +360,14 @@ html_code = f"""
       updateInfoPanel(data.properties);
     }}
   }}
+
+  // Fecha o painel de informações
+  closeBtn.addEventListener("click", () => {{
+    infoPanel.classList.remove("visible");
+    clearSelection();
+    setActiveLegend(null);
+    selectedName = null;
+  }});
 
   // Criando polígonos SVG e itens da legenda
   geojson.features.forEach(f => {{
@@ -363,7 +404,7 @@ html_code = f"""
         left = e.clientX - mapRect.left - tooltip.offsetWidth - 8;
       }}
       if(top + tooltip.offsetHeight > mapRect.height) {{
-        top = e.clientY - mapRect.top - tooltip.offsetHeight - 8;
+        top = e.clientY - mapDiv.top - tooltip.offsetHeight - 8;
       }}
 
       tooltip.style.left = left + "px";
@@ -408,4 +449,4 @@ html_code = f"""
 """
 
 # Renderiza o HTML no Streamlit
-st.components.v1.html(html_code, height=600, scrolling=True)
+st.components.v1.html(html_code, height=650, scrolling=True)
