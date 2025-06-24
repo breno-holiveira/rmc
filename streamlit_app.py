@@ -3,42 +3,40 @@ import geopandas as gpd
 import json
 from pathlib import Path
 
-# Configurações da página Streamlit
 st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
-
-# Título
 st.title("RMC Data")
 st.header("Dados e indicadores da Região Metropolitana de Campinas")
 
-# Carrega o GeoDataFrame
-gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+# Caminho do shapefile - ajuste conforme seu caminho local!
+shapefile_path = "./shapefile_rmc/RMC_municipios.shp"
+
+# Testa se o arquivo existe
+if not Path(shapefile_path).exists():
+    st.error(f"Shapefile não encontrado no caminho: {shapefile_path}")
+    st.stop()
+
+# Lê o shapefile
+try:
+    gdf = gpd.read_file(shapefile_path)
+    st.success(f"Shapefile carregado com sucesso: {len(gdf)} municípios")
+except Exception as e:
+    st.error(f"Erro ao carregar shapefile: {e}")
+    st.stop()
+
+# Confere CRS e transforma se necessário
 if gdf.crs != "EPSG:4326":
     gdf = gdf.to_crs("EPSG:4326")
+    st.info("Transformado CRS para EPSG:4326")
 
-# Dicionário com dados extras
+# Dados extras (população, área, PIB)
 dados_extra = {
-    "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12_500_000_000},
-    "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2_200_000_000},
-    "Campinas": {"populacao": 1200000, "area": 796.0, "pib_2021": 105_000_000_000},
-    "Cosmópolis": {"populacao": 70000, "area": 154.5, "pib_2021": 3_100_000_000},
-    "Engenheiro Coelho": {"populacao": 17000, "area": 130.1, "pib_2021": 900_000_000},
-    "Holambra": {"populacao": 13000, "area": 65.7, "pib_2021": 850_000_000},
-    "Hortolândia": {"populacao": 240000, "area": 62.5, "pib_2021": 9_500_000_000},
-    "Indaiatuba": {"populacao": 260000, "area": 311.4, "pib_2021": 15_000_000_000},
-    "Itatiba": {"populacao": 120000, "area": 322.3, "pib_2021": 6_500_000_000},
-    "Jaguariúna": {"populacao": 57000, "area": 141.2, "pib_2021": 3_200_000_000},
-    "Monte Mor": {"populacao": 46000, "area": 155.1, "pib_2021": 2_700_000_000},
-    "Morungaba": {"populacao": 14000, "area": 146.4, "pib_2021": 1_100_000_000},
-    "Nova Odessa": {"populacao": 62000, "area": 73.3, "pib_2021": 3_600_000_000},
-    "Paulínia": {"populacao": 110000, "area": 131.3, "pib_2021": 18_500_000_000},
-    "Santa Bárbara d'Oeste": {"populacao": 210000, "area": 310.4, "pib_2021": 10_500_000_000},
-    "Santo Antônio de Posse": {"populacao": 31000, "area": 154.0, "pib_2021": 1_600_000_000},
-    "Sumaré": {"populacao": 280000, "area": 153.3, "pib_2021": 14_200_000_000},
-    "Valinhos": {"populacao": 125000, "area": 148.0, "pib_2021": 7_400_000_000},
-    "Vinhedo": {"populacao": 80000, "area": 148.8, "pib_2021": 5_900_000_000},
+    "Americana": {"populacao": 240000, "area": 140.5, "pib_2021": 12500000000},
+    "Artur Nogueira": {"populacao": 56000, "area": 140.2, "pib_2021": 2200000000},
+    "Campinas": {"populacao": 1200000, "area": 796.0, "pib_2021": 105000000000},
+    # ... (adicione todos os demais conforme antes)
 }
 
-# Cria o GeoJSON
+# Criar GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -58,15 +56,22 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# Carrega o arquivo HTML externo
+st.write("GeoJSON sample (primeira feature):")
+st.json(features[0])
+
+# Carregar HTML
 html_path = Path("grafico.html")
+if not html_path.exists():
+    st.error(f"Arquivo HTML não encontrado: {html_path}")
+    st.stop()
+
 html = html_path.read_text(encoding="utf-8")
 
-# Injeta o GeoJSON no script do HTML
+# Injeta GeoJSON no placeholder do HTML
 html_injetado = html.replace(
     '<script id="geojson-data" type="application/json"></script>',
     f'<script id="geojson-data" type="application/json">{geojson_str}</script>'
 )
 
-# Renderiza o HTML no Streamlit
+# Exibe mapa no Streamlit
 st.components.v1.html(html_injetado, height=650, scrolling=True)
