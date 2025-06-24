@@ -20,7 +20,7 @@ if gdf.crs != "EPSG:4326":
 gdf = gdf.sort_values("NM_MUN")
 
 # --- Carregar dados ---
-dados_path = "./planilhas/dados_rmc.xlsx"  # ajuste para o local correto
+dados_path = "dados_rmc.xlsx"  # arquivo na pasta raiz
 
 df_dados = pd.read_excel(dados_path)
 df_dados.set_index("nome", inplace=True)
