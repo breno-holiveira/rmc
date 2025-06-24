@@ -146,7 +146,7 @@ html_code = f"""
     max-height: 80vh;
     background: #fff;
     padding: 20px 24px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     color: #333;
     font-size: 15px;
     line-height: 1.5;
