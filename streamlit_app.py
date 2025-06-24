@@ -1,11 +1,12 @@
 import streamlit as st
+import pandas as pd
 import geopandas as gpd
 import json
 from pathlib import Path
 
 # CONFIGURAÇÕES DA PÁGINA INICIAL
 st.set_page_config(
-    page_title='MC Data',
+    page_title='RMC Data',
     page_icon='📊',
     layout='wide',
     initial_sidebar_state='expanded'
