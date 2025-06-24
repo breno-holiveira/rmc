@@ -141,8 +141,8 @@ html_code = f"""
   #info-panel {{
     position: fixed;
     top: 50px;
-    right: 50px;
-    width: 280px;
+    right: 25px;
+    width: 320px;
     max-height: 80vh;
     background: #fff;
     padding: 20px 24px;
