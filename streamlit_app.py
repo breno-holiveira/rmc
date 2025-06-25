@@ -19,7 +19,7 @@ st.set_page_config(
 params = st.query_params
 page = params.get("page", "")
 
-# ====== MENU HORIZONTAL GLASS ======
+# ====== MENU HORIZONTAL MODERNO, SÓBRIO ======
 menu_items = {
     "Início": "",
     "Página 1": "pag1",
@@ -65,8 +65,7 @@ st.markdown(f"""
 """ + "\n".join([
     f'<a href="/?page={v}" target="_self" class="{"active" if page == v else ""}">{k}</a>'
     for k, v in menu_items.items()
-]) + "</div>
-""", unsafe_allow_html=True)
+]) + "</div>", unsafe_allow_html=True)
 
 # ====== FUNÇÕES CACHEADAS ======
 
