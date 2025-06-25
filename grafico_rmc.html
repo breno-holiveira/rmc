@@ -17,7 +17,7 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 260px; /* Aumentado de 240px */
+      width: 260px;
       height: 100vh;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
@@ -45,8 +45,9 @@
 
     #sidebar h2 {
       margin: 0 0 12px;
-      color: #2e466e;
+      color: #2d3e50;
       font-size: 16px;
+      font-weight: 600;
     }
 
     #search {
@@ -67,7 +68,7 @@
     }
 
     #list div {
-      padding: 8px 8px;
+      padding: 8px;
       border-radius: 5px;
       cursor: pointer;
       color: #2e466e;
@@ -81,20 +82,21 @@
     }
 
     #list div:hover {
-      background: rgba(44, 62, 112, 0.1);
+      background: rgba(44, 62, 112, 0.08);
     }
 
     #list div.active {
-      background: rgba(44, 62, 112, 0.15);
+      background: rgba(44, 62, 112, 0.12);
       color: #1f2f45;
       font-weight: 600;
     }
 
     #map {
-      margin-left: 50px; /* também ajustado aqui */
+      margin-left: 245px;
       height: 100vh;
       position: relative;
       overflow: hidden;
+      background-color: #f4f7fa;
     }
 
     svg {
@@ -104,21 +106,21 @@
     }
 
     .area {
-      fill: rgba(44, 62, 112, 0.15);
-      stroke: rgba(44, 62, 112, 0.4);
+      fill: rgba(44, 62, 112, 0.12);
+      stroke: rgba(44, 62, 112, 0.35);
       stroke-width: 1;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .area:hover {
-      fill: rgba(44, 62, 112, 0.35);
+      fill: rgba(44, 62, 112, 0.3);
       stroke-width: 1.3;
     }
 
     .area.selected {
       fill: rgba(44, 62, 112, 0.5);
-      stroke: rgba(30, 40, 70, 0.8);
+      stroke: rgba(30, 40, 70, 0.85);
       stroke-width: 1.5;
     }
 
@@ -139,11 +141,11 @@
       position: absolute;
       top: 24px;
       right: 24px;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
       padding: 16px;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
       width: 280px;
       font-size: 14px;
       display: none;
@@ -156,8 +158,9 @@
     #infoPanel.visible { display: block; }
 
     #infoPanel h3 {
-      margin: 0 0 10px;
+      margin: 0 0 12px;
       color: #2c3e70;
+      font-size: 15px;
     }
 
     #infoPanel .grid {
@@ -168,18 +171,19 @@
 
     #infoPanel .label {
       font-weight: 500;
-      color: #4d648d;
+      color: #4c5a78;
     }
 
     #infoPanel .value {
       text-align: right;
-      color: #2d3f54;
+      color: #1e2f45;
+      font-weight: 400;
     }
 
     #infoPanel .fonte {
       font-size: 10px;
-      grid-column: 1/-1;
-      color: #7a8ba3;
+      grid-column: 1 / -1;
+      color: #8a9ab0;
       margin-top: 10px;
       text-align: right;
     }
