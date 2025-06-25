@@ -3,15 +3,15 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# IMPORTAÇÕES DAS PÁGINAS
+# Importa páginas
 import pages.pag1 as pag1
 import pages.pag2 as pag2
 import pages.pag3 as pag3
 
-# CONFIGURAÇÃO
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 
-# ======= MENU =======
+# ===== MENU NAVBAR =====
 menu_items = {
     "Início": "",
     "Página 1": "pag1",
@@ -46,23 +46,31 @@ st.markdown("""
     for label in menu_items
 ]) + "</div>", unsafe_allow_html=True)
 
-# ==== ROTEAMENTO =====
+# ====== ROTEAMENTO ======
 params = st.query_params
 page = params.get("page", "")
 
-if page == "":
-    st.title("RMC Data")
-    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+# === Funções com cache para desempenho ===
+@st.cache_data
+def carregar_df():
+    df = pd.read_excel("dados_rmc.xlsx")
+    df.set_index("nome", inplace=True)
+    return df
 
+@st.cache_data
+def carregar_gdf():
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != 'EPSG:4326':
         gdf = gdf.to_crs('EPSG:4326')
-    gdf = gdf.sort_values(by='NM_MUN')
+    return gdf.sort_values(by='NM_MUN')
 
-    df = pd.read_excel('dados_rmc.xlsx')
-    df.set_index("nome", inplace=True)
+@st.cache_resource
+def carregar_html_base():
+    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
+        return f.read()
 
-    # GeoJSON
+@st.cache_data
+def construir_geojson(gdf, df):
     features = []
     for _, row in gdf.iterrows():
         nome = row["NM_MUN"]
@@ -70,22 +78,27 @@ if page == "":
         props = df.loc[nome].to_dict() if nome in df.index else {}
         props["name"] = nome
         features.append({"type": "Feature", "geometry": geom, "properties": props})
-    gj = {"type": "FeatureCollection", "features": features}
-    geojson_js = json.dumps(gj)
+    return json.dumps({"type": "FeatureCollection", "features": features})
 
-    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-        html_template = f.read()
+
+# ==== Página Inicial ====
+if page == "":
+    st.title("RMC Data")
+    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+
+    gdf = carregar_gdf()
+    df = carregar_df()
+    geojson_js = construir_geojson(gdf, df)
+    html_template = carregar_html_base()
+
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 elif page == "pag1":
     pag1.main()
-
 elif page == "pag2":
     pag2.main()
-
 elif page == "pag3":
     pag3.main()
-
 else:
     st.error("Página não encontrada.")
