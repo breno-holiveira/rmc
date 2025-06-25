@@ -2,12 +2,20 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
+import matplotlib.cm as cm
+import matplotlib.colors as mcolors
 
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+
+# Filtro de ordenação
+coluna_ordenar = st.selectbox(
+    "Ordenar e destacar municípios por:",
+    ("Nenhum", "PIB 2021", "PIB per capita", "População 2022")
+)
 
 # Carregamento dos dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
@@ -18,18 +26,40 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construção do GeoJSON com dados
+# Escolha da coluna para destacar
+coluna_destaque = {
+    "PIB 2021": "pib_2021",
+    "PIB per capita": "per_capita_2021",
+    "População 2022": "populacao_2022"
+}.get(coluna_ordenar, None)
+
+# Cores para destaque
+cores = {}
+if coluna_destaque:
+    valores = df[coluna_destaque].dropna()
+    norm = mcolors.Normalize(vmin=valores.min(), vmax=valores.max())
+    cmap = cm.get_cmap('Blues')
+    for nome in df.index:
+        val = df.at[nome, coluna_destaque]
+        if pd.notnull(val):
+            rgba = cmap(norm(val))
+            hex_cor = mcolors.to_hex(rgba)
+            cores[nome] = hex_cor
+
+# Construção do GeoJSON com dados e cores
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
     geom = row["geometry"].__geo_interface__
     props = df.loc[nome].to_dict() if nome in df.index else {}
     props["name"] = nome
+    props["color"] = cores.get(nome, "#b6cce5")  # cor padrão
     features.append({"type": "Feature", "geometry": geom, "properties": props})
 
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
+# Geração do HTML
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -45,9 +75,8 @@ html_code = f"""
     font-family: 'Segoe UI', sans-serif;
     background-color: #f9fafa;
     display: flex;
-    overflow: hidden; /* Evita scroll da página */
+    overflow: hidden;
   }}
-  /* Sidebar com busca e lista */
   #sidebar {{
     width: 260px;
     background: #fff;
@@ -100,36 +129,29 @@ html_code = f"""
     color: #fff;
     font-weight: 600;
   }}
-
-  /* Mapa e SVG */
   #map {{
     flex-grow: 1;
     position: relative;
-    overflow: hidden; /* Impede scroll no mapa */
+    overflow: hidden;
   }}
   svg {{
     width: 100%;
     height: 100%;
   }}
   .area {{
-    fill: #b6cce5;
     stroke: #4d648d;
     stroke-width: 1;
     cursor: pointer;
     transition: all 0.3s ease;
   }}
   .area:hover {{
-    fill: #8db3dd;
     stroke-width: 1.5;
   }}
   .area.selected {{
-    fill: #4d648d;
     stroke: #1a2d5a;
   }}
-
-  /* Tooltip */
   #tooltip {{
-    position: fixed; /* fixado na tela */
+    position: fixed;
     padding: 5px 10px;
     background: rgba(30, 60, 120, 0.95);
     color: white;
@@ -141,8 +163,6 @@ html_code = f"""
     z-index: 1000;
     user-select: none;
   }}
-
-  /* Painel de Informações mais integrado */
   #info {{
     position: fixed;
     right: 24px;
@@ -199,16 +219,16 @@ html_code = f"""
 </style>
 </head>
 <body>
-  <div id="sidebar" role="complementary" aria-label="Lista de municípios">
+  <div id="sidebar">
     <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
-    <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
+    <input id="search" type="search" placeholder="Buscar município..." />
+    <div id="list"></div>
   </div>
-  <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
+  <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
+    <div id="tooltip"></div>
   </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+  <div id="info">
     <h3>Município</h3>
     <div class="grid">
       <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
@@ -263,19 +283,14 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        // Scroll customizado para só rolar a barra lateral e não a página
         const container = list;
         const containerHeight = container.clientHeight;
         const containerTop = container.getBoundingClientRect().top;
-
         const elementTop = div.getBoundingClientRect().top;
         const elementHeight = div.offsetHeight;
-
         const scrollTop = container.scrollTop;
         const offset = elementTop - containerTop;
-
         const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-
         container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
@@ -299,15 +314,10 @@ function showInfo(name) {{
 function updateList(filter = "") {{
   const filterLower = filter.toLowerCase();
   [...list.children].forEach(div => {{
-    if(div.textContent.toLowerCase().includes(filterLower)) {{
-      div.style.display = "block";
-    }} else {{
-      div.style.display = "none";
-    }}
+    div.style.display = div.textContent.toLowerCase().includes(filterLower) ? "block" : "none";
   }});
 }}
 
-// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
@@ -320,17 +330,15 @@ geo.features.forEach(f => {{
   }}
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d.trim());
+  path.setAttribute("fill", f.properties.color || "#b6cce5");
   path.classList.add("area");
   path.setAttribute("data-name", name);
   svg.appendChild(path);
   paths[name] = path;
 
-  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
-    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
-    tooltip.style.left = (e.clientX + offsetX) + "px";
-    tooltip.style.top = (e.clientY + offsetY) + "px";
+    tooltip.style.left = (e.clientX + 8) + "px";
+    tooltip.style.top = (e.clientY - 22) + "px";
     tooltip.style.display = "block";
     tooltip.textContent = name;
   }});
@@ -338,17 +346,15 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", e => {{
-    e.preventDefault();  // previne scroll da página ao clicar no município
-    e.stopPropagation(); // evita propagação para scroll do container pai
+    e.preventDefault();
+    e.stopPropagation();
     select(name);
   }});
 
-  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
   div.tabIndex = 0;
-  div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
   div.addEventListener("keydown", e => {{
     if (e.key === "Enter" || e.key === " ") {{
@@ -367,7 +373,6 @@ search.addEventListener("input", e => {{
   }}
 }});
 
-// Seleciona primeiro município ao carregar
 if(geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
