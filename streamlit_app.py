@@ -102,6 +102,7 @@ html_code = f"""
     background: #e6f0ff;
     display: flex;
     flex-direction: column;
+    padding-left: 20px;
   }}
 
   svg {{
