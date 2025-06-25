@@ -4,13 +4,13 @@ import geopandas as gpd
 import json
 import streamlit.components.v1 as components
 
-# Configuração da página
+# Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-# Carregar shapefile e dados Excel
+# Carregamento dos dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
 if gdf.crs != 'EPSG:4326':
     gdf = gdf.to_crs('EPSG:4326')
@@ -38,7 +38,7 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Reset e base */
+  /* Reset básico e fonte */
   * {{ margin:0; padding:0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
   html, body, #root, #container {{ height: 100%; overflow: hidden; background: #f7faff; }}
 
@@ -95,7 +95,7 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Área mapa */
+  /* Área do mapa */
   #map-area {{
     flex-grow: 1;
     position: relative;
@@ -106,7 +106,7 @@ html_code = f"""
 
   svg {{
     width: 100%;
-    height: calc(100vh - 40px);
+    height: 100%;
     display: block;
   }}
 
@@ -126,7 +126,7 @@ html_code = f"""
     stroke: #1a2d5a;
   }}
 
-  /* Tooltip */
+  /* Tooltip simples */
   #tooltip {{
     position: absolute;
     background: rgba(30, 60, 120, 0.9);
@@ -140,30 +140,25 @@ html_code = f"""
     z-index: 999;
   }}
 
-  /* Painel info */
+  /* Painel info fixo, minimalista */
   #info {{
     position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: saturate(180%) blur(8px);
     border-radius: 14px;
     padding: 18px 22px;
-    max-width: 260px;
+    max-width: 320px;
     font-size: 14px;
     color: #1a2d5a;
     box-shadow: 0 4px 15px rgba(0,0,0,0.12);
     display: none;
     user-select: text;
     line-height: 1.3;
-    transition: opacity 0.35s ease, transform 0.35s ease;
-    opacity: 0;
-    transform: translateX(20px);
   }}
   #info.visible {{
     display: block;
-    opacity: 1;
-    transform: translateX(0);
   }}
   #info h3 {{
     margin-bottom: 14px;
@@ -251,18 +246,6 @@ function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
 }}
 
-function scrollToActive() {{
-  const active = document.querySelector('.municipio-item.active');
-  if (!active) return;
-  const container = list;
-  const containerRect = container.getBoundingClientRect();
-  const activeRect = active.getBoundingClientRect();
-  const offset = activeRect.top - containerRect.top;
-  const scrollTop = container.scrollTop;
-  const scrollTarget = scrollTop + offset - container.clientHeight/2 + active.clientHeight/2;
-  container.scrollTo({{ top: scrollTarget, behavior: "smooth" }});
-}}
-
 function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
@@ -273,10 +256,7 @@ function select(name) {{
     paths[name].classList.add("selected");
     showInfo(name);
     const el = document.querySelector(`[data-name="${{name}}"]`);
-    if (el) {{
-      el.classList.add('active');
-      scrollToActive();
-    }}
+    if (el) el.classList.add('active');
   }}
 }}
 
@@ -313,7 +293,7 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", () => select(name));
-
+  // Adiciona município na lista lateral
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
