@@ -3,15 +3,23 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Importa páginas
+# Importação dos módulos das páginas
 import pages.pag1 as pag1
 import pages.pag2 as pag2
 import pages.pag3 as pag3
 
 # Configuração da página
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(
+    page_title="RMC Data",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# ===== MENU NAVBAR =====
+# ========== QUERY PARAMS ==========
+params = st.query_params
+page = params.get("page", "")
+
+# ========== MENU HORIZONTAL ==========
 menu_items = {
     "Início": "",
     "Página 1": "pag1",
@@ -19,38 +27,42 @@ menu_items = {
     "Página 3": "pag3"
 }
 
-st.markdown("""
+# Estilo do menu com aba ativa destacada
+st.markdown(f"""
 <style>
-.menu-container {
+.menu-container {{
     background: #111827;
     padding: 12px 24px;
     display: flex;
     gap: 30px;
     font-family: sans-serif;
     font-size: 16px;
-}
-.menu-container a {
+}}
+
+.menu-container a {{
     color: #fff;
     text-decoration: none;
     padding: 6px 12px;
     border-radius: 6px;
     transition: background 0.3s;
-}
-.menu-container a:hover {
+}}
+
+.menu-container a:hover {{
     background: rgba(255,255,255,0.1);
-}
+}}
+
+.menu-container .active {{
+    background: rgba(255,255,255,0.2);
+}}
 </style>
 <div class="menu-container">
 """ + "\n".join([
-    f'<a href="/?page={menu_items[label]}" target="_self">{label}</a>'
-    for label in menu_items
+    f'<a href="/?page={v}" target="_self" class="{"active" if page == v else ""}">{k}</a>'
+    for k, v in menu_items.items()
 ]) + "</div>", unsafe_allow_html=True)
 
-# ====== ROTEAMENTO ======
-params = st.query_params
-page = params.get("page", "")
+# ========== FUNÇÕES CACHEADAS ==========
 
-# === Funções com cache para desempenho ===
 @st.cache_data
 def carregar_df():
     df = pd.read_excel("dados_rmc.xlsx")
@@ -70,7 +82,10 @@ def carregar_html_base():
         return f.read()
 
 @st.cache_data
-def construir_geojson(gdf, df):
+def construir_geojson():
+    gdf = carregar_gdf()
+    df = carregar_df()
+
     features = []
     for _, row in gdf.iterrows():
         nome = row["NM_MUN"]
@@ -78,27 +93,30 @@ def construir_geojson(gdf, df):
         props = df.loc[nome].to_dict() if nome in df.index else {}
         props["name"] = nome
         features.append({"type": "Feature", "geometry": geom, "properties": props})
+
     return json.dumps({"type": "FeatureCollection", "features": features})
 
+# ========== ROTEAMENTO DE PÁGINAS ==========
 
-# ==== Página Inicial ====
 if page == "":
+    # Página inicial com mapa interativo
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-    gdf = carregar_gdf()
-    df = carregar_df()
-    geojson_js = construir_geojson(gdf, df)
+    geojson_js = construir_geojson()
     html_template = carregar_html_base()
-
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 elif page == "pag1":
     pag1.main()
+
 elif page == "pag2":
     pag2.main()
+
 elif page == "pag3":
     pag3.main()
+
 else:
     st.error("Página não encontrada.")
