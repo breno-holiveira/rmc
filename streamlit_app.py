@@ -32,34 +32,31 @@ st.markdown(f"""
 .menu-container {{
     position: sticky;
     top: 0;
-    z-index: 999;
-    backdrop-filter: blur(12px);
-    background: rgba(255, 255, 255, 0.1);
-    padding: 12px 24px;
-    margin-bottom: 12px;
+    z-index: 1000;
+    background-color: #1f2937;  /* cinza-grafite elegante */
+    padding: 14px 28px;
     display: flex;
-    gap: 24px;
+    gap: 20px;
     font-family: 'Segoe UI', sans-serif;
-    font-size: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    font-size: 15px;
+    border-bottom: 1px solid #374151;
 }}
 
 .menu-container a {{
-    color: #e5e7eb;
+    color: #d1d5db;
     text-decoration: none;
-    padding: 6px 16px;
-    border-radius: 8px;
-    transition: background 0.3s, color 0.3s;
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: background 0.25s, color 0.25s;
 }}
 
 .menu-container a:hover {{
-    background: rgba(255, 255, 255, 0.07);
+    background-color: #374151;
+    color: #ffffff;
 }}
 
 .menu-container .active {{
-    background: rgba(255, 255, 255, 0.14);
+    background-color: #4b5563;
     color: #ffffff;
 }}
 </style>
@@ -68,7 +65,8 @@ st.markdown(f"""
 """ + "\n".join([
     f'<a href="/?page={v}" target="_self" class="{"active" if page == v else ""}">{k}</a>'
     for k, v in menu_items.items()
-]) + "</div>", unsafe_allow_html=True)
+]) + "</div>
+""", unsafe_allow_html=True)
 
 # ====== FUNÇÕES CACHEADAS ======
 
