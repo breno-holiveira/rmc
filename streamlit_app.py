@@ -133,7 +133,7 @@ html_code = f"""
     const info = document.getElementById("info");
     const list = document.getElementById("list");
     const search = document.getElementById("search");
-    const paths = {{}};
+    const paths = {};
     let selected = null;
 
     let coords = [];
