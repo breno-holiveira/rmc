@@ -22,20 +22,20 @@ features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
     geom = row["geometry"].__geo_interface__
-    props = df.loc[nome].to_dict() if nome in df.index else {}
+    props = df.loc[nome].to_dict() if nome in df.index else {{}}
     props["name"] = nome
-    features.append({"type": "Feature", "geometry": geom, "properties": props})
+    features.append({{"type": "Feature", "geometry": geom, "properties": props}})
 
-gj = {"type": "FeatureCollection", "features": features}
+gj = {{"type": "FeatureCollection", "features": features}}
 geojson_js = json.dumps(gj)
 
 # HTML/CSS/JS
 html_code = f"""
 <!DOCTYPE html>
-<html lang=\"pt-BR\">
+<html lang="pt-BR">
 <head>
-  <meta charset=\"UTF-8\" />
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RMC Interativo</title>
   <style>
     html, body {{
@@ -61,7 +61,9 @@ html_code = f"""
       box-shadow: 2px 0 8px rgba(0,0,0,0.06);
       transition: all 0.3s ease;
     }}
-    #sidebar::-webkit-scrollbar {{ width: 8px; }}
+    #sidebar::-webkit-scrollbar {{
+      width: 8px;
+    }}
     #sidebar::-webkit-scrollbar-thumb {{
       background-color: rgba(140, 160, 190, 0.3);
       border-radius: 8px;
@@ -75,12 +77,19 @@ html_code = f"""
       font-size: 17px;
     }}
     #search {{
-      width: calc(100% - 8px);
-      padding: 6px;
-      border-radius: 6px;
-      border: 1px solid #ccd7e2;
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(140, 160, 190, 0.5);
       margin-bottom: 12px;
-      background-color: #f9fbfd;
+      background-color: rgba(250, 252, 255, 0.9);
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }}
+    #search:focus {{
+      border-color: rgba(44, 62, 112, 0.8);
+      outline: none;
+      background-color: rgba(255, 255, 255, 1);
     }}
     #list div {{
       padding: 8px;
@@ -90,11 +99,11 @@ html_code = f"""
       transition: background 0.2s;
     }}
     #list div:hover {{
-      background: rgba(150, 180, 220, 0.25);
+      background: rgba(100, 130, 160, 0.25);
     }}
     #list div.active {{
-      background: rgba(50, 80, 120, 0.85);
-      color: #fff;
+      background: rgba(44, 62, 112, 0.5);
+      color: #f0f4ff;
       font-weight: 600;
     }}
     #map {{
@@ -103,24 +112,30 @@ html_code = f"""
       position: relative;
       overflow: hidden;
     }}
-    svg {{ width: 100%; height: 100%; display: block; }}
+    svg {{
+      width: 100%;
+      height: 100%;
+      display: block;
+    }}
     .area {{
-      fill: rgba(180, 200, 230, 0.6);
-      stroke: #415d84;
+      fill: rgba(100, 130, 160, 0.3);
+      stroke: rgba(44, 62, 112, 0.7);
       stroke-width: 1;
       cursor: pointer;
       transition: all 0.2s ease;
     }}
     .area:hover {{
-      fill: rgba(130, 160, 210, 0.8);
+      fill: rgba(44, 62, 112, 0.45);
       stroke-width: 1.4;
     }}
     .area.selected {{
-      fill: rgba(50, 80, 120, 0.9);
+      fill: rgba(44, 62, 112, 0.65);
+      stroke: rgba(30, 40, 70, 0.9);
+      stroke-width: 1.6;
     }}
     #tooltip {{
       position: fixed;
-      background: rgba(44,62,112,0.95);
+      background: rgba(44,62,112,0.85);
       color: white;
       padding: 6px 10px;
       font-size: 13px;
@@ -128,6 +143,7 @@ html_code = f"""
       display: none;
       pointer-events: none;
       z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }}
     #info {{
       position: absolute;
@@ -152,8 +168,14 @@ html_code = f"""
       grid-template-columns: 1fr 1fr;
       gap: 6px 12px;
     }}
-    #info .label {{ font-weight: 600; color: #4d648d; }}
-    #info .value {{ text-align: right; color: #2d3f54; }}
+    #info .label {{
+      font-weight: 600;
+      color: #4d648d;
+    }}
+    #info .value {{
+      text-align: right;
+      color: #2d3f54;
+    }}
     #info .fonte {{
       font-size: 10px;
       grid-column: 1/-1;
@@ -164,24 +186,24 @@ html_code = f"""
   </style>
 </head>
 <body>
-  <div id=\"sidebar\">
+  <div id="sidebar">
     <h2>Municípios</h2>
-    <input id=\"search\" placeholder=\"Buscar...\" />
-    <div id=\"list\"></div>
+    <input id="search" placeholder="Buscar..." />
+    <div id="list"></div>
   </div>
-  <div id=\"map\">
-    <svg viewBox=\"0 0 1000 950\" preserveAspectRatio=\"xMidYMid meet\"></svg>
-    <div id=\"tooltip\"></div>
-    <div id=\"info\">
+  <div id="map">
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="tooltip"></div>
+    <div id="info">
       <h3>Município</h3>
-      <div class=\"grid\">
-        <div class=\"label\">PIB 2021:</div><div class=\"value\" id=\"pib\"></div>
-        <div class=\"label\">% no PIB regional:</div><div class=\"value\" id=\"part\"></div>
-        <div class=\"label\">PIB per capita:</div><div class=\"value\" id=\"percapita\"></div>
-        <div class=\"label\">População:</div><div class=\"value\" id=\"pop\"></div>
-        <div class=\"label\">Área:</div><div class=\"value\" id=\"area\"></div>
-        <div class=\"label\">Densidade:</div><div class=\"value\" id=\"dens\"></div>
-        <div class=\"fonte\">Fonte: IBGE</div>
+      <div class="grid">
+        <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
+        <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
+        <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
+        <div class="label">População:</div><div class="value" id="pop"></div>
+        <div class="label">Área:</div><div class="value" id="area"></div>
+        <div class="label">Densidade:</div><div class="value" id="dens"></div>
+        <div class="fonte">Fonte: IBGE</div>
       </div>
     </div>
   </div>
@@ -193,46 +215,46 @@ html_code = f"""
     const info = document.getElementById("info");
     const list = document.getElementById("list");
     const search = document.getElementById("search");
-    const paths = Object.create(null);
+    const paths = {{}};
     let selected = null;
 
     let coords = [];
-    geo.features.forEach(f => {
+    geo.features.forEach(f => {{
       const g = f.geometry;
       if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
       else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
-    });
+    }});
     const lons = coords.map(c => c[0]);
     const lats = coords.map(c => c[1]);
     const minX = Math.min(...lons), maxX = Math.max(...lons);
     const minY = Math.min(...lats), maxY = Math.max(...lats);
 
-    function project([lon, lat]) {
+    function project([lon, lat]) {{
       const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
       const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
       return [x, y];
-    }
-    function polygonToPath(coords) {
+    }}
+    function polygonToPath(coords) {{
       return coords.map(c => project(c).join(",")).join(" ");
-    }
-    function select(name) {
-      if (selected) {
+    }}
+    function select(name) {{
+      if (selected) {{
         paths[selected].classList.remove("selected");
         [...list.children].forEach(d => d.classList.remove("active"));
-      }
+      }}
       selected = name;
-      if (paths[name]) {
+      if (paths[name]) {{
         paths[name].classList.add("selected");
-        [...list.children].forEach(div => {
-          if (div.dataset.name === name) {
+        [...list.children].forEach(div => {{
+          if (div.dataset.name === name) {{
             div.classList.add("active");
-            div.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
+            div.scrollIntoView({{ behavior: "smooth", block: "center" }});
+          }}
+        }});
         showInfo(name);
-      }
-    }
-    function showInfo(name) {
+      }}
+    }}
+    function showInfo(name) {{
       const f = geo.features.find(f => f.properties.name === name);
       if (!f) return;
       info.querySelector("h3").textContent = name;
@@ -243,8 +265,8 @@ html_code = f"""
       info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
       info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
       info.classList.add("visible");
-    }
-    geo.features.forEach(f => {
+    }}
+    geo.features.forEach(f => {{
       const name = f.properties.name;
       let d = "";
       if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
@@ -256,12 +278,12 @@ html_code = f"""
       svg.appendChild(path);
       paths[name] = path;
 
-      path.addEventListener("mousemove", e => {
+      path.addEventListener("mousemove", e => {{
         tooltip.style.left = (e.clientX + 10) + "px";
         tooltip.style.top = (e.clientY - 20) + "px";
         tooltip.textContent = name;
         tooltip.style.display = "block";
-      });
+      }});
       path.addEventListener("mouseleave", () => tooltip.style.display = "none");
       path.addEventListener("click", () => select(name));
 
@@ -270,13 +292,13 @@ html_code = f"""
       div.dataset.name = name;
       div.addEventListener("click", () => select(name));
       list.appendChild(div);
-    });
-    search.addEventListener("input", e => {
+    }});
+    search.addEventListener("input", e => {{
       const val = e.target.value.toLowerCase();
-      [...list.children].forEach(d => {
+      [...list.children].forEach(d => {{
         d.style.display = d.textContent.toLowerCase().includes(val) ? "block" : "none";
-      });
-    });
+      }});
+    }});
     if (geo.features.length > 0) select(geo.features[0].properties.name);
   </script>
 </body>
