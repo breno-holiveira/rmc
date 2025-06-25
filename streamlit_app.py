@@ -4,7 +4,7 @@ import geopandas as gpd
 import json
 import streamlit.components.v1 as components
 
-# Configuração da página
+# Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
@@ -90,39 +90,39 @@ const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("municipio-list");
 const search = document.getElementById("search");
-const paths = {};
+const paths = {{}};
 let selected = null;
 let coords = [];
-geo.features.forEach(f => {
+geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
   else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
-});
+}});
 const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
 const minY = Math.min(...lats), maxY = Math.max(...lats);
-function project([lon, lat]) {
+function project([lon, lat]) {{
   const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
   const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
   return [x, y];
-}
-function polygonToPath(coords) {
+}}
+function polygonToPath(coords) {{
   return coords.map(c => project(c).join(",")).join(" ");
-}
-function select(name) {
-  if (selected) {
+}}
+function select(name) {{
+  if (selected) {{
     paths[selected].classList.remove("selected");
     document.querySelectorAll('.municipio-item').forEach(d => d.classList.remove('active'));
-  }
+  }}
   selected = name;
-  if (paths[name]) {
+  if (paths[name]) {{
     paths[name].classList.add("selected");
     showInfo(name);
-    const el = document.querySelector(`[data-name="${name}"]`);
+    const el = document.querySelector(`[data-name="${{name}}"]`);
     if (el) el.classList.add('active');
-  }
-}
-function showInfo(name) {
+  }}
+}}
+function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
   info.classList.add("visible");
@@ -132,24 +132,24 @@ function showInfo(name) {
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-}
-geo.features.forEach(f => {
+}}
+geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
   if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-  else f.geometry.coordinates.forEach(p => { d += "M" + polygonToPath(p[0]) + " Z "; });
+  else f.geometry.coordinates.forEach(p => {{ d += "M" + polygonToPath(p[0]) + " Z "; }});
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d.trim());
   path.classList.add("area");
   path.setAttribute("data-name", name);
   svg.appendChild(path);
   paths[name] = path;
-  path.addEventListener("mousemove", e => {
+  path.addEventListener("mousemove", e => {{
     tooltip.style.left = e.clientX + 10 + "px";
     tooltip.style.top = e.clientY - 20 + "px";
     tooltip.textContent = name;
     tooltip.style.display = "block";
-  });
+  }});
   path.addEventListener("mouseleave", () => tooltip.style.display = "none");
   path.addEventListener("click", () => select(name));
   const div = document.createElement("div");
@@ -158,13 +158,13 @@ geo.features.forEach(f => {
   div.className = 'municipio-item';
   div.addEventListener("click", () => select(name));
   list.appendChild(div);
-});
-search.addEventListener("input", e => {
+}});
+search.addEventListener("input", e => {{
   const val = e.target.value.toLowerCase();
-  document.querySelectorAll('.municipio-item').forEach(d => {
+  document.querySelectorAll('.municipio-item').forEach(d => {{
     d.style.display = d.textContent.toLowerCase().includes(val) ? 'block' : 'none';
-  });
-});
+  }});
+}});
 if (geo.features.length > 0) select(geo.features[0].properties.name);
 </script>
 </body>
