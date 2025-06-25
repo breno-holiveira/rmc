@@ -325,4 +325,4 @@ if (geo.features.length > 0) select(geo.features[0].properties.name);
 </html>
 """
 
-components.html(html_code, height=700, scrolling=False)
+components.html(html_code, height=650, scrolling=False)
