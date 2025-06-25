@@ -61,16 +61,7 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-# Menu com botões que controlam a página interna (sem reload)
-# Usa st.session_state para guardar o estado da página ativa
-
-if "page" not in st.session_state:
-    st.session_state.page = "home"
-
-def set_page(p):
-    st.session_state.page = p
-
-# HTML do menu fixo via streamlit (botões)
+# Menu fixo no topo
 menu_html = """
 <div class="menu-fixed">
     <button id="btn-home">Início</button>
@@ -104,35 +95,31 @@ for (const [key, btn] of Object.entries(buttons)) {
 </script>
 """
 
-# Renderiza o menu
 st.components.v1.html(menu_html, height=60)
 
-# Captura evento do menu via JS -> Streamlit via componente (usa st.experimental_get_query_params workaround)
-# Streamlit não tem comunicação bidirecional JS <-> Python perfeita, usamos workaround simples com st.experimental_get_query_params
+# Usar st.query_params para pegar parâmetro page da URL
+params = st.query_params
+page_param = params.get("page", ["home"])[0]
 
-# Para comunicar JS com Streamlit, vamos usar st.experimental_set_query_params, que atualiza a URL e reinicia a app,
-# capturando o parâmetro page para atualizar o conteúdo.
-
-page_param = st.experimental_get_query_params().get("page", ["home"])[0]
+if "page" not in st.session_state:
+    st.session_state.page = "home"
 
 if page_param != st.session_state.page:
     st.session_state.page = page_param
 
-# Atualiza URL para manter coerência, mas evita loops infinitos
+# Atualiza URL com o parâmetro page
 def update_query_params(p):
-    if st.experimental_get_query_params().get("page", [""])[0] != p:
+    if st.query_params.get("page", [""])[0] != p:
         st.experimental_set_query_params(page=p)
 
 update_query_params(st.session_state.page)
 
-# Área principal com conteúdo dinâmico
 st.markdown('<div class="content-area">', unsafe_allow_html=True)
 
 if st.session_state.page == "home":
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-    # Carregamento e exibição do mapa
     @st.cache_data(show_spinner=False)
     def carregar_dados():
         gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
