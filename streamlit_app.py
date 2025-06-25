@@ -37,4 +37,4 @@ with open("grafico_rmc.html", "r", encoding="utf-8") as f:
 html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
 
 # Exibir no Streamlit
-st.components.v1.html(html_code, height=600, scrolling=False)
+st.components.v1.html(html_code, height=650, scrolling=False)
