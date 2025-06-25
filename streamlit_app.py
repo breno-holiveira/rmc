@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
-import streamlit.components.v1 as components
 
 # Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide")
@@ -19,6 +18,7 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
+# Construção do GeoJSON com dados
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -38,90 +38,85 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Reset e fonte */
-  * {{
-    margin:0; padding:0; box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }}
-  html, body, #root, #container {{
-    height: 100%;
-    overflow: hidden;
-    background: #f7faff;
-  }}
-
-  /* Layout flex horizontal, 3 colunas fixas */
-  #container {{
-    display: flex;
+  html, body {{
     height: 100vh;
-    width: 100vw;
-    user-select: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f9fafa;
+    display: flex;
+    overflow: hidden; /* Evita scroll da página */
   }}
-
-  /* Sidebar esquerdo - lista municípios */
+  /* Sidebar com busca e lista */
   #sidebar {{
-    width: 280px;
+    width: 260px;
     background: #fff;
-    border-right: 1px solid #cbd3db;
+    padding: 20px 16px 12px 16px;
+    border-right: 1px solid #e1e4e8;
+    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
-    padding: 16px 18px;
-    overflow-y: auto;
+  }}
+  #sidebar h2 {{
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a2d5a;
+    user-select: none;
   }}
   #search {{
-    padding: 8px 12px;
-    border: 1px solid #a9b6cd;
-    border-radius: 8px;
-    font-size: 14px;
     margin-bottom: 12px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
     outline-offset: 2px;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.3s;
   }}
   #search:focus {{
     border-color: #4d648d;
-    box-shadow: 0 0 6px rgba(77,100,141,0.5);
+    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
   }}
-  #municipio-list {{
+  #list {{
     flex-grow: 1;
     overflow-y: auto;
+    padding-right: 6px;
   }}
-  .municipio-item {{
-    padding: 8px 10px;
+  #list div {{
+    padding: 8px 12px;
+    margin-bottom: 6px;
     border-radius: 8px;
     cursor: pointer;
+    user-select: none;
     font-size: 15px;
     color: #1a2d5a;
-    margin-bottom: 6px;
-    transition: background-color 0.25s, color 0.25s;
+    transition: background-color 0.3s, color 0.3s;
   }}
-  .municipio-item:hover {{
-    background-color: #d3e0f7;
+  #list div:hover {{
+    background-color: #e3ecf9;
   }}
-  .municipio-item.active {{
+  #list div.active {{
     background-color: #4d648d;
     color: #fff;
     font-weight: 600;
   }}
 
-  /* Container mapa */
-  #map-area {{
+  /* Mapa e SVG */
+  #map {{
     flex-grow: 1;
-    background: #e6f0ff;
     position: relative;
-    padding: 12px;
+    overflow: hidden; /* Impede scroll no mapa */
   }}
-
   svg {{
     width: 100%;
     height: 100%;
-    display: block;
   }}
-
   .area {{
     fill: #b6cce5;
     stroke: #4d648d;
     stroke-width: 1;
     cursor: pointer;
-    transition: fill 0.3s ease, stroke-width 0.3s ease;
+    transition: all 0.3s ease;
   }}
   .area:hover {{
     fill: #8db3dd;
@@ -132,112 +127,118 @@ html_code = f"""
     stroke: #1a2d5a;
   }}
 
-  /* Tooltip simples */
+  /* Tooltip */
   #tooltip {{
-    position: absolute;
-    background: rgba(30, 60, 120, 0.9);
-    color: white;
+    position: fixed; /* fixado na tela */
     padding: 5px 10px;
-    border-radius: 6px;
+    background: rgba(30, 60, 120, 0.95);
+    color: white;
     font-size: 13px;
+    border-radius: 5px;
     pointer-events: none;
     display: none;
-    white-space: nowrap;
-    z-index: 999;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+    user-select: none;
   }}
 
-  /* Painel direito - informações município */
-  #info-panel {{
-    width: 320px;
-    background: #fff;
-    border-left: 1px solid #cbd3db;
-    padding: 20px 24px;
-    overflow-y: auto;
+  /* Painel de Informações mais integrado */
+  #info {{
+    position: fixed;
+    right: 24px;
+    top: 40px;
+    background: #f0f3f8;
+    padding: 16px 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    max-width: 320px;
     font-size: 14px;
-    color: #1a2d5a;
     line-height: 1.4;
-    user-select: text;
-    display: flex;
-    flex-direction: column;
+    color: #1a2d5a;
+    user-select: none;
+    display: none;
+    border: 1px solid #d9e2f3;
+    z-index: 20;
   }}
-
-  #info-panel h3 {{
-    font-size: 22px;
+  #info.visible {{
+    display: block;
+  }}
+  #info h3 {{
+    margin: 0 0 12px 0;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 18px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    color: #2c3e70;
+    border-bottom: 1px solid #c3d0e8;
+    padding-bottom: 6px;
   }}
-
-  .info-grid {{
+  #info .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px 24px;
+    row-gap: 8px;
+    column-gap: 24px;
   }}
-  .label {{
+  #info .label {{
     font-weight: 600;
     color: #4d648d;
     white-space: nowrap;
-    user-select: none;
   }}
-  .value {{
-    text-align: right;
+  #info .value {{
     font-weight: 500;
+    text-align: right;
+    color: #34495e;
     overflow-wrap: break-word;
   }}
-  .fonte {{
-    margin-top: 16px;
+  #info .fonte {{
+    grid-column: 1 / -1;
     font-size: 11px;
-    font-style: italic;
     color: #7f8caa;
+    font-style: italic;
+    margin-top: 16px;
     text-align: right;
   }}
-
 </style>
 </head>
 <body>
-<div id="container" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
-  <aside id="sidebar" role="complementary" aria-label="Lista de municípios">
-    <input type="search" id="search" aria-label="Buscar município" placeholder="Buscar município..." autocomplete="off" />
-    <div id="municipio-list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
-  </aside>
-  <section id="map-area" aria-label="Mapa dos municípios">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-label="Mapa dos municípios"></svg>
+  <div id="sidebar" role="complementary" aria-label="Lista de municípios">
+    <h2>Municípios</h2>
+    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
+    <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
+  </div>
+  <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-  </section>
-  <section id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado" tabindex="0">
+  </div>
+  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
     <h3>Município</h3>
-    <div class="info-grid">
-      <div class="label">PIB:</div><div class="value" id="pib"></div>
-      <div class="label">% RMC:</div><div class="value" id="part"></div>
-      <div class="label">Per capita:</div><div class="value" id="percapita"></div>
-      <div class="label">População:</div><div class="value" id="pop"></div>
-      <div class="label">Área:</div><div class="value" id="area"></div>
-      <div class="label">Densidade:</div><div class="value" id="dens"></div>
+    <div class="grid">
+      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
+      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
+      <div class="label">Área:</div> <div class="value" id="area"></div>
+      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
+      <div class="fonte">Fonte: IBGE Cidades</div>
     </div>
-    <div class="fonte">Fonte: IBGE Cidades</div>
-  </section>
-</div>
-
+  </div>
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
 const tooltip = document.getElementById("tooltip");
-const list = document.getElementById("municipio-list");
+const info = document.getElementById("info");
+const list = document.getElementById("list");
 const search = document.getElementById("search");
-const infoPanel = document.getElementById("info-panel");
-const paths = {{}};
-let selected = null;
 
-// Coordenadas para cálculo de bounding box do mapa
-const coords = [];
+let selected = null;
+const paths = {{}};
+
+let coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
   else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
 }});
-const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
+const lons = coords.map(c => c[0]);
+const lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
 const minY = Math.min(...lats), maxY = Math.max(...lats);
 
@@ -254,44 +255,69 @@ function polygonToPath(coords) {{
 function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
-    document.querySelectorAll('.municipio-item').forEach(d => d.classList.remove('active'));
+    [...list.children].forEach(d => d.classList.remove("active"));
   }}
   selected = name;
   if (paths[name]) {{
     paths[name].classList.add("selected");
-    showInfo(name);
+    [...list.children].forEach(div => {{
+      if(div.dataset.name === name) {{
+        div.classList.add("active");
+        // Scroll customizado para só rolar a barra lateral e não a página
+        const container = list;
+        const containerHeight = container.clientHeight;
+        const containerTop = container.getBoundingClientRect().top;
 
-    // Destaca na lista e scroll suave para acompanhar
-    const el = document.querySelector(`[data-name="${{name}}"]`);
-    if (el) {{
-      el.classList.add('active');
-      const container = list;
-      const containerHeight = container.clientHeight;
-      const elementTop = el.offsetTop;
-      const scrollTop = container.scrollTop;
-      const scrollTo = elementTop - containerHeight / 2 + el.offsetHeight / 2;
-      container.scrollTo({{ top: scrollTo, behavior: 'smooth' }});
-    }}
+        const elementTop = div.getBoundingClientRect().top;
+        const elementHeight = div.offsetHeight;
+
+        const scrollTop = container.scrollTop;
+        const offset = elementTop - containerTop;
+
+        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
+
+        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
+      }}
+    }});
+    showInfo(name);
   }}
 }}
 
 function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
-  infoPanel.querySelector("h3").textContent = name;
-  infoPanel.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  infoPanel.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-  infoPanel.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
-  infoPanel.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-  infoPanel.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
-  infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+  info.querySelector("h3").textContent = name;
+  info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+  info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+  info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
+  info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+  info.classList.add("visible");
 }}
 
+function updateList(filter = "") {{
+  const filterLower = filter.toLowerCase();
+  [...list.children].forEach(div => {{
+    if(div.textContent.toLowerCase().includes(filterLower)) {{
+      div.style.display = "block";
+    }} else {{
+      div.style.display = "none";
+    }}
+  }});
+}}
+
+// Cria polígonos e itens da legenda
 geo.features.forEach(f => {{
   const name = f.properties.name;
   let d = "";
-  if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-  else f.geometry.coordinates.forEach(p => {{ d += "M" + polygonToPath(p[0]) + " Z "; }});
+  if (f.geometry.type === "Polygon") {{
+    d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
+  }} else {{
+    f.geometry.coordinates.forEach(p => {{
+      d += "M" + polygonToPath(p[0]) + " Z ";
+    }});
+  }}
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", d.trim());
   path.classList.add("area");
@@ -299,24 +325,30 @@ geo.features.forEach(f => {{
   svg.appendChild(path);
   paths[name] = path;
 
+  // Eventos do mapa
   path.addEventListener("mousemove", e => {{
-    tooltip.style.left = e.clientX + 10 + "px";
-    tooltip.style.top = e.clientY - 25 + "px";
-    tooltip.textContent = name;
+    const offsetX = 8;  // distância horizontal do mouse para o tooltip (reduzido)
+    const offsetY = -22; // distância vertical do mouse para o tooltip (mais perto)
+    tooltip.style.left = (e.clientX + offsetX) + "px";
+    tooltip.style.top = (e.clientY + offsetY) + "px";
     tooltip.style.display = "block";
+    tooltip.textContent = name;
   }});
   path.addEventListener("mouseleave", () => {{
     tooltip.style.display = "none";
   }});
-  path.addEventListener("click", () => select(name));
+  path.addEventListener("click", e => {{
+    e.preventDefault();  // previne scroll da página ao clicar no município
+    e.stopPropagation(); // evita propagação para scroll do container pai
+    select(name);
+  }});
 
-  // Adiciona município na lista lateral
+  // Item da legenda
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
-  div.className = 'municipio-item';
-  div.setAttribute("role", "option");
   div.tabIndex = 0;
+  div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
   div.addEventListener("keydown", e => {{
     if (e.key === "Enter" || e.key === " ") {{
@@ -328,18 +360,20 @@ geo.features.forEach(f => {{
 }});
 
 search.addEventListener("input", e => {{
-  const val = e.target.value.toLowerCase();
-  document.querySelectorAll('.municipio-item').forEach(d => {{
-    d.style.display = d.textContent.toLowerCase().includes(val) ? 'block' : 'none';
-  }});
+  updateList(e.target.value);
+  const visibleItems = [...list.children].filter(d => d.style.display !== "none");
+  if(visibleItems.length === 1) {{
+    select(visibleItems[0].dataset.name);
+  }}
 }});
 
-// Seleciona o primeiro município inicialmente
-if (geo.features.length > 0) select(geo.features[0].properties.name);
-
+// Seleciona primeiro município ao carregar
+if(geo.features.length > 0) {{
+  select(geo.features[0].properties.name);
+}}
 </script>
 </body>
 </html>
 """
 
-components.html(html_code, height=720, scrolling=False)
+st.components.v1.html(html_code, height=650, scrolling=False)
