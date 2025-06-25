@@ -6,7 +6,7 @@ import json
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-st.title("RMC Data")
+st.title("RMC Datbjha")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
 # Carregamento dos dados
