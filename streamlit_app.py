@@ -49,6 +49,7 @@ html_code = f"""
     background: #f7faff;
   }}
 
+  /* Layout flex horizontal, 3 colunas fixas */
   #container {{
     display: flex;
     height: 100vh;
@@ -56,7 +57,7 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Sidebar - lista municípios */
+  /* Sidebar esquerdo - lista municípios */
   #sidebar {{
     width: 280px;
     background: #fff;
@@ -101,13 +102,11 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Área do mapa */
+  /* Container mapa */
   #map-area {{
     flex-grow: 1;
-    position: relative;
     background: #e6f0ff;
-    display: flex;
-    flex-direction: column;
+    position: relative;
     padding: 12px;
   }}
 
@@ -147,42 +146,34 @@ html_code = f"""
     z-index: 999;
   }}
 
-  /* Painel info flutuante com toggle */
-  #info {{
-    position: fixed;
-    top: 60px;
-    right: 20px;
-    width: 340px;
-    max-height: calc(100vh - 80px);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: saturate(180%) blur(10px);
-    border-radius: 14px;
-    padding: 18px 22px;
+  /* Painel direito - informações município */
+  #info-panel {{
+    width: 320px;
+    background: #fff;
+    border-left: 1px solid #cbd3db;
+    padding: 20px 24px;
+    overflow-y: auto;
     font-size: 14px;
     color: #1a2d5a;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    overflow-y: auto;
-    line-height: 1.3;
+    line-height: 1.4;
     user-select: text;
-    display: none;
-    z-index: 1000;
-    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
   }}
-  #info.visible {{
-    display: block;
-  }}
-  #info h3 {{
-    margin-bottom: 14px;
+
+  #info-panel h3 {{
+    font-size: 22px;
     font-weight: 700;
-    font-size: 20px;
+    margin-bottom: 18px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }}
-  .grid {{
+
+  .info-grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px 20px;
+    gap: 12px 24px;
   }}
   .label {{
     font-weight: 600;
@@ -193,36 +184,14 @@ html_code = f"""
   .value {{
     text-align: right;
     font-weight: 500;
-    color: #2c3e70;
     overflow-wrap: break-word;
   }}
   .fonte {{
-    grid-column: 1 / -1;
-    font-size: 10px;
+    margin-top: 16px;
+    font-size: 11px;
     font-style: italic;
-    text-align: right;
     color: #7f8caa;
-    margin-top: 12px;
-  }}
-
-  /* Botão para abrir/fechar painel info */
-  #toggle-info-btn {{
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #4d648dcc;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 14px;
-    cursor: pointer;
-    font-weight: 600;
-    box-shadow: 0 3px 8px rgba(77,100,141,0.8);
-    transition: background-color 0.25s ease;
-    z-index: 1100;
-  }}
-  #toggle-info-btn:hover {{
-    background: #35507a;
+    text-align: right;
   }}
 
 </style>
@@ -233,35 +202,31 @@ html_code = f"""
     <input type="search" id="search" aria-label="Buscar município" placeholder="Buscar município..." autocomplete="off" />
     <div id="municipio-list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
   </aside>
-  <section id="map-area">
+  <section id="map-area" aria-label="Mapa dos municípios">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-label="Mapa dos municípios"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </section>
-</div>
-
-<button id="toggle-info-btn" aria-pressed="false" aria-label="Abrir painel de informações do município">Info</button>
-
-<section id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado" tabindex="0">
-  <h3>Município</h3>
-  <div class="grid">
-    <div class="label">PIB:</div><div class="value" id="pib"></div>
-    <div class="label">% RMC:</div><div class="value" id="part"></div>
-    <div class="label">Per capita:</div><div class="value" id="percapita"></div>
-    <div class="label">População:</div><div class="value" id="pop"></div>
-    <div class="label">Área:</div><div class="value" id="area"></div>
-    <div class="label">Densidade:</div><div class="value" id="dens"></div>
+  <section id="info-panel" role="region" aria-live="polite" aria-label="Informações do município selecionado" tabindex="0">
+    <h3>Município</h3>
+    <div class="info-grid">
+      <div class="label">PIB:</div><div class="value" id="pib"></div>
+      <div class="label">% RMC:</div><div class="value" id="part"></div>
+      <div class="label">Per capita:</div><div class="value" id="percapita"></div>
+      <div class="label">População:</div><div class="value" id="pop"></div>
+      <div class="label">Área:</div><div class="value" id="area"></div>
+      <div class="label">Densidade:</div><div class="value" id="dens"></div>
+    </div>
     <div class="fonte">Fonte: IBGE Cidades</div>
-  </div>
-</section>
+  </section>
+</div>
 
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
 const tooltip = document.getElementById("tooltip");
-const info = document.getElementById("info");
 const list = document.getElementById("municipio-list");
 const search = document.getElementById("search");
-const toggleBtn = document.getElementById("toggle-info-btn");
+const infoPanel = document.getElementById("info-panel");
 const paths = {{}};
 let selected = null;
 
@@ -270,7 +235,7 @@ const coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-  else f.geometry.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+  else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
 }});
 const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
@@ -307,26 +272,19 @@ function select(name) {{
       const scrollTo = elementTop - containerHeight / 2 + el.offsetHeight / 2;
       container.scrollTo({{ top: scrollTo, behavior: 'smooth' }});
     }}
-
-    // Abre painel info automaticamente
-    if (!info.classList.contains("visible")) {{
-      info.classList.add("visible");
-      toggleBtn.setAttribute("aria-pressed", "true");
-      toggleBtn.textContent = "Fechar";
-    }}
   }}
 }}
 
 function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
-  info.querySelector("h3").textContent = name;
-  info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-  info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
-  info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+  infoPanel.querySelector("h3").textContent = name;
+  infoPanel.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+  infoPanel.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+  infoPanel.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+  infoPanel.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+  infoPanel.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
+  infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
 }}
 
 geo.features.forEach(f => {{
@@ -376,23 +334,7 @@ search.addEventListener("input", e => {{
   }});
 }});
 
-// Toggle botão painel info
-toggleBtn.addEventListener("click", () => {{
-  const isVisible = info.classList.contains("visible");
-  if (isVisible) {{
-    info.classList.remove("visible");
-    toggleBtn.setAttribute("aria-pressed", "false");
-    toggleBtn.textContent = "Info";
-  }} else {{
-    if (selected) {{
-      info.classList.add("visible");
-      toggleBtn.setAttribute("aria-pressed", "true");
-      toggleBtn.textContent = "Fechar";
-    }}
-  }}
-}});
-
-// Seleciona o primeiro município inicialmente e abre painel
+// Seleciona o primeiro município inicialmente
 if (geo.features.length > 0) select(geo.features[0].properties.name);
 
 </script>
@@ -400,4 +342,4 @@ if (geo.features.length > 0) select(geo.features[0].properties.name);
 </html>
 """
 
-components.html(html_code, height=700, scrolling=False)
+components.html(html_code, height=720, scrolling=False)
