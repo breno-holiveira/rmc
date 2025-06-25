@@ -77,14 +77,16 @@ html_code = f"""
       font-size: 17px;
     }}
     #search {{
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 8px;
-      border: 1px solid rgba(140, 160, 190, 0.5);
-      margin-bottom: 12px;
-      background-color: rgba(250, 252, 255, 0.9);
-      font-size: 14px;
-      transition: border-color 0.3s ease;
+  width: 90%;  /* ajusta a largura para menos de 100% */
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccd7e2;
+  margin-bottom: 12px;
+  background-color: #f9fbfd;
+  box-sizing: border-box; /* para garantir que padding e border fiquem dentro da largura */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
     }}
     #search:focus {{
       border-color: rgba(44, 62, 112, 0.8);
