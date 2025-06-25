@@ -58,19 +58,19 @@
       background-color: white;
     }
     #list div {
-      padding: 8.5px 8px;            /* padding vertical maior para facilitar clique e leitura */
+      padding: 8.5px 8px;            /* padding vertical para espaçamento */
       border-radius: 5px;
       cursor: pointer;
       color: #2e466e;
       font-size: 13px;
       transition: background 0.2s;
-      margin-bottom: 6px;            /* mais espaço entre os municípios */
-      white-space: nowrap;           /* impede quebra de linha */
-      overflow: hidden;              /* esconde excesso horizontal */
-      text-overflow: ellipsis;       /* reticências para texto longo */
-      line-height: 1.4em;            /* espaçamento vertical maior evita corte vertical */
-      height: auto;
-      min-height: 24px;              /* altura mínima para acomodar texto */
+      margin-bottom: 6px;            /* espaço maior entre municípios */
+      white-space: nowrap;           /* impede quebra de linha horizontal */
+      overflow: hidden;              /* esconde o que ultrapassar */
+      text-overflow: ellipsis;       /* reticências no texto muito longo */
+      line-height: 1.4em;            /* para evitar corte vertical */
+      min-height: 24px;              /* altura mínima para texto */
+      box-sizing: border-box;        /* evita cortes por padding */
     }
     #list div:hover {
       background: rgba(44, 62, 112, 0.1);
@@ -85,14 +85,11 @@
       height: 100vh;
       position: relative;
       overflow: hidden;
-      width: calc(100% - 240px - 380px); /* largura ajustada considerando sidebar + painel info */
-      float: left;
     }
     svg {
-      width: 600px; /* largura fixa do gráfico */
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       display: block;
-      float: left;
     }
     .area {
       fill: rgba(44, 62, 112, 0.15);
@@ -123,19 +120,19 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
     #infoPanel {
-      position: fixed;               /* fixo para flutuar na direita */
+      position: absolute;
       top: 24px;
       right: 24px;
-      width: 380px;                  /* largura maior */
-      height: auto;
-      max-height: calc(100vh - 48px);
       background: rgba(255,255,255,0.88);
       backdrop-filter: blur(12px);
       padding: 16px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      max-width: 380px;   /* largura aumentada */
       font-size: 13px;
       display: none;
+      height: auto;
+      max-height: calc(100vh - 48px);
       overflow-y: auto;
       z-index: 1001;
     }
