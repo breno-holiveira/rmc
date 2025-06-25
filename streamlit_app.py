@@ -29,6 +29,7 @@ for _, row in gdf.iterrows():
 gj = {"type": "FeatureCollection", "features": features}
 geojson_js = json.dumps(gj)
 
+# HTML/CSS/JS
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -50,16 +51,39 @@ html_code = f"""
       left: 0;
       width: 240px;
       height: 100vh;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(10px);
-      border-right: 1px solid #ccc;
+      border-right: 1px solid #c7d1e0;
       padding: 16px;
       overflow-y: auto;
       scroll-behavior: smooth;
       z-index: 10;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
     }}
-    #sidebar h2 {{ margin: 0 0 12px; color: #2c3e70; font-size: 17px; }}
-    #search {{ width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 12px; }}
+    #sidebar::-webkit-scrollbar {{
+      width: 8px;
+    }}
+    #sidebar::-webkit-scrollbar-thumb {{
+      background-color: rgba(140, 160, 190, 0.3);
+      border-radius: 8px;
+    }}
+    #sidebar:hover::-webkit-scrollbar-thumb {{
+      background-color: rgba(100, 130, 160, 0.5);
+    }}
+    #sidebar h2 {{
+      margin: 0 0 12px;
+      color: #2c3e70;
+      font-size: 17px;
+    }}
+    #search {{
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccd7e2;
+      margin-bottom: 12px;
+      background-color: #f9fbfd;
+    }}
     #list div {{
       padding: 8px;
       border-radius: 6px;
@@ -67,8 +91,14 @@ html_code = f"""
       color: #2c3e70;
       transition: background 0.2s;
     }}
-    #list div:hover {{ background: #dbe7fb; }}
-    #list div.active {{ background: #2c3e70; color: #fff; font-weight: 600; }}
+    #list div:hover {{
+      background: rgba(180, 200, 230, 0.3);
+    }}
+    #list div.active {{
+      background: #2c3e70;
+      color: #fff;
+      font-weight: 600;
+    }}
     #map {{
       margin-left: 240px;
       height: 100vh;
@@ -81,14 +111,15 @@ html_code = f"""
       display: block;
     }}
     .area {{
-      fill: #a5c3e8;
-      stroke: #324d77;
+      fill: #c3d3e5;
+      stroke: #415d84;
       stroke-width: 1;
       cursor: pointer;
+      transition: all 0.2s ease;
     }}
     .area:hover {{
-      fill: #7ba6d9;
-      stroke-width: 1.5;
+      fill: #9fb8d6;
+      stroke-width: 1.4;
     }}
     .area.selected {{
       fill: #2c3e70;
@@ -118,7 +149,10 @@ html_code = f"""
       display: none;
     }}
     #info.visible {{ display: block; }}
-    #info h3 {{ margin: 0 0 10px; color: #2c3e70; }}
+    #info h3 {{
+      margin: 0 0 10px;
+      color: #2c3e70;
+    }}
     #info .grid {{
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -261,4 +295,4 @@ html_code = f"""
 </html>
 """
 
-st.components.v1.html(html_code, height=650, scrolling=False)
+st.components.v1.html(html_code, height=750, scrolling=False)
