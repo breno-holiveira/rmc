@@ -303,4 +303,4 @@ html_code = f"""
 </html>
 """
 
-st.components.v1.html(html_code, height=750, scrolling=False)
+st.components.v1.html(html_code, height=650, scrolling=False)
