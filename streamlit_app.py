@@ -1,3 +1,7 @@
+import streamlit as st
+import pandas as pd
+import geopandas as gpd
+import json
 
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
