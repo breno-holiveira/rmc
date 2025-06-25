@@ -18,7 +18,7 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construção do GeoJSON com dados
+# Construção do GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -30,6 +30,7 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
+# HTML/CSS/JS
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -47,7 +48,7 @@ html_code = f"""
     display: flex;
     overflow: hidden;
   }}
-  /* Sidebar */
+
   #sidebar {{
     width: 260px;
     background: #fff;
@@ -56,13 +57,13 @@ html_code = f"""
     box-shadow: 1px 0 5px rgba(0,0,0,0.03);
     display: flex;
     flex-direction: column;
+    z-index: 10;
   }}
   #sidebar h2 {{
     margin: 0 0 6px 0;
     font-size: 16px;
     font-weight: 600;
     color: #1a2d5a;
-    user-select: none;
   }}
   #search {{
     margin-bottom: 10px;
@@ -70,12 +71,7 @@ html_code = f"""
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    outline-offset: 2px;
-    transition: border-color 0.3s;
-  }}
-  #search:focus {{
-    border-color: #4d648d;
-    box-shadow: 0 0 5px rgba(77, 100, 141, 0.5);
+    outline: none;
   }}
   #list {{
     flex-grow: 1;
@@ -87,11 +83,8 @@ html_code = f"""
     margin-bottom: 4px;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
-    font-size: 16px;
-    line-height: 1.3;
+    font-size: 15px;
     color: #1a2d5a;
-    transition: background-color 0.3s, color 0.3s;
   }}
   #list div:hover {{
     background-color: #e3ecf9;
@@ -102,7 +95,6 @@ html_code = f"""
     font-weight: 600;
   }}
 
-  /* Mapa */
   #map {{
     flex-grow: 1;
     position: relative;
@@ -128,7 +120,6 @@ html_code = f"""
     stroke: #1a2d5a;
   }}
 
-  /* Tooltip */
   #tooltip {{
     position: fixed;
     padding: 5px 10px;
@@ -138,37 +129,35 @@ html_code = f"""
     border-radius: 5px;
     pointer-events: none;
     display: none;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
     z-index: 1000;
-    user-select: none;
   }}
 
-  /* Painel info compacto com ajuste para evitar quebra */
   #info {{
-    position: fixed;
-    right: 24px;
-    top: 40px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 300px;
+    height: 100%;
     background: #f0f3f8;
-    padding: 12px 16px;
-    border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-    max-width: 320px;
-    font-size: 14px;
-    line-height: 1.3;
-    color: #1a2d5a;
-    user-select: none;
-    display: none;
-    border: 1px solid #d9e2f3;
+    padding: 20px;
+    border-left: 1px solid #d9e2f3;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.06);
+    transform: translateX(100%);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    opacity: 0;
+    pointer-events: none;
     z-index: 20;
   }}
   #info.visible {{
-    display: block;
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
   }}
   #info h3 {{
-    margin: 0 0 10px 0;
+    margin-top: 0;
     font-size: 18px;
-    font-weight: 700;
     color: #2c3e70;
+    margin-bottom: 12px;
     border-bottom: 1px solid #c3d0e8;
     padding-bottom: 4px;
   }}
@@ -177,51 +166,58 @@ html_code = f"""
     grid-template-columns: 1fr 1fr;
     row-gap: 6px;
     column-gap: 20px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
   }}
-  #info .label {{
+  #info.visible .grid {{
+    opacity: 1;
+  }}
+  .label {{
     font-weight: 600;
     color: #4d648d;
-    white-space: nowrap;  /* não quebra */
+    white-space: nowrap;
   }}
-  #info .value {{
-    font-weight: 500;
+  .value {{
     text-align: right;
+    font-weight: 500;
     color: #34495e;
-    white-space: nowrap;  /* não quebra */
-    overflow-wrap: normal;
+    white-space: nowrap;
   }}
-  #info .fonte {{
+  .fonte {{
     grid-column: 1 / -1;
     font-size: 10px;
     color: #7f8caa;
-    font-style: italic;
     margin-top: 12px;
     text-align: right;
+    font-style: italic;
   }}
 </style>
 </head>
 <body>
-  <div id="sidebar" role="complementary" aria-label="Lista de municípios">
-    <h2>Municípios</h2>
-    <input id="search" type="search" placeholder="Buscar município..." aria-label="Buscar município" />
-    <div id="list" tabindex="0" role="listbox" aria-multiselectable="false" aria-label="Lista de municípios"></div>
+<div id="sidebar">
+  <h2>Municípios</h2>
+  <input id="search" type="search" placeholder="Buscar município..." />
+  <div id="list"></div>
+</div>
+
+<div id="map">
+  <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+  <div id="tooltip"></div>
+</div>
+
+<div id="info">
+  <h3>Município</h3>
+  <div class="grid">
+    <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
+    <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+    <div class="label">PIB per capita:</div> <div class="value" id="percapita"></div>
+    <div class="label">População:</div> <div class="value" id="pop"></div>
+    <div class="label">Área:</div> <div class="value" id="area"></div>
+    <div class="label">Densidade:</div> <div class="value" id="dens"></div>
+    <div class="fonte">Fonte: IBGE Cidades</div>
   </div>
-  <div id="map" role="main" aria-label="Mapa interativo da Região Metropolitana de Campinas">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-    <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-  </div>
-  <div id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Município</h3>
-    <div class="grid">
-      <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-      <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
-      <div class="label">PIB per capita (2021):</div> <div class="value" id="percapita"></div>
-      <div class="label">População (2022):</div> <div class="value" id="pop"></div>
-      <div class="label">Área:</div> <div class="value" id="area"></div>
-      <div class="label">Densidade demográfica:</div> <div class="value" id="dens"></div>
-      <div class="fonte">Fonte: IBGE Cidades</div>
-    </div>
-  </div>
+</div>
+
 <script>
 const geo = {geojson_str};
 const svg = document.querySelector("svg");
@@ -229,7 +225,6 @@ const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("list");
 const search = document.getElementById("search");
-
 let selected = null;
 const paths = {{}};
 
@@ -258,6 +253,7 @@ function select(name) {{
   if (selected) {{
     paths[selected].classList.remove("selected");
     [...list.children].forEach(d => d.classList.remove("active"));
+    info.classList.remove("visible");
   }}
   selected = name;
   if (paths[name]) {{
@@ -265,15 +261,6 @@ function select(name) {{
     [...list.children].forEach(div => {{
       if(div.dataset.name === name) {{
         div.classList.add("active");
-        const container = list;
-        const containerHeight = container.clientHeight;
-        const containerTop = container.getBoundingClientRect().top;
-        const elementTop = div.getBoundingClientRect().top;
-        const elementHeight = div.offsetHeight;
-        const scrollTop = container.scrollTop;
-        const offset = elementTop - containerTop;
-        const scrollTo = scrollTop + offset - containerHeight / 2 + elementHeight / 2;
-        container.scrollTo({{ top: scrollTo, behavior: "smooth" }});
       }}
     }});
     showInfo(name);
@@ -283,24 +270,20 @@ function select(name) {{
 function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
+  info.classList.add("visible");
   info.querySelector("h3").textContent = name;
   info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace(".", ",") + "%" : "-";
   info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
   info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-  info.classList.add("visible");
 }}
 
 function updateList(filter = "") {{
   const filterLower = filter.toLowerCase();
   [...list.children].forEach(div => {{
-    if(div.textContent.toLowerCase().includes(filterLower)) {{
-      div.style.display = "block";
-    }} else {{
-      div.style.display = "none";
-    }}
+    div.style.display = div.textContent.toLowerCase().includes(filterLower) ? "block" : "none";
   }});
 }}
 
@@ -322,16 +305,12 @@ geo.features.forEach(f => {{
   paths[name] = path;
 
   path.addEventListener("mousemove", e => {{
-    const offsetX = 8;
-    const offsetY = -22;
-    tooltip.style.left = (e.clientX + offsetX) + "px";
-    tooltip.style.top = (e.clientY + offsetY) + "px";
+    tooltip.style.left = (e.clientX + 10) + "px";
+    tooltip.style.top = (e.clientY - 20) + "px";
     tooltip.style.display = "block";
     tooltip.textContent = name;
   }});
-  path.addEventListener("mouseleave", () => {{
-    tooltip.style.display = "none";
-  }});
+  path.addEventListener("mouseleave", () => tooltip.style.display = "none");
   path.addEventListener("click", e => {{
     e.preventDefault();
     e.stopPropagation();
@@ -341,27 +320,14 @@ geo.features.forEach(f => {{
   const div = document.createElement("div");
   div.textContent = name;
   div.dataset.name = name;
-  div.tabIndex = 0;
-  div.setAttribute('role', 'option');
   div.addEventListener("click", () => select(name));
-  div.addEventListener("keydown", e => {{
-    if (e.key === "Enter" || e.key === " ") {{
-      e.preventDefault();
-      select(name);
-    }}
-  }});
   list.appendChild(div);
 }});
 
 search.addEventListener("input", e => {{
   updateList(e.target.value);
-  const visibleItems = [...list.children].filter(d => d.style.display !== "none");
-  if(visibleItems.length === 1) {{
-    select(visibleItems[0].dataset.name);
-  }}
 }});
-
-if(geo.features.length > 0) {{
+if (geo.features.length > 0) {{
   select(geo.features[0].properties.name);
 }}
 </script>
@@ -369,4 +335,4 @@ if(geo.features.length > 0) {{
 </html>
 """
 
-st.components.v1.html(html_code, height=600, scrolling=False)
+st.components.v1.html(html_code, height=750, scrolling=False)
