@@ -12,7 +12,7 @@ import pages.pag3 as pag3
 st.set_page_config(
     page_title="RMC Data",
     layout="wide",
-    initial_sidebar_state="collapsed"  # Barra lateral não será usada, mas escondemos logo para evitar layout
+    initial_sidebar_state="collapsed"  # barra lateral removida via CSS
 )
 
 # ======== REMOVER COMPLETAMENTE BARRA LATERAL ========
@@ -32,7 +32,7 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # ======== ROTEAMENTO ========
 params = st.experimental_get_query_params()
-page = params.get("page", [""])[0]  # pegar primeiro valor ou vazio
+page = params.get("page", [""])[0]  # pega o primeiro valor ou vazio
 
 # ======== MENU HORIZONTAL MODERNO E FIXO ========
 menu_items = {
@@ -80,7 +80,7 @@ st.markdown(f"""
         font-weight: 600;
     }}
 
-    /* Adicionar espaçamento superior para conteúdo ficar abaixo do menu fixo */
+    /* Espaço para conteúdo não ficar atrás do menu fixo */
     .app-content {{
         padding-top: 64px;
         max-width: 1200px;
@@ -92,13 +92,13 @@ st.markdown(f"""
 """ + "\n".join([
     f'<a href="/?page={v}" class="{"active" if page == v else ""}">{k}</a>'
     for k, v in menu_items.items()
-]) + "</div>
+]) + "</div>"
 
++ """
 <div class='app-content'>
-""", unsafe_allow_html=True)
+""" , unsafe_allow_html=True)
 
 # ======== FUNÇÕES DE CACHE OTIMIZADAS ========
-
 @st.cache_data(show_spinner=False)
 def carregar_df():
     df = pd.read_excel("dados_rmc.xlsx")
@@ -157,5 +157,5 @@ elif page == "pag3":
 else:
     st.error("Página não encontrada.")
 
-# Fechar a div app-content aberta no menu
+# Fecha div app-content aberta no menu
 st.markdown("</div>", unsafe_allow_html=True)
