@@ -27,7 +27,6 @@ for _, row in gdf.iterrows():
     features.append({"type": "Feature", "geometry": geom, "properties": props})
 
 gj = {"type": "FeatureCollection", "features": features}
-# Passar objeto JSON diretamente (não string JSON)
 geojson_js = json.dumps(gj)
 
 html_code = f"""
@@ -46,16 +45,18 @@ html_code = f"""
       overflow: hidden;
     }}
     #sidebar {{
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 240px;
+      height: 100vh;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
       border-right: 1px solid #ccc;
       padding: 16px;
       overflow-y: auto;
-      height: 100vh;
-      transition: all 0.3s ease;
       scroll-behavior: smooth;
-      float: left;
+      z-index: 10;
     }}
     #sidebar h2 {{ margin: 0 0 12px; color: #2c3e70; font-size: 17px; }}
     #search {{ width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 12px; }}
@@ -72,6 +73,7 @@ html_code = f"""
       margin-left: 240px;
       height: 100vh;
       position: relative;
+      overflow: hidden;
     }}
     svg {{
       width: 100%;
