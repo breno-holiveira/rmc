@@ -38,7 +38,7 @@ html_code = f"""
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mapa Interativo RMC</title>
 <style>
-  /* Reset básico e fonte */
+  /* Reset e fonte */
   * {{
     margin:0; padding:0; box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -108,9 +108,7 @@ html_code = f"""
     background: #e6f0ff;
     display: flex;
     flex-direction: column;
-    padding: 8px 8px 8px 8px;
-    /* largura ajustada para não ficar por baixo do painel info */
-    max-width: calc(100vw - 280px - 350px);
+    padding: 12px;
   }}
 
   svg {{
@@ -149,9 +147,13 @@ html_code = f"""
     z-index: 999;
   }}
 
-  /* Painel info fixo lateral direito */
+  /* Painel info flutuante com toggle */
   #info {{
+    position: fixed;
+    top: 60px;
+    right: 20px;
     width: 340px;
+    max-height: calc(100vh - 80px);
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: saturate(180%) blur(10px);
     border-radius: 14px;
@@ -159,12 +161,12 @@ html_code = f"""
     font-size: 14px;
     color: #1a2d5a;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    overflow: hidden;
-    user-select: text;
+    overflow-y: auto;
     line-height: 1.3;
+    user-select: text;
     display: none;
-    position: relative;
-    flex-shrink: 0;
+    z-index: 1000;
+    transition: right 0.3s ease;
   }}
   #info.visible {{
     display: block;
@@ -202,6 +204,27 @@ html_code = f"""
     color: #7f8caa;
     margin-top: 12px;
   }}
+
+  /* Botão para abrir/fechar painel info */
+  #toggle-info-btn {{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4d648dcc;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 3px 8px rgba(77,100,141,0.8);
+    transition: background-color 0.25s ease;
+    z-index: 1100;
+  }}
+  #toggle-info-btn:hover {{
+    background: #35507a;
+  }}
+
 </style>
 </head>
 <body>
@@ -214,19 +237,22 @@ html_code = f"""
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-label="Mapa dos municípios"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
   </section>
-  <section id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-    <h3>Município</h3>
-    <div class="grid">
-      <div class="label">PIB:</div><div class="value" id="pib"></div>
-      <div class="label">% RMC:</div><div class="value" id="part"></div>
-      <div class="label">Per capita:</div><div class="value" id="percapita"></div>
-      <div class="label">População:</div><div class="value" id="pop"></div>
-      <div class="label">Área:</div><div class="value" id="area"></div>
-      <div class="label">Densidade:</div><div class="value" id="dens"></div>
-      <div class="fonte">Fonte: IBGE Cidades</div>
-    </div>
-  </section>
 </div>
+
+<button id="toggle-info-btn" aria-pressed="false" aria-label="Abrir painel de informações do município">Info</button>
+
+<section id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado" tabindex="0">
+  <h3>Município</h3>
+  <div class="grid">
+    <div class="label">PIB:</div><div class="value" id="pib"></div>
+    <div class="label">% RMC:</div><div class="value" id="part"></div>
+    <div class="label">Per capita:</div><div class="value" id="percapita"></div>
+    <div class="label">População:</div><div class="value" id="pop"></div>
+    <div class="label">Área:</div><div class="value" id="area"></div>
+    <div class="label">Densidade:</div><div class="value" id="dens"></div>
+    <div class="fonte">Fonte: IBGE Cidades</div>
+  </div>
+</section>
 
 <script>
 const geo = {geojson_str};
@@ -235,15 +261,16 @@ const tooltip = document.getElementById("tooltip");
 const info = document.getElementById("info");
 const list = document.getElementById("municipio-list");
 const search = document.getElementById("search");
+const toggleBtn = document.getElementById("toggle-info-btn");
 const paths = {{}};
 let selected = null;
 
-// Coleta todas as coordenadas para calcular bounding box
+// Coordenadas para cálculo de bounding box do mapa
 const coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-  else g.geometry.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+  else f.geometry.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
 }});
 const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
@@ -268,7 +295,8 @@ function select(name) {{
   if (paths[name]) {{
     paths[name].classList.add("selected");
     showInfo(name);
-    // Destaca na lista e faz scroll para acompanhar
+
+    // Destaca na lista e scroll suave para acompanhar
     const el = document.querySelector(`[data-name="${{name}}"]`);
     if (el) {{
       el.classList.add('active');
@@ -276,9 +304,15 @@ function select(name) {{
       const containerHeight = container.clientHeight;
       const elementTop = el.offsetTop;
       const scrollTop = container.scrollTop;
-      // centraliza o item selecionado na área visível
       const scrollTo = elementTop - containerHeight / 2 + el.offsetHeight / 2;
       container.scrollTo({{ top: scrollTo, behavior: 'smooth' }});
+    }}
+
+    // Abre painel info automaticamente
+    if (!info.classList.contains("visible")) {{
+      info.classList.add("visible");
+      toggleBtn.setAttribute("aria-pressed", "true");
+      toggleBtn.textContent = "Fechar";
     }}
   }}
 }}
@@ -286,7 +320,6 @@ function select(name) {{
 function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
-  info.classList.add("visible");
   info.querySelector("h3").textContent = name;
   info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
   info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
@@ -343,7 +376,23 @@ search.addEventListener("input", e => {{
   }});
 }});
 
-// Seleciona o primeiro município inicialmente
+// Toggle botão painel info
+toggleBtn.addEventListener("click", () => {{
+  const isVisible = info.classList.contains("visible");
+  if (isVisible) {{
+    info.classList.remove("visible");
+    toggleBtn.setAttribute("aria-pressed", "false");
+    toggleBtn.textContent = "Info";
+  }} else {{
+    if (selected) {{
+      info.classList.add("visible");
+      toggleBtn.setAttribute("aria-pressed", "true");
+      toggleBtn.textContent = "Fechar";
+    }}
+  }}
+}});
+
+// Seleciona o primeiro município inicialmente e abre painel
 if (geo.features.length > 0) select(geo.features[0].properties.name);
 
 </script>
