@@ -2,192 +2,224 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
-import matplotlib.cm as cm
-import matplotlib.colors as mcolors
-import numpy as np
+import plotly.express as px
+import matplotlib.pyplot as plt
+from streamlit_folium import folium_static
+import folium
 
-# Configuração da página
-st.set_page_config(page_title="RMC Data", layout="wide")
-st.title("RMC Data")
-st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+# Configurações da página
+st.set_page_config(
+    page_title="RMC Data",
+    layout="wide",
+    page_icon="📍",
+    initial_sidebar_state="expanded"
+)
+
+# CSS customizado
+st.markdown("""
+<style>
+    .main .block-container {
+        padding-top: 2rem;
+    }
+    .sidebar .sidebar-content {
+        background-color: #f8f9fa;
+    }
+    section[data-testid="stSidebar"] {
+        width: 300px !important;
+    }
+    div.stSelectbox > div > div > div > div {
+        color: #1a2d5a;
+    }
+    div[data-baseweb="select"] > div {
+        border-color: #4d648d !important;
+    }
+    .metric-box {
+        background-color: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .stPlotlyChart {
+        border-radius: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Título e descrição
+st.title("📊 RMC Data")
+st.markdown("### Análise dos dados e indicadores da Região Metropolitana de Campinas")
 
 # Carregamento dos dados
-gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-if gdf.crs != 'EPSG:4326':
-    gdf = gdf.to_crs('EPSG:4326')
-gdf = gdf.sort_values(by='NM_MUN')
+@st.cache_data
+def load_data():
+    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+    if gdf.crs != 'EPSG:4326':
+        gdf = gdf.to_crs('EPSG:4326')
+    gdf = gdf.sort_values(by='NM_MUN')
+    
+    df = pd.read_excel('dados_rmc.xlsx')
+    df.set_index("nome", inplace=True)
+    
+    # Construção do GeoJSON com dados
+    features = []
+    for _, row in gdf.iterrows():
+        nome = row["NM_MUN"]
+        geom = row["geometry"].__geo_interface__
+        props = df.loc[nome].to_dict() if nome in df.index else {}
+        props["name"] = nome
+        features.append({"type": "Feature", "geometry": geom, "properties": props})
+    
+    return {"type": "FeatureCollection", "features": features}, df
 
-df = pd.read_excel('dados_rmc.xlsx')
-df.set_index("nome", inplace=True)
-
-# Variável que será destacada (fixa por enquanto, em breve dinâmica)
-coluna_destaque = "per_capita_2021"
-
-# Normalização por quantis e coloração com cmap
-valores = df[coluna_destaque].dropna()
-quantis = pd.qcut(valores, q=5, labels=False, duplicates="drop")
-cmap = cm.get_cmap("viridis")
-
-cores = {}
-for nome in df.index:
-    if nome in quantis.index:
-        idx = quantis[nome]
-        cor = mcolors.to_hex(cmap(idx / quantis.max()))
-        cores[nome] = cor
-
-# Construção do GeoJSON com propriedades e cor
-features = []
-for _, row in gdf.iterrows():
-    nome = row["NM_MUN"]
-    geom = row["geometry"].__geo_interface__
-    props = df.loc[nome].to_dict() if nome in df.index else {}
-    props["name"] = nome
-    props["color"] = cores.get(nome, "#b6cce5")
-    features.append({"type": "Feature", "geometry": geom, "properties": props})
-
-geojson = {"type": "FeatureCollection", "features": features}
+geojson, df = load_data()
 geojson_str = json.dumps(geojson)
 
-# HTML com filtro integrado no painel lateral
-html_code = f"""
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8" />
-<style>
-  html, body {{
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', sans-serif;
-    display: flex;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #f9fafa;
-  }}
-  #sidebar {{
-    width: 260px;
-    background: #fff;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-    box-shadow: 1px 0 4px rgba(0,0,0,0.03);
-    display: flex;
-    flex-direction: column;
-  }}
-  #sidebar h2 {{
-    margin-bottom: 10px;
-    font-size: 18px;
-    color: #1a2d5a;
-  }}
-  #filter {{
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    font-size: 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }}
-  #search {{
-    margin-bottom: 12px;
-    padding: 8px 10px;
-    font-size: 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }}
-  #list {{
-    flex-grow: 1;
-    overflow-y: auto;
-  }}
-  #list div {{
-    padding: 8px 10px;
-    margin-bottom: 6px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 15px;
-    color: #1a2d5a;
-  }}
-  #list div:hover {{
-    background-color: #e3ecf9;
-  }}
-  #map {{
-    flex-grow: 1;
-    position: relative;
-  }}
-  svg {{
-    width: 100%;
-    height: 100%;
-  }}
-  .area {{
-    stroke: #4d648d;
-    stroke-width: 1;
-    transition: 0.3s;
-  }}
-</style>
-</head>
-<body>
-  <div id="sidebar">
-    <h2>Municípios</h2>
-    <select id="filter">
-      <option value="pib_2021">PIB 2021</option>
-      <option value="per_capita_2021" selected>PIB per capita</option>
-      <option value="populacao_2022">População</option>
-      <option value="densidade_demografica_2022">Densidade demográfica</option>
-      <option value="participacao_rmc">% no PIB regional</option>
-    </select>
-    <input id="search" type="text" placeholder="Buscar município..." />
-    <div id="list"></div>
-  </div>
-  <div id="map">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-  </div>
-  <script>
-    const geo = {geojson_str};
-    const svg = document.querySelector("svg");
-    const list = document.getElementById("list");
+# Sidebar - Filtros e seleções
+with st.sidebar:
+    st.subheader("🔍 Filtros")
+    selected_municipio = st.selectbox(
+        "Selecione um município",
+        df.index,
+        index=0
+    )
+    
+    st.subheader("📊 Opções de Visualização")
+    show_map = st.checkbox("Mostrar mapa interativo", value=True)
+    show_graphs = st.checkbox("Mostrar gráficos comparativos", value=True)
+    
+    st.markdown("---")
+    st.markdown("ℹ️ **Sobre os dados**")
+    st.caption("Fonte: IBGE Cidades e outras fontes oficiais")
 
-    let coords = [];
-    geo.features.forEach(f => {{
-      const g = f.geometry;
-      if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-      else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
-    }});
-    const lons = coords.map(c => c[0]);
-    const lats = coords.map(c => c[1]);
-    const minX = Math.min(...lons), maxX = Math.max(...lons);
-    const minY = Math.min(...lats), maxY = Math.max(...lats);
+# Seção principal
+tab1, tab2 = st.tabs(["📌 Visão Geral", "📈 Análise Detalhada"])
 
-    function project([lon, lat]) {{
-      const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
-      const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
-      return [x, y];
-    }}
+with tab1:
+    # Cartões de métricas para o município selecionado
+    if selected_municipio in df.index:
+        m_data = df.loc[selected_municipio]
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+                <div class="metric-box">
+                    <h3 style='margin:0;color:#4d648d'>PIB 2021</h3>
+                    <p style='font-size:24px;font-weight:bold;margin:5px 0;'>R$ {}</p>
+                </div>
+            """.format(f"{m_data.get('pib_2021', 0):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")),
+            unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown("""
+                <div class="metric-box">
+                    <h3 style='margin:0;color:#4d648d'>População (2022)</h3>
+                    <p style='font-size:24px;font-weight:bold;margin:5px 0;'>{:,}</p>
+                </div>
+            """.format(m_data.get('populacao_2022', 0)).replace(",", "."),
+            unsafe_allow_html=True)
+            
+        with col3:
+            st.markdown("""
+                <div class="metric-box">
+                    <h3 style='margin:0;color:#4d648d'>PIB per capita</h3>
+                    <p style='font-size:24px;font-weight:bold;margin:5px 0;'>R$ {}</p>
+                </div>
+            """.format(f"{m_data.get('per_capita_2021', 0):,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")),
+            unsafe_allow_html=True)
 
-    function polygonToPath(coords) {{
-      return coords.map(c => project(c).join(",")).join(" ");
-    }}
+    # Mapa interativo
+    if show_map:
+        st.subheader("🗺️ Mapa Interativo da RMC")
+        
+        # Criar mapa com Folium
+        m = folium.Map(
+            location=[-22.9, -47.06], 
+            zoom_start=10,
+            tiles="cartodbpositron"
+        )
+        
+        # Adicionar GeoJSON ao mapa
+        folium.GeoJson(
+            geojson_str,
+            name="RMC",
+            style_function=lambda feature: {
+                'fillColor': '#4d648d',
+                'color': '#1a2d5a',
+                'weight': 1,
+                'fillOpacity': 0.7
+            },
+            highlight_function=lambda x: {
+                'weight': 3,
+                'fillOpacity': 0.9
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=["name", "pib_2021", "populacao_2022"],
+                aliases=["Município", "PIB (2021)", "População (2022)"],
+                localize=True
+            )
+        ).add_to(m)
+        
+        # Destacar município selecionado
+        for feature in geojson['features']:
+            if feature['properties']['name'] == selected_municipio:
+                folium.GeoJson(
+                    feature,
+                    name="Selecionado",
+                    style_function=lambda x: {
+                        'fillColor': '#d62728',
+                        'color': '#d62728',
+                        'weight': 2,
+                        'fillOpacity': 0.9
+                    }
+                ).add_to(m)
+                break
+        
+        folium_static(m, width=900, height=600)
 
-    geo.features.forEach(f => {{
-      const name = f.properties.name;
-      let d = "";
-      if (f.geometry.type === "Polygon") {{
-        d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-      }} else {{
-        f.geometry.coordinates.forEach(p => {{
-          d += "M" + polygonToPath(p[0]) + " Z ";
-        }});
-      }}
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", d.trim());
-      path.setAttribute("fill", f.properties.color || "#ccc");
-      path.classList.add("area");
-      svg.appendChild(path);
+with tab2:
+    st.subheader(f"📊 Comparativo entre Municípios - {selected_municipio}")
+    
+    if show_graphs:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Gráfico de barras - PIB
+            fig = px.bar(
+                df.sort_values('pib_2021', ascending=False),
+                x='pib_2021',
+                y=df.index,
+                orientation='h',
+                title='PIB dos Municípios (2021)',
+                labels={'pib_2021': 'PIB (R$)', 'index': 'Município'},
+                color_discrete_sequence=['#4d648d']
+            )
+            fig.update_layout(height=500)
+            # Destacar município selecionado
+            fig.update_traces(marker_color=['#d62728' if x == selected_municipio else '#4d648d' for x in df.index])
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            # Gráfico de pizza - Participação no PIB regional
+            fig = px.pie(
+                df,
+                values='participacao_rmc',
+                names=df.index,
+                title='Participação no PIB Regional',
+                color_discrete_sequence=px.colors.sequential.Blues_r
+            )
+            # Destacar município selecionado
+            fig.update_traces(
+                pull=[0.1 if x == selected_municipio else 0 for x in df.index],
+                marker_colors=['#d62728' if x == selected_municipio else '#4d648d' for x in df.index],
+                textposition='inside'
+            )
+            fig.update_layout(height=500, showlegend=False)
+            st.plotly_chart(fig, use_container_width=True)
 
-      const div = document.createElement("div");
-      div.textContent = name;
-      list.appendChild(div);
-    }});
-  </script>
-</body>
-</html>
-"""
-
-# Exibe o HTML com o mapa
-st.components.v1.html(html_code, height=720, scrolling=False)
+# Rodapé
+st.markdown("---")
+st.caption("""
+    Desenvolvido com Python, Streamlit e geoprocessamento. 
+    Dados atualizados em 2023.
+""")
