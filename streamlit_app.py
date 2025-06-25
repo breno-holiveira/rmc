@@ -7,43 +7,51 @@ import pages.pag1 as pag1
 import pages.pag2 as pag2
 import pages.pag3 as pag3
 
+# CONFIGURAÇÃO INICIAL: layout wide e SEM barra lateral (removemos abaixo)
 st.set_page_config(
     page_title="RMC Data",
     layout="wide"
 )
 
-# Remove a barra lateral de verdade e expande o conteúdo
-hide_sidebar_style = """
+# --- REMOVE A BARRA LATERAL COMPLETAMENTE DO DOM VIA JS + CSS ---
+hide_sidebar_and_expand = """
 <style>
-    div[data-testid="stSidebar"] {display: none;}
+    /* Remove sidebar container */
+    div[data-testid="stSidebar"] {
+        display: none !important;
+    }
+    /* Expande a área principal para ocupar 100% */
     div[data-testid="stAppViewContainer"] > .main > div:first-child {
         max-width: 100% !important;
         padding-left: 1rem !important;
     }
+    /* Remove qualquer padding/margin esquerda remanescente */
+    .css-k1vhr4 {padding-left: 0 !important;}
 </style>
+<script>
+    // Remove sidebar container do DOM para não ocupar espaço
+    const sidebar = window.parent.document.querySelector('div[data-testid="stSidebar"]');
+    if (sidebar) {
+        sidebar.remove();
+    }
+</script>
 """
-st.markdown(hide_sidebar_style, unsafe_allow_html=True)
+st.markdown(hide_sidebar_and_expand, unsafe_allow_html=True)
 
-# Obtem página via query_params
+# --- PEGAR PÁGINA VIA QUERY PARAM ---
 params = st.query_params
 page = params.get("page", [""])[0]
 
-menu_items = {
-    "Início": "",
-    "Página 1": "pag1",
-    "Página 2": "pag2",
-    "Página 3": "pag3"
-}
-
-# Menu fixo, estilizado e funcional
+# --- MENU FIXO, FUNCIONAL E INTEGRADO ABAIXO DA BARRA STREAMLIT (48px de altura) ---
 st.markdown(f"""
 <style>
+    /* Espaço para a barra padrão do Streamlit no topo (48px) */
     .menu-container {{
         position: fixed;
-        top: 0;
+        top: 48px;  /* abaixo do menu superior padrão do Streamlit */
         left: 0;
         right: 0;
-        z-index: 9999;
+        z-index: 10000;
         background: #22272e;
         padding: 14px 30px;
         display: flex;
@@ -51,8 +59,9 @@ st.markdown(f"""
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         font-size: 16px;
         border-bottom: 1px solid #444c56;
-        box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
+        box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
     }}
+
     .menu-container a {{
         color: #cdd9e5;
         text-decoration: none;
@@ -62,33 +71,45 @@ st.markdown(f"""
         user-select: none;
         cursor: pointer;
     }}
+
     .menu-container a:hover {{
         background-color: #58a6ff;
         color: white;
     }}
+
     .menu-container a.active {{
         background-color: #0f62fe;
         color: white;
         font-weight: 600;
     }}
-    /* espaço para conteúdo abaixo do menu fixo */
+
+    /* Conteúdo abaixo do menu (48px + 48px menu fixo) */
     .app-content {{
-        padding-top: 64px;
+        padding-top: 96px;
         max-width: 1200px;
         margin: auto;
+    }}
+
+    /* Scroll suave */
+    html {{
+        scroll-behavior: smooth;
     }}
 </style>
 
 <div class="menu-container">
 """ + "\n".join([
     f'<a href="/?page={v}" class="{"active" if page == v else ""}">{k}</a>'
-    for k, v in menu_items.items()
+    for k, v in {
+        "Início": "",
+        "Página 1": "pag1",
+        "Página 2": "pag2",
+        "Página 3": "pag3"
+    }.items()
 ]) + "</div>" + """
-<div class='app-content'>
+<div class="app-content">
 """, unsafe_allow_html=True)
 
-# Funções cacheadas para desempenho (igual antes)
-
+# ======= FUNÇÕES CACHEADAS (igual antes) =======
 @st.cache_data(show_spinner=False)
 def carregar_df():
     df = pd.read_excel("dados_rmc.xlsx")
@@ -124,8 +145,7 @@ def construir_geojson():
         })
     return json.dumps({"type": "FeatureCollection", "features": features})
 
-# Roteamento de páginas
-
+# ======= ROTEAMENTO PÁGINAS =======
 if page == "":
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
@@ -148,4 +168,5 @@ elif page == "pag3":
 else:
     st.error("Página não encontrada.")
 
+# Fecha div app-content aberta no menu
 st.markdown("</div>", unsafe_allow_html=True)
