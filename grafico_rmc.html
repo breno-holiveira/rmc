@@ -144,8 +144,8 @@
   padding: 16px;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  width: 400px;           /* fixo */
-  height: 480px;          /* fixo (aproximadamente 60% da tela padrão) */
+  width: 400px; /* fixo, antes era max-width */
+  height: calc(100vh - 48px); /* fixo, antes era height auto + max-height */
   font-size: 13px;
   display: none;
   overflow-y: auto;
