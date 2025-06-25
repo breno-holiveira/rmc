@@ -77,7 +77,7 @@ html_code = f"""
       font-size: 17px;
     }}
     #search {{
-  width: 90%;  /* ajusta a largura para menos de 100% */
+  width: 99%;  /* ajusta a largura para menos de 100% */
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccd7e2;
