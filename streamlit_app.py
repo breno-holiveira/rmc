@@ -27,10 +27,8 @@ for _, row in gdf.iterrows():
     features.append({"type": "Feature", "geometry": geom, "properties": props})
 
 gj = {"type": "FeatureCollection", "features": features}
-gj_str = json.dumps(gj)
-
-# IMPORTANTE: Escapar o JSON para inserir como string JS corretamente
-# Usar json.dumps para inserir entre aspas no JS
+# Passar objeto JSON diretamente (não string JSON)
+geojson_js = json.dumps(gj)
 
 html_code = f"""
 <!DOCTYPE html>
@@ -57,6 +55,7 @@ html_code = f"""
       height: 100vh;
       transition: all 0.3s ease;
       scroll-behavior: smooth;
+      float: left;
     }}
     #sidebar h2 {{ margin: 0 0 12px; color: #2c3e70; font-size: 17px; }}
     #search {{ width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 12px; }}
@@ -69,11 +68,29 @@ html_code = f"""
     }}
     #list div:hover {{ background: #dbe7fb; }}
     #list div.active {{ background: #2c3e70; color: #fff; font-weight: 600; }}
-    #map {{ flex-grow: 1; height: 100vh; position: relative; }}
-    svg {{ width: 100%; height: 100%; }}
-    .area {{ fill: #a5c3e8; stroke: #324d77; stroke-width: 1; cursor: pointer; }}
-    .area:hover {{ fill: #7ba6d9; stroke-width: 1.5; }}
-    .area.selected {{ fill: #2c3e70; }}
+    #map {{
+      margin-left: 240px;
+      height: 100vh;
+      position: relative;
+    }}
+    svg {{
+      width: 100%;
+      height: 100%;
+      display: block;
+    }}
+    .area {{
+      fill: #a5c3e8;
+      stroke: #324d77;
+      stroke-width: 1;
+      cursor: pointer;
+    }}
+    .area:hover {{
+      fill: #7ba6d9;
+      stroke-width: 1.5;
+    }}
+    .area.selected {{
+      fill: #2c3e70;
+    }}
     #tooltip {{
       position: fixed;
       background: rgba(44,62,112,0.95);
@@ -100,16 +117,32 @@ html_code = f"""
     }}
     #info.visible {{ display: block; }}
     #info h3 {{ margin: 0 0 10px; color: #2c3e70; }}
-    #info .grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }}
-    #info .label {{ font-weight: 600; color: #4d648d; }}
-    #info .value {{ text-align: right; color: #2d3f54; }}
-    #info .fonte {{ font-size: 10px; grid-column: 1/-1; color: #7a8ba3; margin-top: 10px; text-align: right; }}
+    #info .grid {{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 12px;
+    }}
+    #info .label {{
+      font-weight: 600;
+      color: #4d648d;
+    }}
+    #info .value {{
+      text-align: right;
+      color: #2d3f54;
+    }}
+    #info .fonte {{
+      font-size: 10px;
+      grid-column: 1/-1;
+      color: #7a8ba3;
+      margin-top: 10px;
+      text-align: right;
+    }}
   </style>
 </head>
 <body>
   <div id="sidebar">
     <h2>Municípios</h2>
-    <input id="search" placeholder="Buscar...">
+    <input id="search" placeholder="Buscar..." />
     <div id="list"></div>
   </div>
   <div id="map">
@@ -128,8 +161,9 @@ html_code = f"""
       </div>
     </div>
   </div>
+
   <script>
-    const geo = JSON.parse({json.dumps(gj_str)});
+    const geo = {geojson_js};
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
     const info = document.getElementById("info");
@@ -142,7 +176,7 @@ html_code = f"""
     geo.features.forEach(f => {{
       const g = f.geometry;
       if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-      else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+      else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
     }});
     const lons = coords.map(c => c[0]);
     const lats = coords.map(c => c[1]);
@@ -190,7 +224,7 @@ html_code = f"""
       const name = f.properties.name;
       let d = "";
       if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-      else f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
+      else if (f.geometry.type === "MultiPolygon") f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d", d.trim());
       path.classList.add("area");
