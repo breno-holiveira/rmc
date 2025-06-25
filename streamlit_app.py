@@ -3,38 +3,31 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Importar páginas
 import pages.pag1 as pag1
 import pages.pag2 as pag2
 import pages.pag3 as pag3
 
-# ======== CONFIGURAÇÃO DA PÁGINA =========
 st.set_page_config(
     page_title="RMC Data",
-    layout="wide",
-    initial_sidebar_state="collapsed"  # Barra lateral removida via CSS
+    layout="wide"
 )
 
-# ======== REMOVER COMPLETAMENTE BARRA LATERAL ========
-hide_streamlit_style = """
-    <style>
-        /* Remove barra lateral */
-        .css-1d391kg {display: none;}
-        /* Remove botão hamburguer superior */
-        button[title="Mostrar barra lateral"] {display: none;}
-        /* Remove espaço reservado */
-        .css-1v3fvcr {padding-left: 0px !important;}
-        /* Remove margem esquerda da página */
-        .css-1outpf7 {padding-left: 0px !important;}
-    </style>
+# Remove a barra lateral de verdade e expande o conteúdo
+hide_sidebar_style = """
+<style>
+    div[data-testid="stSidebar"] {display: none;}
+    div[data-testid="stAppViewContainer"] > .main > div:first-child {
+        max-width: 100% !important;
+        padding-left: 1rem !important;
+    }
+</style>
 """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+st.markdown(hide_sidebar_style, unsafe_allow_html=True)
 
-# ======== ROTEAMENTO ========
+# Obtem página via query_params
 params = st.query_params
-page = params.get("page", [""])[0]  # Pega o primeiro valor da lista ou vazio
+page = params.get("page", [""])[0]
 
-# ======== MENU HORIZONTAL MODERNO E FIXO ========
 menu_items = {
     "Início": "",
     "Página 1": "pag1",
@@ -42,6 +35,7 @@ menu_items = {
     "Página 3": "pag3"
 }
 
+# Menu fixo, estilizado e funcional
 st.markdown(f"""
 <style>
     .menu-container {{
@@ -59,7 +53,6 @@ st.markdown(f"""
         border-bottom: 1px solid #444c56;
         box-shadow: 0 2px 8px rgb(0 0 0 / 0.2);
     }}
-
     .menu-container a {{
         color: #cdd9e5;
         text-decoration: none;
@@ -67,20 +60,18 @@ st.markdown(f"""
         border-radius: 8px;
         transition: background-color 0.3s ease, color 0.3s ease;
         user-select: none;
+        cursor: pointer;
     }}
-
     .menu-container a:hover {{
         background-color: #58a6ff;
         color: white;
     }}
-
     .menu-container a.active {{
         background-color: #0f62fe;
         color: white;
         font-weight: 600;
     }}
-
-    /* Espaço para conteúdo não ficar atrás do menu fixo */
+    /* espaço para conteúdo abaixo do menu fixo */
     .app-content {{
         padding-top: 64px;
         max-width: 1200px;
@@ -96,7 +87,8 @@ st.markdown(f"""
 <div class='app-content'>
 """, unsafe_allow_html=True)
 
-# ======== FUNÇÕES DE CACHE OTIMIZADAS ========
+# Funções cacheadas para desempenho (igual antes)
+
 @st.cache_data(show_spinner=False)
 def carregar_df():
     df = pd.read_excel("dados_rmc.xlsx")
@@ -132,7 +124,8 @@ def construir_geojson():
         })
     return json.dumps({"type": "FeatureCollection", "features": features})
 
-# ======== ROTEAMENTO DAS PÁGINAS ========
+# Roteamento de páginas
+
 if page == "":
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
@@ -155,5 +148,4 @@ elif page == "pag3":
 else:
     st.error("Página não encontrada.")
 
-# Fecha a div app-content aberta no menu
 st.markdown("</div>", unsafe_allow_html=True)
