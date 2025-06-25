@@ -17,7 +17,7 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 240px;
+      width: 260px; /* Aumentado de 240px */
       height: 100vh;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
@@ -27,6 +27,43 @@
       scroll-behavior: smooth;
       z-index: 10;
       box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+      box-sizing: border-box;
+    }
+
+    #sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb {
+      background-color: rgba(140, 160, 190, 0.25);
+      border-radius: 8px;
+    }
+
+    #sidebar:hover::-webkit-scrollbar-thumb {
+      background-color: rgba(100, 130, 160, 0.45);
+    }
+
+    #sidebar h2 {
+      margin: 0 0 12px;
+      color: #2e466e;
+      font-size: 16px;
+    }
+
+    #search {
+      width: 98%;
+      padding: 6px;
+      border-radius: 5px;
+      border: 1px solid #cbd7e3;
+      margin-bottom: 12px;
+      background-color: #f6f9fc;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    #search:focus {
+      border-color: rgba(44, 62, 112, 0.5);
+      outline: none;
+      background-color: white;
     }
 
     #list div {
@@ -36,18 +73,28 @@
       color: #2e466e;
       font-size: 13px;
       transition: background 0.2s;
-      margin-bottom: 4px;
-      white-space: nowrap; /* <- Aqui evita quebra de linha como "Vinhedo" */
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      box-sizing: border-box;
+    }
+
+    #list div:hover {
+      background: rgba(44, 62, 112, 0.1);
+    }
+
+    #list div.active {
+      background: rgba(44, 62, 112, 0.15);
+      color: #1f2f45;
+      font-weight: 600;
     }
 
     #map {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      margin-left: 260px; /* também ajustado aqui */
       height: 100vh;
-      width: 600px; /* Largura exata do mapa */
-      z-index: 1;
+      position: relative;
+      overflow: hidden;
     }
 
     svg {
@@ -89,7 +136,7 @@
     }
 
     #infoPanel {
-      position: fixed;
+      position: absolute;
       top: 24px;
       right: 24px;
       background: rgba(255,255,255,0.88);
@@ -97,10 +144,13 @@
       padding: 16px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      max-width: 360px;
+      max-width: 380px;
       font-size: 13px;
       display: none;
-      z-index: 2;
+      height: auto;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      z-index: 1001;
     }
 
     #infoPanel.visible { display: block; }
@@ -141,7 +191,6 @@
     <input id="search" placeholder="Buscar..." />
     <div id="list"></div>
   </div>
-
   <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip"></div>
@@ -175,7 +224,6 @@
       if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
       else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
     });
-
     const lons = coords.map(c => c[0]);
     const lats = coords.map(c => c[1]);
     const minX = Math.min(...lons), maxX = Math.max(...lons);
@@ -240,6 +288,7 @@
         tooltip.textContent = name;
         tooltip.style.display = "block";
       });
+
       path.addEventListener("mouseleave", () => tooltip.style.display = "none");
       path.addEventListener("click", () => select(name));
 
