@@ -29,6 +29,7 @@ for _, row in gdf.iterrows():
 gj = {"type": "FeatureCollection", "features": features}
 geojson_js = json.dumps(gj)
 
+# HTML/CSS/JS
 html_code = f"""
 <!DOCTYPE html>
 <html lang=\"pt-BR\">
@@ -38,24 +39,31 @@ html_code = f"""
   <title>RMC Interativo</title>
   <style>
     html, body {{
-      height: 100%; margin: 0;
+      height: 100%;
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(120deg, #f6f9fc, #e7edf4);
+      background: linear-gradient(120deg, #f5f8fc, #e6ecf5);
       overflow: hidden;
     }}
     #sidebar {{
-      position: fixed; top: 0; left: 0;
-      width: 240px; height: 100vh;
-      background: rgba(255, 255, 255, 0.85);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: rgba(255, 255, 255, 0.82);
       backdrop-filter: blur(10px);
-      border-right: 1px solid #cfd9e4;
-      padding: 16px; overflow-y: auto;
+      border-right: 1px solid #c7d1e0;
+      padding: 16px;
+      overflow-y: auto;
       scroll-behavior: smooth;
-      z-index: 10; box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+      z-index: 10;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
     }}
-    #sidebar::-webkit-scrollbar {{ width: 6px; }}
+    #sidebar::-webkit-scrollbar {{ width: 8px; }}
     #sidebar::-webkit-scrollbar-thumb {{
-      background-color: rgba(140, 160, 190, 0.25);
+      background-color: rgba(140, 160, 190, 0.3);
       border-radius: 8px;
     }}
     #sidebar:hover::-webkit-scrollbar-thumb {{
@@ -63,17 +71,16 @@ html_code = f"""
     }}
     #sidebar h2 {{
       margin: 0 0 12px;
-      color: #32476a;
+      color: #2c3e70;
       font-size: 17px;
     }}
     #search {{
-      width: 94%;
-      padding: 7px 8px;
+      width: calc(100% - 8px);
+      padding: 6px;
       border-radius: 6px;
       border: 1px solid #ccd7e2;
       margin-bottom: 12px;
-      background-color: rgba(245, 248, 252, 0.9);
-      font-size: 14px;
+      background-color: #f9fbfd;
     }}
     #list div {{
       padding: 8px;
@@ -83,36 +90,37 @@ html_code = f"""
       transition: background 0.2s;
     }}
     #list div:hover {{
-      background: rgba(160, 180, 210, 0.25);
+      background: rgba(150, 180, 220, 0.25);
     }}
     #list div.active {{
-      background: rgba(80, 120, 180, 0.35);
-      color: #1f2d40;
+      background: rgba(50, 80, 120, 0.85);
+      color: #fff;
       font-weight: 600;
     }}
     #map {{
       margin-left: 240px;
       height: 100vh;
       position: relative;
+      overflow: hidden;
     }}
     svg {{ width: 100%; height: 100%; display: block; }}
     .area {{
-      fill: rgba(160, 180, 210, 0.4);
-      stroke: #3f5372;
+      fill: rgba(180, 200, 230, 0.6);
+      stroke: #415d84;
       stroke-width: 1;
       cursor: pointer;
       transition: all 0.2s ease;
     }}
     .area:hover {{
-      fill: rgba(120, 160, 210, 0.6);
+      fill: rgba(130, 160, 210, 0.8);
       stroke-width: 1.4;
     }}
     .area.selected {{
-      fill: rgba(80, 110, 160, 0.5);
+      fill: rgba(50, 80, 120, 0.9);
     }}
     #tooltip {{
       position: fixed;
-      background: rgba(60,80,120,0.9);
+      background: rgba(44,62,112,0.95);
       color: white;
       padding: 6px 10px;
       font-size: 13px;
@@ -125,7 +133,7 @@ html_code = f"""
       position: absolute;
       top: 24px;
       right: 24px;
-      background: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.85);
       backdrop-filter: blur(12px);
       padding: 16px;
       border-radius: 10px;
@@ -156,120 +164,121 @@ html_code = f"""
   </style>
 </head>
 <body>
-  <div id="sidebar">
+  <div id=\"sidebar\">
     <h2>Municípios</h2>
-    <input id="search" placeholder="Buscar..." />
-    <div id="list"></div>
+    <input id=\"search\" placeholder=\"Buscar...\" />
+    <div id=\"list\"></div>
   </div>
-  <div id="map">
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-    <div id="tooltip"></div>
-    <div id="info">
+  <div id=\"map\">
+    <svg viewBox=\"0 0 1000 950\" preserveAspectRatio=\"xMidYMid meet\"></svg>
+    <div id=\"tooltip\"></div>
+    <div id=\"info\">
       <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
-        <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
-        <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-        <div class="label">População:</div><div class="value" id="pop"></div>
-        <div class="label">Área:</div><div class="value" id="area"></div>
-        <div class="label">Densidade:</div><div class="value" id="dens"></div>
-        <div class="fonte">Fonte: IBGE</div>
+      <div class=\"grid\">
+        <div class=\"label\">PIB 2021:</div><div class=\"value\" id=\"pib\"></div>
+        <div class=\"label\">% no PIB regional:</div><div class=\"value\" id=\"part\"></div>
+        <div class=\"label\">PIB per capita:</div><div class=\"value\" id=\"percapita\"></div>
+        <div class=\"label\">População:</div><div class=\"value\" id=\"pop\"></div>
+        <div class=\"label\">Área:</div><div class=\"value\" id=\"area\"></div>
+        <div class=\"label\">Densidade:</div><div class=\"value\" id=\"dens\"></div>
+        <div class=\"fonte\">Fonte: IBGE</div>
       </div>
     </div>
   </div>
-<script>
-const geo = {geojson_js};
-const svg = document.querySelector("svg");
-const tooltip = document.getElementById("tooltip");
-const info = document.getElementById("info");
-const list = document.getElementById("list");
-const search = document.getElementById("search");
-const paths = {};
-let selected = null;
 
-let coords = [];
-geo.features.forEach(f => {
-  const g = f.geometry;
-  if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-  else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
-});
-const lons = coords.map(c => c[0]);
-const lats = coords.map(c => c[1]);
-const minX = Math.min(...lons), maxX = Math.max(...lons);
-const minY = Math.min(...lats), maxY = Math.max(...lats);
+  <script>
+    const geo = {geojson_js};
+    const svg = document.querySelector("svg");
+    const tooltip = document.getElementById("tooltip");
+    const info = document.getElementById("info");
+    const list = document.getElementById("list");
+    const search = document.getElementById("search");
+    const paths = Object.create(null);
+    let selected = null;
 
-function project([lon, lat]) {
-  const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
-  const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
-  return [x, y];
-}
-function polygonToPath(coords) {
-  return coords.map(c => project(c).join(",")).join(" ");
-}
-function select(name) {
-  if (selected) {
-    paths[selected].classList.remove("selected");
-    [...list.children].forEach(d => d.classList.remove("active"));
-  }
-  selected = name;
-  if (paths[name]) {
-    paths[name].classList.add("selected");
-    [...list.children].forEach(div => {
-      if (div.dataset.name === name) {
-        div.classList.add("active");
-        div.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
+    let coords = [];
+    geo.features.forEach(f => {
+      const g = f.geometry;
+      if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
+      else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
     });
-    showInfo(name);
-  }
-}
-function showInfo(name) {
-  const f = geo.features.find(f => f.properties.name === name);
-  if (!f) return;
-  info.querySelector("h3").textContent = name;
-  info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-  info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
-  info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-  info.classList.add("visible");
-}
-geo.features.forEach(f => {
-  const name = f.properties.name;
-  let d = "";
-  if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-  else if (f.geometry.type === "MultiPolygon") f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", d.trim());
-  path.classList.add("area");
-  path.setAttribute("data-name", name);
-  svg.appendChild(path);
-  paths[name] = path;
+    const lons = coords.map(c => c[0]);
+    const lats = coords.map(c => c[1]);
+    const minX = Math.min(...lons), maxX = Math.max(...lons);
+    const minY = Math.min(...lats), maxY = Math.max(...lats);
 
-  path.addEventListener("mousemove", e => {
-    tooltip.style.left = (e.clientX + 10) + "px";
-    tooltip.style.top = (e.clientY - 20) + "px";
-    tooltip.textContent = name;
-    tooltip.style.display = "block";
-  });
-  path.addEventListener("mouseleave", () => tooltip.style.display = "none");
-  path.addEventListener("click", () => select(name));
+    function project([lon, lat]) {
+      const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
+      const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
+      return [x, y];
+    }
+    function polygonToPath(coords) {
+      return coords.map(c => project(c).join(",")).join(" ");
+    }
+    function select(name) {
+      if (selected) {
+        paths[selected].classList.remove("selected");
+        [...list.children].forEach(d => d.classList.remove("active"));
+      }
+      selected = name;
+      if (paths[name]) {
+        paths[name].classList.add("selected");
+        [...list.children].forEach(div => {
+          if (div.dataset.name === name) {
+            div.classList.add("active");
+            div.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        });
+        showInfo(name);
+      }
+    }
+    function showInfo(name) {
+      const f = geo.features.find(f => f.properties.name === name);
+      if (!f) return;
+      info.querySelector("h3").textContent = name;
+      info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+      info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+      info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+      info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+      info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
+      info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+      info.classList.add("visible");
+    }
+    geo.features.forEach(f => {
+      const name = f.properties.name;
+      let d = "";
+      if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
+      else if (f.geometry.type === "MultiPolygon") f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", d.trim());
+      path.classList.add("area");
+      path.setAttribute("data-name", name);
+      svg.appendChild(path);
+      paths[name] = path;
 
-  const div = document.createElement("div");
-  div.textContent = name;
-  div.dataset.name = name;
-  div.addEventListener("click", () => select(name));
-  list.appendChild(div);
-});
-search.addEventListener("input", e => {
-  const val = e.target.value.toLowerCase();
-  [...list.children].forEach(d => {
-    d.style.display = d.textContent.toLowerCase().includes(val) ? "block" : "none";
-  });
-});
-if (geo.features.length > 0) select(geo.features[0].properties.name);
-</script>
+      path.addEventListener("mousemove", e => {
+        tooltip.style.left = (e.clientX + 10) + "px";
+        tooltip.style.top = (e.clientY - 20) + "px";
+        tooltip.textContent = name;
+        tooltip.style.display = "block";
+      });
+      path.addEventListener("mouseleave", () => tooltip.style.display = "none");
+      path.addEventListener("click", () => select(name));
+
+      const div = document.createElement("div");
+      div.textContent = name;
+      div.dataset.name = name;
+      div.addEventListener("click", () => select(name));
+      list.appendChild(div);
+    });
+    search.addEventListener("input", e => {
+      const val = e.target.value.toLowerCase();
+      [...list.children].forEach(d => {
+        d.style.display = d.textContent.toLowerCase().includes(val) ? "block" : "none";
+      });
+    });
+    if (geo.features.length > 0) select(geo.features[0].properties.name);
+  </script>
 </body>
 </html>
 """
