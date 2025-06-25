@@ -17,19 +17,19 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construir GeoJSON
+# Construir GeoJSON (Aqui: chaves normais!)
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
     geom = row["geometry"].__geo_interface__
-    props = df.loc[nome].to_dict() if nome in df.index else {{}}
+    props = df.loc[nome].to_dict() if nome in df.index else {}
     props["name"] = nome
-    features.append({{"type": "Feature", "geometry": geom, "properties": props}})
+    features.append({"type": "Feature", "geometry": geom, "properties": props})
 
-gj = {{"type": "FeatureCollection", "features": features}}
+gj = {"type": "FeatureCollection", "features": features}
 geojson_js = json.dumps(gj)
 
-# HTML/CSS/JS
+# HTML/CSS/JS (Aqui: chaves duplas para escapar dentro da f-string)
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
