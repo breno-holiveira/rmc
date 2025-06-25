@@ -12,25 +12,20 @@
       background: linear-gradient(120deg, #f4f7fa, #e9eef4);
       overflow: hidden;
     }
-    body {
-      display: flex;
-      height: 100vh;
-      gap: 0;
-      color: #2c3e70;
-    }
-
-    /* Coluna lateral - lista municípios */
     #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 240px;
+      height: 100vh;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
       border-right: 1px solid #cdd6e4;
       padding: 16px;
       overflow-y: auto;
       scroll-behavior: smooth;
+      z-index: 10;
       box-shadow: 2px 0 8px rgba(0,0,0,0.04);
-      display: flex;
-      flex-direction: column;
     }
     #sidebar::-webkit-scrollbar {
       width: 8px;
@@ -44,10 +39,11 @@
     }
     #sidebar h2 {
       margin: 0 0 12px;
+      color: #2e466e;
       font-size: 16px;
     }
     #search {
-      width: 100%;
+      width: 98%;
       padding: 6px;
       border-radius: 5px;
       border: 1px solid #cbd7e3;
@@ -65,6 +61,7 @@
       padding: 7px 8px;
       border-radius: 5px;
       cursor: pointer;
+      color: #2e466e;
       font-size: 13px;
       transition: background 0.2s;
     }
@@ -73,17 +70,16 @@
     }
     #list div.active {
       background: rgba(44, 62, 112, 0.15);
-      font-weight: 600;
       color: #1f2f45;
+      font-weight: 600;
     }
 
-    /* Coluna do mapa */
     #map {
-      flex: 1 1 auto;
+      margin-left: 240px;
+      height: 100vh;
       position: relative;
       overflow: hidden;
-      min-width: 600px;
-      height: 100vh;
+      transition: margin-right 0.3s ease;
     }
     svg {
       width: 100%;
@@ -119,57 +115,56 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
 
-    /* Coluna info (janela flutuante transformada em coluna lateral direita) */
-    #info {
-      flex: 0 0 260px; /* largura fixa e pequena */
-      background: rgba(255, 255, 255, 0.65);
+    /* Painel de informações - inicialmente escondido */
+    #infoPanel {
+      position: fixed;
+      top: 60px; /* para não ficar colado no topo */
+      right: 20px;
+      width: 280px;
+      height: calc(100vh - 80px);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: saturate(180%) blur(10px);
-      padding: 14px 16px;
+      padding: 20px;
       border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(44, 62, 112, 0.1);
-      color: #2c3e70;
+      box-shadow: 0 4px 20px rgba(44, 62, 112, 0.15);
       font-size: 14px;
       line-height: 1.5;
+      color: #2c3e70;
       overflow-y: auto;
       user-select: text;
-      margin-left: 10px; /* pequeno espaço entre mapa e info */
-      border: 1px solid rgba(44, 62, 112, 0.08);
+      border: 1px solid rgba(44, 62, 112, 0.1);
       display: none;
-      flex-direction: column;
-      transition: box-shadow 0.3s ease;
-      max-height: 90vh; /* evitar coluna muito alta */
+      z-index: 50;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    #info:hover {
-      box-shadow: 0 6px 20px rgba(44, 62, 112, 0.15);
+    #infoPanel.visible {
+      display: block;
+      transform: translateX(0);
+      opacity: 1;
     }
-    #info.visible {
-      display: flex;
+
+    /* Botão flutuante no canto superior direito */
+    #toggleButton {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      width: 44px;
+      height: 44px;
+      background: rgba(44, 62, 112, 0.85);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(44, 62, 112, 0.4);
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 44px;
+      text-align: center;
+      user-select: none;
+      z-index: 60;
+      transition: background-color 0.2s ease;
     }
-    #info h3 {
-      margin-top: 0;
-      margin-bottom: 12px;
-      font-weight: 700;
-      font-size: 18px;
-    }
-    #info .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 10px;
-    }
-    #info .label {
-      font-weight: 600;
-      color: #4d648d;
-    }
-    #info .value {
-      text-align: right;
-      color: #2d3f54;
-    }
-    #info .fonte {
-      font-size: 10px;
-      grid-column: 1/-1;
-      color: #7a8ba3;
-      margin-top: 10px;
-      text-align: right;
+    #toggleButton:hover {
+      background: rgba(44, 62, 112, 1);
     }
   </style>
 </head>
@@ -183,16 +178,21 @@
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip"></div>
   </div>
-  <div id="info">
+
+  <button id="toggleButton" title="Mostrar/Ocultar informações">ℹ️</button>
+
+  <div id="infoPanel">
     <h3>Município</h3>
     <div class="grid">
-      <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
-      <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
-      <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-      <div class="label">População:</div><div class="value" id="pop"></div>
-      <div class="label">Área:</div><div class="value" id="area"></div>
-      <div class="label">Densidade:</div><div class="value" id="dens"></div>
-      <div class="fonte">Fonte: IBGE</div>
+      <div><strong>PIB 2021:</strong> <span id="pib">-</span></div>
+      <div><strong>% no PIB regional:</strong> <span id="part">-</span></div>
+      <div><strong>PIB per capita:</strong> <span id="percapita">-</span></div>
+      <div><strong>População:</strong> <span id="pop">-</span></div>
+      <div><strong>Área:</strong> <span id="area">-</span></div>
+      <div><strong>Densidade:</strong> <span id="dens">-</span></div>
+      <div style="font-size: 11px; color: #7a8ba3; margin-top: 12px; text-align: right;">
+        Fonte: IBGE
+      </div>
     </div>
   </div>
 
@@ -200,11 +200,13 @@
     const geo = __GEOJSON_PLACEHOLDER__;
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
-    const info = document.getElementById("info");
+    const infoPanel = document.getElementById("infoPanel");
     const list = document.getElementById("list");
     const search = document.getElementById("search");
+    const toggleButton = document.getElementById("toggleButton");
     const paths = {};
     let selected = null;
+    let infoVisible = false;
 
     let coords = [];
     geo.features.forEach(f => {
@@ -245,15 +247,15 @@
     function showInfo(name) {
       const f = geo.features.find(f => f.properties.name === name);
       if (!f) return;
-      info.querySelector("h3").textContent = name;
-      info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-      info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-      info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
-      info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-      info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
-      info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-      info.classList.add("visible");
+      infoPanel.querySelector("h3").textContent = name;
+      infoPanel.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+      infoPanel.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+      infoPanel.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+      infoPanel.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+      infoPanel.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
+      infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
     }
+
     geo.features.forEach(f => {
       const name = f.properties.name;
       let d = "";
@@ -287,7 +289,22 @@
         d.style.display = d.textContent.toLowerCase().includes(val) ? "block" : "none";
       });
     });
+
+    toggleButton.addEventListener("click", () => {
+      infoVisible = !infoVisible;
+      if (infoVisible) {
+        infoPanel.classList.add("visible");
+        // Ajusta margem do mapa para não ficar atrás do painel
+        document.getElementById("map").style.marginRight = "320px";
+      } else {
+        infoPanel.classList.remove("visible");
+        document.getElementById("map").style.marginRight = "0";
+      }
+    });
+
+    // Seleciona o primeiro município automaticamente
     if (geo.features.length > 0) select(geo.features[0].properties.name);
+
   </script>
 </body>
 </html>
