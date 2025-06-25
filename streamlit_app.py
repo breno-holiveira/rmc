@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configurações da página
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.title("RMC Data")
@@ -18,7 +18,6 @@ gdf = gdf.sort_values(by='NM_MUN')
 df = pd.read_excel('dados_rmc.xlsx')
 df.set_index("nome", inplace=True)
 
-# Construção do GeoJSON
 features = []
 for _, row in gdf.iterrows():
     nome = row["NM_MUN"]
@@ -30,165 +29,169 @@ for _, row in gdf.iterrows():
 geojson = {"type": "FeatureCollection", "features": features}
 geojson_str = json.dumps(geojson)
 
-# HTML/CSS/JS
+# HTML + CSS + JS com painel flutuante transparente e responsivo
 html_code = f"""
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mapa Interativo RMC</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RMC Interativo</title>
 <style>
   html, body {{
-    height: 100vh;
     margin: 0;
     padding: 0;
+    height: 100vh;
     font-family: 'Segoe UI', sans-serif;
-    background-color: #f9fafa;
     display: flex;
     overflow: hidden;
+    background: #f4f6f9;
   }}
 
   #sidebar {{
     width: 260px;
-    background: #fff;
-    padding: 16px 12px 8px 12px;
-    border-right: 1px solid #e1e4e8;
-    box-shadow: 1px 0 5px rgba(0,0,0,0.03);
-    display: flex;
-    flex-direction: column;
+    background: #ffffff;
+    border-right: 1px solid #ddd;
+    padding: 16px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
     z-index: 10;
+    overflow-y: auto;
   }}
+
   #sidebar h2 {{
-    margin: 0 0 6px 0;
     font-size: 16px;
-    font-weight: 600;
+    margin-bottom: 8px;
     color: #1a2d5a;
   }}
+
   #search {{
-    margin-bottom: 10px;
+    width: 100%;
     padding: 6px 10px;
-    font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    outline: none;
+    margin-bottom: 10px;
   }}
+
   #list {{
-    flex-grow: 1;
+    max-height: calc(100vh - 120px);
     overflow-y: auto;
-    padding-right: 4px;
   }}
+
   #list div {{
     padding: 6px 10px;
-    margin-bottom: 4px;
-    border-radius: 8px;
+    margin-bottom: 6px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 15px;
-    color: #1a2d5a;
+    transition: background 0.2s;
   }}
+
   #list div:hover {{
-    background-color: #e3ecf9;
+    background: #e7eefb;
   }}
+
   #list div.active {{
-    background-color: #4d648d;
+    background: #4d648d;
     color: #fff;
-    font-weight: 600;
+    font-weight: bold;
   }}
 
   #map {{
     flex-grow: 1;
     position: relative;
-    overflow: hidden;
   }}
+
   svg {{
     width: 100%;
     height: 100%;
   }}
+
   .area {{
-    fill: #b6cce5;
+    fill: #c6d7f2;
     stroke: #4d648d;
     stroke-width: 1;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: fill 0.2s;
   }}
+
   .area:hover {{
-    fill: #8db3dd;
-    stroke-width: 1.5;
+    fill: #9ebde2;
   }}
+
   .area.selected {{
     fill: #4d648d;
-    stroke: #1a2d5a;
+    stroke: #2b3b66;
   }}
 
   #tooltip {{
     position: fixed;
     padding: 5px 10px;
-    background: rgba(30, 60, 120, 0.95);
+    background: #2a3f7c;
     color: white;
     font-size: 13px;
-    border-radius: 5px;
-    pointer-events: none;
+    border-radius: 6px;
     display: none;
     z-index: 1000;
+    pointer-events: none;
   }}
 
   #info {{
     position: absolute;
-    right: 0;
-    top: 0;
-    width: 300px;
-    height: 100%;
-    background: #f0f3f8;
+    top: 30px;
+    right: 30px;
+    min-width: 280px;
+    max-width: 320px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     padding: 20px;
-    border-left: 1px solid #d9e2f3;
-    box-shadow: -2px 0 6px rgba(0,0,0,0.06);
-    transform: translateX(100%);
-    transition: transform 0.4s ease, opacity 0.4s ease;
     opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
     pointer-events: none;
     z-index: 20;
   }}
+
   #info.visible {{
-    transform: translateX(0);
     opacity: 1;
+    transform: translateY(0);
     pointer-events: auto;
   }}
+
   #info h3 {{
     margin-top: 0;
     font-size: 18px;
-    color: #2c3e70;
+    color: #1a2d5a;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 6px;
     margin-bottom: 12px;
-    border-bottom: 1px solid #c3d0e8;
-    padding-bottom: 4px;
   }}
-  #info .grid {{
+
+  .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    row-gap: 6px;
-    column-gap: 20px;
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    gap: 8px 20px;
   }}
-  #info.visible .grid {{
-    opacity: 1;
-  }}
+
   .label {{
     font-weight: 600;
-    color: #4d648d;
+    color: #3e4a66;
     white-space: nowrap;
   }}
+
   .value {{
     text-align: right;
     font-weight: 500;
-    color: #34495e;
+    color: #2c3e70;
     white-space: nowrap;
   }}
+
   .fonte {{
     grid-column: 1 / -1;
     font-size: 10px;
     color: #7f8caa;
-    margin-top: 12px;
     text-align: right;
+    margin-top: 10px;
     font-style: italic;
   }}
 </style>
@@ -196,7 +199,7 @@ html_code = f"""
 <body>
 <div id="sidebar">
   <h2>Municípios</h2>
-  <input id="search" type="search" placeholder="Buscar município..." />
+  <input id="search" type="text" placeholder="Buscar..." />
   <div id="list"></div>
 </div>
 
@@ -209,7 +212,7 @@ html_code = f"""
   <h3>Município</h3>
   <div class="grid">
     <div class="label">PIB 2021:</div> <div class="value" id="pib"></div>
-    <div class="label">% no PIB regional:</div> <div class="value" id="part"></div>
+    <div class="label">% PIB regional:</div> <div class="value" id="part"></div>
     <div class="label">PIB per capita:</div> <div class="value" id="percapita"></div>
     <div class="label">População:</div> <div class="value" id="pop"></div>
     <div class="label">Área:</div> <div class="value" id="area"></div>
@@ -273,10 +276,10 @@ function showInfo(name) {{
   info.classList.add("visible");
   info.querySelector("h3").textContent = name;
   info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace(".", ",") + "%" : "-";
+  info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
   info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
   info.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
+  info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
   info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
 }}
 
