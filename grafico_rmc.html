@@ -12,20 +12,22 @@
       background: linear-gradient(120deg, #f4f7fa, #e9eef4);
       overflow: hidden;
     }
+    /* Sidebar (legenda) */
     #sidebar {
       position: fixed;
       top: 0;
       left: 0;
       width: 240px;
-      height: 600px; /* fixa a altura */
+      height: 600px;
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(10px);
       border-right: 1px solid #cdd6e4;
-      padding: 16px;
+      padding: 16px 12px 16px 16px; /* menos padding à direita para evitar corte texto */
       overflow-y: auto;
       scroll-behavior: smooth;
       z-index: 10;
       box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+      box-sizing: border-box;
     }
     #sidebar::-webkit-scrollbar {
       width: 8px;
@@ -58,12 +60,15 @@
       background-color: white;
     }
     #list div {
-      padding: 7px 8px;
+      padding: 6px 10px; /* diminui um pouco para não cortar */
       border-radius: 5px;
       cursor: pointer;
       color: #2e466e;
       font-size: 13px;
       transition: background 0.2s;
+      white-space: nowrap; /* evita quebra de linha */
+      overflow: hidden;
+      text-overflow: ellipsis; /* ... para texto longo */
     }
     #list div:hover {
       background: rgba(44, 62, 112, 0.1);
@@ -73,12 +78,13 @@
       color: #1f2f45;
       font-weight: 600;
     }
+    /* Mapa */
     #map {
       position: fixed;
       top: 0;
       left: 240px;
-      width: calc(100% - 240px - 320px); /* sidebar + painel */
-      height: 600px; /* fixo */
+      width: calc(100% - 240px - 320px);
+      height: 600px;
       overflow: hidden;
       background: transparent;
       z-index: 5;
@@ -116,60 +122,62 @@
       z-index: 1000;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    /* Painel flutuante (3ª coluna) */
+    /* Painel botão flutuante no canto superior direito */
     #infoPanel {
       position: fixed;
       top: 20px;
       right: 20px;
-      width: 300px;
-      height: 560px; /* altura próxima do mapa */
-      background: rgba(255, 255, 255, 0.7);
+      max-width: 300px;
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: saturate(180%) blur(10px);
-      padding: 20px;
+      padding: 16px 20px;
       border-radius: 14px;
       box-shadow: 0 4px 20px rgba(44, 62, 112, 0.15);
       font-size: 14px;
       line-height: 1.5;
       color: #2c3e70;
-      overflow-y: auto;
       user-select: text;
       border: 1px solid rgba(44, 62, 112, 0.1);
       display: none;
       z-index: 50;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      display: flex;
-      flex-direction: column;
+      transition: opacity 0.3s ease;
+      /* Auto height, só o que precisar */
+      max-height: 80vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      cursor: default;
     }
     #infoPanel.visible {
-      display: flex;
-      transform: translateX(0);
+      display: block;
       opacity: 1;
     }
     #infoPanel h3 {
       margin: 0 0 12px;
-      flex-shrink: 0;
     }
-    #infoPanel .grid {
-      flex-grow: 1;
+    #infoPanel .grid > div {
+      margin-bottom: 8px;
       display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: 8px;
-      overflow-y: auto;
+      justify-content: space-between;
+      gap: 12px;
+      white-space: nowrap;
     }
     #infoPanel .label {
       font-weight: 600;
       color: #4d648d;
+      flex-shrink: 0;
     }
     #infoPanel .value {
       text-align: right;
       color: #2d3f54;
+      flex-grow: 1;
+      overflow-wrap: break-word;
+      word-break: break-word;
     }
     #infoPanel .fonte {
-      margin-top: auto;
       font-size: 11px;
       color: #7a8ba3;
       text-align: right;
+      margin-top: 16px;
     }
   </style>
 </head>
