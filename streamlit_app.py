@@ -39,8 +39,15 @@ html_code = f"""
 <title>Mapa Interativo RMC</title>
 <style>
   /* Reset básico e fonte */
-  * {{ margin:0; padding:0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }}
-  html, body, #root, #container {{ height: 100%; overflow: hidden; background: #f7faff; }}
+  * {{
+    margin:0; padding:0; box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }}
+  html, body, #root, #container {{
+    height: 100%;
+    overflow: hidden;
+    background: #f7faff;
+  }}
 
   #container {{
     display: flex;
@@ -49,7 +56,7 @@ html_code = f"""
     user-select: none;
   }}
 
-  /* Sidebar */
+  /* Sidebar - lista municípios */
   #sidebar {{
     width: 280px;
     background: #fff;
@@ -72,7 +79,6 @@ html_code = f"""
     border-color: #4d648d;
     box-shadow: 0 0 6px rgba(77,100,141,0.5);
   }}
-
   #municipio-list {{
     flex-grow: 1;
     overflow-y: auto;
@@ -102,7 +108,9 @@ html_code = f"""
     background: #e6f0ff;
     display: flex;
     flex-direction: column;
-    padding-left: -100px;
+    padding: 8px 8px 8px 8px;
+    /* largura ajustada para não ficar por baixo do painel info */
+    max-width: calc(100vw - 280px - 350px);
   }}
 
   svg {{
@@ -141,22 +149,22 @@ html_code = f"""
     z-index: 999;
   }}
 
-  /* Painel info fixo, minimalista */
+  /* Painel info fixo lateral direito */
   #info {{
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: saturate(180%) blur(8px);
+    width: 340px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: saturate(180%) blur(10px);
     border-radius: 14px;
     padding: 18px 22px;
-    max-width: 320px;
     font-size: 14px;
     color: #1a2d5a;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-    display: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
     user-select: text;
     line-height: 1.3;
+    display: none;
+    position: relative;
+    flex-shrink: 0;
   }}
   #info.visible {{
     display: block;
@@ -165,22 +173,26 @@ html_code = f"""
     margin-bottom: 14px;
     font-weight: 700;
     font-size: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }}
   .grid {{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px 18px;
+    gap: 10px 20px;
   }}
   .label {{
     font-weight: 600;
     color: #4d648d;
     white-space: nowrap;
+    user-select: none;
   }}
   .value {{
     text-align: right;
     font-weight: 500;
     color: #2c3e70;
-    white-space: nowrap;
+    overflow-wrap: break-word;
   }}
   .fonte {{
     grid-column: 1 / -1;
@@ -190,7 +202,6 @@ html_code = f"""
     color: #7f8caa;
     margin-top: 12px;
   }}
-
 </style>
 </head>
 <body>
@@ -202,18 +213,18 @@ html_code = f"""
   <section id="map-area">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-label="Mapa dos municípios"></svg>
     <div id="tooltip" role="tooltip" aria-hidden="true"></div>
-    <section id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
-      <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB:</div><div class="value" id="pib"></div>
-        <div class="label">% RMC:</div><div class="value" id="part"></div>
-        <div class="label">Per capita:</div><div class="value" id="percapita"></div>
-        <div class="label">População:</div><div class="value" id="pop"></div>
-        <div class="label">Área:</div><div class="value" id="area"></div>
-        <div class="label">Densidade:</div><div class="value" id="dens"></div>
-        <div class="fonte">Fonte: IBGE Cidades</div>
-      </div>
-    </section>
+  </section>
+  <section id="info" role="region" aria-live="polite" aria-label="Informações do município selecionado">
+    <h3>Município</h3>
+    <div class="grid">
+      <div class="label">PIB:</div><div class="value" id="pib"></div>
+      <div class="label">% RMC:</div><div class="value" id="part"></div>
+      <div class="label">Per capita:</div><div class="value" id="percapita"></div>
+      <div class="label">População:</div><div class="value" id="pop"></div>
+      <div class="label">Área:</div><div class="value" id="area"></div>
+      <div class="label">Densidade:</div><div class="value" id="dens"></div>
+      <div class="fonte">Fonte: IBGE Cidades</div>
+    </div>
   </section>
 </div>
 
@@ -227,11 +238,12 @@ const search = document.getElementById("search");
 const paths = {{}};
 let selected = null;
 
+// Coleta todas as coordenadas para calcular bounding box
 const coords = [];
 geo.features.forEach(f => {{
   const g = f.geometry;
   if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
-  else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
+  else g.geometry.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
 }});
 const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
 const minX = Math.min(...lons), maxX = Math.max(...lons);
@@ -256,8 +268,18 @@ function select(name) {{
   if (paths[name]) {{
     paths[name].classList.add("selected");
     showInfo(name);
+    // Destaca na lista e faz scroll para acompanhar
     const el = document.querySelector(`[data-name="${{name}}"]`);
-    if (el) el.classList.add('active');
+    if (el) {{
+      el.classList.add('active');
+      const container = list;
+      const containerHeight = container.clientHeight;
+      const elementTop = el.offsetTop;
+      const scrollTop = container.scrollTop;
+      // centraliza o item selecionado na área visível
+      const scrollTo = elementTop - containerHeight / 2 + el.offsetHeight / 2;
+      container.scrollTo({{ top: scrollTo, behavior: 'smooth' }});
+    }}
   }}
 }}
 
@@ -265,6 +287,7 @@ function showInfo(name) {{
   const f = geo.features.find(f => f.properties.name === name);
   if (!f) return;
   info.classList.add("visible");
+  info.querySelector("h3").textContent = name;
   info.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
   info.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
   info.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
@@ -284,6 +307,7 @@ geo.features.forEach(f => {{
   path.setAttribute("data-name", name);
   svg.appendChild(path);
   paths[name] = path;
+
   path.addEventListener("mousemove", e => {{
     tooltip.style.left = e.clientX + 10 + "px";
     tooltip.style.top = e.clientY - 25 + "px";
@@ -294,6 +318,7 @@ geo.features.forEach(f => {{
     tooltip.style.display = "none";
   }});
   path.addEventListener("click", () => select(name));
+
   // Adiciona município na lista lateral
   const div = document.createElement("div");
   div.textContent = name;
@@ -326,4 +351,4 @@ if (geo.features.length > 0) select(geo.features[0].properties.name);
 </html>
 """
 
-components.html(html_code, height=650, scrolling=False)
+components.html(html_code, height=700, scrolling=False)
