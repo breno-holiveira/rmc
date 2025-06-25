@@ -29,13 +29,15 @@ for _, row in gdf.iterrows():
 gj = {"type": "FeatureCollection", "features": features}
 gj_str = json.dumps(gj)
 
-# HTML com melhorias visuais modernas, suavidade e glassmorphism
+# IMPORTANTE: Escapar o JSON para inserir como string JS corretamente
+# Usar json.dumps para inserir entre aspas no JS
+
 html_code = f"""
 <!DOCTYPE html>
-<html lang=\"pt-BR\">
+<html lang="pt-BR">
 <head>
-  <meta charset=\"UTF-8\">
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RMC Interativo</title>
   <style>
     html, body {{
@@ -105,74 +107,74 @@ html_code = f"""
   </style>
 </head>
 <body>
-  <div id=\"sidebar\">
+  <div id="sidebar">
     <h2>Municípios</h2>
-    <input id=\"search\" placeholder=\"Buscar...\">
-    <div id=\"list\"></div>
+    <input id="search" placeholder="Buscar...">
+    <div id="list"></div>
   </div>
-  <div id=\"map\">
-    <svg viewBox=\"0 0 1000 950\" preserveAspectRatio=\"xMidYMid meet\"></svg>
-    <div id=\"tooltip\"></div>
-    <div id=\"info\">
+  <div id="map">
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="tooltip"></div>
+    <div id="info">
       <h3>Município</h3>
-      <div class=\"grid\">
-        <div class=\"label\">PIB 2021:</div><div class=\"value\" id=\"pib\"></div>
-        <div class=\"label\">% no PIB regional:</div><div class=\"value\" id=\"part\"></div>
-        <div class=\"label\">PIB per capita:</div><div class=\"value\" id=\"percapita\"></div>
-        <div class=\"label\">População:</div><div class=\"value\" id=\"pop\"></div>
-        <div class=\"label\">Área:</div><div class=\"value\" id=\"area\"></div>
-        <div class=\"label\">Densidade:</div><div class=\"value\" id=\"dens\"></div>
-        <div class=\"fonte\">Fonte: IBGE</div>
+      <div class="grid">
+        <div class="label">PIB 2021:</div><div class="value" id="pib"></div>
+        <div class="label">% no PIB regional:</div><div class="value" id="part"></div>
+        <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
+        <div class="label">População:</div><div class="value" id="pop"></div>
+        <div class="label">Área:</div><div class="value" id="area"></div>
+        <div class="label">Densidade:</div><div class="value" id="dens"></div>
+        <div class="fonte">Fonte: IBGE</div>
       </div>
     </div>
   </div>
   <script>
-    const geo = {gj_str};
+    const geo = JSON.parse({json.dumps(gj_str)});
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
     const info = document.getElementById("info");
     const list = document.getElementById("list");
     const search = document.getElementById("search");
-    const paths = {};
+    const paths = {{}};
     let selected = null;
 
     let coords = [];
-    geo.features.forEach(f => {
+    geo.features.forEach(f => {{
       const g = f.geometry;
       if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
       else g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
-    });
+    }});
     const lons = coords.map(c => c[0]);
     const lats = coords.map(c => c[1]);
     const minX = Math.min(...lons), maxX = Math.max(...lons);
     const minY = Math.min(...lats), maxY = Math.max(...lats);
 
-    function project([lon, lat]) {
+    function project([lon, lat]) {{
       const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
       const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
       return [x, y];
-    }
-    function polygonToPath(coords) {
+    }}
+    function polygonToPath(coords) {{
       return coords.map(c => project(c).join(",")).join(" ");
-    }
-    function select(name) {
-      if (selected) {
+    }}
+    function select(name) {{
+      if (selected) {{
         paths[selected].classList.remove("selected");
         [...list.children].forEach(d => d.classList.remove("active"));
-      }
+      }}
       selected = name;
-      if (paths[name]) {
+      if (paths[name]) {{
         paths[name].classList.add("selected");
-        [...list.children].forEach(div => {
-          if (div.dataset.name === name) {
+        [...list.children].forEach(div => {{
+          if (div.dataset.name === name) {{
             div.classList.add("active");
-            div.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
+            div.scrollIntoView({{ behavior: "smooth", block: "center" }});
+          }}
+        }});
         showInfo(name);
-      }
-    }
-    function showInfo(name) {
+      }}
+    }}
+    function showInfo(name) {{
       const f = geo.features.find(f => f.properties.name === name);
       if (!f) return;
       info.querySelector("h3").textContent = name;
@@ -183,8 +185,8 @@ html_code = f"""
       info.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
       info.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
       info.classList.add("visible");
-    }
-    geo.features.forEach(f => {
+    }}
+    geo.features.forEach(f => {{
       const name = f.properties.name;
       let d = "";
       if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
@@ -196,12 +198,12 @@ html_code = f"""
       svg.appendChild(path);
       paths[name] = path;
 
-      path.addEventListener("mousemove", e => {
+      path.addEventListener("mousemove", e => {{
         tooltip.style.left = (e.clientX + 10) + "px";
         tooltip.style.top = (e.clientY - 20) + "px";
         tooltip.textContent = name;
         tooltip.style.display = "block";
-      });
+      }});
       path.addEventListener("mouseleave", () => tooltip.style.display = "none");
       path.addEventListener("click", () => select(name));
 
@@ -210,17 +212,17 @@ html_code = f"""
       div.dataset.name = name;
       div.addEventListener("click", () => select(name));
       list.appendChild(div);
-    });
-    search.addEventListener("input", e => {
+    }});
+    search.addEventListener("input", e => {{
       const val = e.target.value.toLowerCase();
-      [...list.children].forEach(d => {
+      [...list.children].forEach(d => {{
         d.style.display = d.textContent.toLowerCase().includes(val) ? "block" : "none";
-      });
-    });
+      }});
+    }});
     if (geo.features.length > 0) select(geo.features[0].properties.name);
   </script>
 </body>
 </html>
 """
 
-st.components.v1.html(html_code, height=700, scrolling=False)
+st.components.v1.html(html_code, height=750, scrolling=False)
