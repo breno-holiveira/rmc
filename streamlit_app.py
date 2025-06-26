@@ -16,6 +16,14 @@ st.markdown(
         margin-top: 0.1rem;
         margin-bottom: 0.5rem;
     }
+    /* Texto introdutório */
+    .intro-text {
+        font-size: 16px;
+        max-width: 900px;
+        color: #34495e;
+        line-height: 1.5;
+        margin-bottom: 30px;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -23,6 +31,20 @@ st.markdown(
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+
+# Texto de introdução explicativo
+st.markdown(
+    """
+    <div class="intro-text">
+    Bem-vindo ao painel interativo de dados da Região Metropolitana de Campinas (RMC). Aqui você pode explorar indicadores econômicos e demográficos atualizados dos municípios que compõem a região. 
+
+    Utilize o mapa abaixo para selecionar um município e visualizar seus dados detalhados, como PIB, participação regional, população, área e densidade demográfica.
+
+    Este painel é uma ferramenta dinâmica para apoiar análises, estudos e tomada de decisão com base em informações oficiais e atualizadas. Explore, compare e descubra as características da RMC de forma intuitiva e visual.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Carregamento de dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
