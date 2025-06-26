@@ -1,88 +1,103 @@
 import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import json
-from streamlit_navigation_bar import st_navbar
 
-# CONFIGURAÇÃO DA PÁGINA
-st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
+# Configuração da página
+st.set_page_config(page_title="RMC Navegação", layout="wide", page_icon="📊")
 
-# ESTILO PERSONALIZADO PARA A BARRA
+# --- CSS para barra de navegação moderna ---
 st.markdown("""
     <style>
-    .st-navbar {
-        background: linear-gradient(to right, #ffffff, #f2f4f7);
+    .nav-container {
+        background: #f0f2f6;
         border-bottom: 1px solid #ddd;
-        padding: 12px 40px;
-        font-family: 'Segoe UI', sans-serif;
+        padding: 10px 30px;
         display: flex;
         gap: 30px;
+        font-family: 'Segoe UI', sans-serif;
         font-size: 16px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
     }
 
-    .st-navbar span {
+    .nav-item {
         color: #444;
-        padding-bottom: 4px;
-        transition: all 0.3s ease;
-        cursor: pointer;
+        text-decoration: none;
+        padding-bottom: 3px;
         border-bottom: 2px solid transparent;
+        transition: all 0.3s ease;
     }
 
-    .st-navbar span:hover {
+    .nav-item:hover {
+        border-bottom: 2px solid #8899aa;
         color: #2c3e70;
-        border-bottom: 2px solid #a6b2c3;
     }
 
-    .st-navbar span.active {
-        color: #2c3e70;
+    .nav-active {
         border-bottom: 2px solid #2c3e70;
         font-weight: 600;
+        color: #2c3e70;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# BARRA DE NAVEGAÇÃO
-page = st_navbar(["Início", "Indicadores", "Mapa", "Sobre"])
-st.write("")  # Pequeno espaçamento abaixo da barra
+# --- Função de navegação via query param ---
+def navigation():
+    try:
+        return st.experimental_get_query_params().get('p', ['home'])[0]
+    except:
+        return 'home'
 
-# TÍTULO E TEXTO INICIAL
-st.title("RMC Data 📊")
-st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+# --- Menu fixo personalizado ---
+current = navigation()
+menu_items = {
+    "home": "Início",
+    "results": "Resultados",
+    "analysis": "Análise",
+    "examples": "Exemplos",
+    "logs": "Logs",
+    "verify": "Verificação",
+    "config": "Configurações"
+}
 
-st.markdown("""
-A Região Metropolitana de Campinas (RMC), formada por 20 municípios, representa **3,07%** do PIB nacional.  
-Criada pela Lei Complementar nº 870 de 2000, a RMC é uma das regiões mais dinâmicas do Brasil.
+menu_html = '<div class="nav-container">'
+for key, label in menu_items.items():
+    active = 'nav-active' if current == key else ''
+    menu_html += f'<a class="nav-item {active}" href="/?p={key}">{label}</a>'
+menu_html += '</div>'
+st.markdown(menu_html, unsafe_allow_html=True)
 
-Em 2021, o PIB da RMC foi de **R$ 266,8 bilhões**, enquanto o PIB brasileiro totalizou **R$ 8,7 trilhões**.
-""")
+# --- Conteúdo de cada página ---
+if current == "home":
+    st.title("🏠 Página Inicial")
+    st.write("Bem-vindo à visualização de dados da Região Metropolitana de Campinas.")
 
-# CARREGAMENTO DOS DADOS
-gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-if gdf.crs != 'EPSG:4326':
-    gdf = gdf.to_crs('EPSG:4326')
-gdf = gdf.sort_values(by='NM_MUN')
+elif current == "results":
+    st.title("📋 Resultados")
+    for item in range(25):
+        st.write(f"Resultado {item+1}")
 
-df = pd.read_excel("dados_rmc.xlsx")
-df.set_index("nome", inplace=True)
+elif current == "analysis":
+    st.title("📊 Análise de Dados")
+    x = st.number_input("Digite X")
+    y = st.number_input("Digite Y")
+    st.success(f"Soma: {x + y}")
 
-# CRIAÇÃO DO GEOJSON
-features = []
-for _, row in gdf.iterrows():
-    nome = row["NM_MUN"]
-    geom = row["geometry"].__geo_interface__
-    props = df.loc[nome].to_dict() if nome in df.index else {}
-    props["name"] = nome
-    features.append({"type": "Feature", "geometry": geom, "properties": props})
+elif current == "examples":
+    st.title("💡 Exemplos")
+    st.info("Aqui você poderá explorar exemplos de uso do sistema.")
 
-gj = {"type": "FeatureCollection", "features": features}
-geojson_js = json.dumps(gj)
+elif current == "logs":
+    st.title("🗂 Logs")
+    st.write("Exibição de logs completos.")
 
-# INSERÇÃO DO GEOJSON NO HTML
-with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-    html_template = f.read()
+elif current == "verify":
+    st.title("🔎 Verificação")
+    st.warning("Verificando dados... aguarde.")
 
-html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+elif current == "config":
+    st.title("⚙️ Configurações")
+    st.write("Ajustes gerais do sistema.")
 
-# EXIBIÇÃO DO MAPA INTERATIVO
-st.components.v1.html(html_code, height=620, scrolling=False)
+else:
+    st.title("Página não encontrada")
+    st.error("Verifique a URL ou selecione um item do menu.")
