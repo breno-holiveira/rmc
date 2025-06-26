@@ -40,12 +40,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Função de navegação via query param ---
+# --- Função de navegação via query param atualizada ---
 def navigation():
-    try:
-        return st.experimental_get_query_params().get('p', ['home'])[0]
-    except:
-        return 'home'
+    params = st.query_params
+    if 'p' in params and len(params['p']) > 0:
+        return params['p'][0]
+    return 'home'
 
 # --- Menu fixo personalizado ---
 current = navigation()
