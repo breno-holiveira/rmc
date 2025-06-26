@@ -3,129 +3,76 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-st.set_page_config(page_title="gRMC Data", layout="wide")
+st.set_page_config(page_title="RMC Data", layout="wide")
 
+# CSS para remover sidebar, header e footer e ajustar padding
 st.markdown("""
 <style>
-/* Remover sidebar, header e footer */
-[data-testid="stSidebar"], header, footer {
+/* Esconder barra lateral completamente */
+[data-testid="stSidebar"] {
     display: none !important;
 }
+
+/* Esconder header (inclui GitHub fork e demais) */
+header {
+    display: none !important;
+}
+
+/* Esconder rodapé */
+footer {
+    display: none !important;
+}
+
+/* Ajustar padding do container principal para cima */
 .block-container {
     padding-top: 0rem !important;
-}
-
-/* Container das abas - só container das abas (st.tabs) */
-div[data-testid="stTabs"] > div > div {
-    padding: 8px 20px;
-    display: flex;
-    gap: 16px;
-    border-bottom: 1.5px solid #ddd;
-    background-color: white;
-}
-
-/* Cada aba dentro do st.tabs */
-div[data-testid="stTabs"] > div > div > div {
-    color: #444 !important;
-    font-weight: 600 !important;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-    font-size: 18px !important; /* maior fonte */
-    padding: 10px 28px !important;
-    border-radius: 8px 8px 0 0 !important;
-    user-select: none !important;
-    cursor: pointer !important;
-    border: 1.5px solid #ccc !important; /* contorno cinza claro sempre visível */
-    border-bottom: none !important;
-    background-color: white !important;
-    box-shadow: none !important;
-    transition: none !important; /* sem transição */
-}
-
-/* Aba ativa */
-div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    color: #0d47a1 !important; /* azul escuro */
-    border-color: #0d47a1 !important; /* contorno azul */
-    background-color: white !important;
-    font-weight: 700 !important;
-    box-shadow: 0 4px 12px rgb(13 71 161 / 0.15) !important;
-}
-
-/* Remove underline padrão do Streamlit nas abas */
-div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
-    border-bottom: none !important;
-    box-shadow: none !important;
-}
-
-/* Remove linhas extras em abas inativas */
-div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]) {
-    border-bottom: none !important;
-}
-
-/* Sem efeito hover - mantém cores constantes */
-div[data-testid="stTabs"] > div > div > div:hover {
-    color: #444 !important;
-    background-color: white !important;
-    border-color: #ccc !important;
-    box-shadow: none !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-abas = st.tabs(["Início", "PIB por Município", "Demografia", "Comparativo"])
+# Exemplo de navegação com abas logo no topo
+abas = st.tabs(["Início", "Página 1", "Página 2", "Página 3"])
 
-@st.cache_data
-def carregar_df():
-    df = pd.read_excel('dados_rmc.xlsx')
-    df.set_index("nome", inplace=True)
-    return df
+with abas[0]:
+    st.title("RMC Data")
+    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-@st.cache_data
-def carregar_gdf():
+    # Exemplo de carregamento de dados e gráfico simplificado
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != 'EPSG:4326':
         gdf = gdf.to_crs('EPSG:4326')
-    return gdf.sort_values(by='NM_MUN')
+    gdf = gdf.sort_values(by='NM_MUN')
 
-@st.cache_data
-def construir_geojson():
-    gdf = carregar_gdf()
-    df = carregar_df()
+    df = pd.read_excel('dados_rmc.xlsx')
+    df.set_index("nome", inplace=True)
+
     features = []
     for _, row in gdf.iterrows():
         nome = row["NM_MUN"]
         geom = row["geometry"].__geo_interface__
         props = df.loc[nome].to_dict() if nome in df.index else {}
         props["name"] = nome
-        features.append({
-            "type": "Feature",
-            "geometry": geom,
-            "properties": props
-        })
-    return json.dumps({"type": "FeatureCollection", "features": features})
+        features.append({"type": "Feature", "geometry": geom, "properties": props})
 
-@st.cache_resource
-def carregar_html_base():
+    gj = {"type": "FeatureCollection", "features": features}
+    geojson_js = json.dumps(gj)
+
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-        return f.read()
+        html_template = f.read()
 
-with abas[0]:
-    st.title("RMC Data")
-    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
-
-    geojson_js = construir_geojson()
-    html_template = carregar_html_base()
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 with abas[1]:
-    st.header("PIB por Município")
-    st.dataframe(carregar_df()[["PIB (2021)"]])
+    st.header("Página 1")
+    st.write("Conteúdo da Página 1")
 
 with abas[2]:
-    st.header("Demografia")
-    st.dataframe(carregar_df()[["populacao", "área", "densidade"]])
+    st.header("Página 2")
+    st.write("Conteúdo da Página 2")
 
 with abas[3]:
-    st.header("Comparativo")
-    df = carregar_df()
-    st.bar_chart(df["PIB (2021)"].sort_values(ascending=False))
+    st.header("Página 3")
+    st.write("Conteúdo da Página 3")
