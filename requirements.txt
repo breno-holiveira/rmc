@@ -9,3 +9,4 @@ plotly
 openpyxl
 matplotlib
 streamlit-community-navigation-bar
+streamlit-navigation-bar>=3.3.0
