@@ -14,49 +14,50 @@
       overflow: hidden;
       user-select: none;
     }
+
+    /* Container principal: ocupa toda a tela */
     #map {
-      position: relative;
-      width: 100vw;
+      display: flex;
       height: 100vh;
-      overflow: hidden;
-    }
-    svg {
-      width: 100%;
-      height: 100%;
-      display: block;
+      width: 100vw;
+      box-sizing: border-box;
+      padding: 20px; /* espaço ao redor interno */
+      gap: 20px;
     }
 
-    /* Caixa seleção dentro do mapa, canto superior esquerdo */
-    #top-bar {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 10;
+    /* Lado esquerdo: conteúdo (label + select + painel info) empilhados */
+    #sidebar {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(8px);
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      flex-direction: column;
+      width: 320px; /* largura fixa para sidebar */
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(14px);
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      color: #1f2f45;
       user-select: text;
+      overflow-y: auto;
     }
-    #top-bar label {
+
+    #sidebar label {
       font-weight: 600;
       font-size: 14px;
-      white-space: nowrap;
+      margin-bottom: 8px;
+      user-select: text;
     }
+
     #municipio-select {
-      padding: 6px 10px;
+      padding: 8px 12px;
       border-radius: 8px;
       border: 1.5px solid #7a8ba3;
       background: #fff;
-      min-width: 180px;
       font-size: 14px;
       color: #2c3e70;
       cursor: pointer;
       user-select: text;
+      margin-bottom: 20px;
       transition: border-color 0.3s;
     }
     #municipio-select:hover, #municipio-select:focus {
@@ -64,31 +65,17 @@
       outline: none;
     }
 
-    /* Painel de info dentro do mapa, canto superior direito */
     #infoPanel {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 300px;
-      max-height: calc(100vh - 40px);
-      background: rgba(255,255,255,0.25);
-      backdrop-filter: blur(14px);
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-      padding: 20px 24px;
-      font-size: 14px;
-      color: #1f2f45;
+      flex-grow: 1; /* ocupa espaço restante */
       overflow-y: auto;
-      display: none;
-      user-select: text;
-      z-index: 10;
     }
-    #infoPanel.visible { display: block; }
+
     #infoPanel h3 {
       margin-top: 0;
       font-size: 20px;
       color: #2c3e70;
       user-select: text;
+      margin-bottom: 16px;
     }
     #infoPanel .grid {
       display: grid;
@@ -100,6 +87,7 @@
       font-weight: 600;
       color: #4d648d;
       user-select: text;
+      align-self: center;
     }
     .value {
       text-align: right;
@@ -116,9 +104,6 @@
       user-select: none;
     }
     #closeBtn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
       background: rgba(44,62,112,0.2);
       border: none;
       border-radius: 50%;
@@ -130,10 +115,23 @@
       color: #2c3e70;
       user-select: none;
       transition: background 0.3s;
+      float: right;
+      margin-top: -10px;
+      margin-bottom: 10px;
     }
     #closeBtn:hover {
       background: rgba(44,62,112,0.4);
       color: white;
+    }
+
+    /* Lado direito: mapa SVG ocupa o resto */
+    svg {
+      flex-grow: 1;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      width: auto;
+      height: 100%;
+      display: block;
     }
 
     /* Polígonos do mapa */
@@ -164,7 +162,7 @@
       border-radius: 5px;
       display: none;
       pointer-events: none;
-      z-index: 20;
+      z-index: 100;
       user-select: none;
       white-space: nowrap;
     }
@@ -173,30 +171,30 @@
 <body>
 
   <div id="map">
-    <div id="top-bar" role="region" aria-label="Seleção de município">
+    <div id="sidebar" role="region" aria-label="Painel de seleção e informações do município">
       <label for="municipio-select">Selecione um município ou clique no mapa:</label>
       <select id="municipio-select" aria-describedby="selectHelp">
         <option value="" selected disabled>Selecione...</option>
       </select>
+
+      <aside id="infoPanel" role="region" aria-live="polite" aria-label="Informações do município">
+        <button id="closeBtn" aria-label="Fechar painel de informações">&times;</button>
+        <h3>Município</h3>
+        <div class="grid">
+          <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
+          <div class="label">% PIB regional:</div><div class="value" id="part"></div>
+          <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
+          <div class="label">População:</div><div class="value" id="pop"></div>
+          <div class="label">Área:</div><div class="value" id="area"></div>
+          <div class="label">Densidade:</div><div class="value" id="dens"></div>
+        </div>
+        <div class="fonte">Fonte: IBGE</div>
+      </aside>
     </div>
 
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-label="Mapa interativo da Região Metropolitana de Campinas"></svg>
 
     <div id="tooltip" role="tooltip"></div>
-
-    <aside id="infoPanel" role="region" aria-live="polite" aria-label="Informações do município">
-      <button id="closeBtn" aria-label="Fechar painel de informações">&times;</button>
-      <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
-        <div class="label">% PIB regional:</div><div class="value" id="part"></div>
-        <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-        <div class="label">População:</div><div class="value" id="pop"></div>
-        <div class="label">Área:</div><div class="value" id="area"></div>
-        <div class="label">Densidade:</div><div class="value" id="dens"></div>
-      </div>
-      <div class="fonte">Fonte: IBGE</div>
-    </aside>
   </div>
 
   <script>
@@ -220,7 +218,6 @@
     const minX = Math.min(...lons), maxX = Math.max(...lons);
     const minY = Math.min(...lats), maxY = Math.max(...lats);
 
-    // Função de projeção simples para ajustar mapa dentro do SVG
     function project([lon, lat]) {
       const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
       const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
@@ -302,6 +299,12 @@
       selected = null;
       selectMunicipio.value = "";
     });
+
+    // Seleciona primeiro município ao carregar
+    if (geo.features.length > 0) {
+      selectMunicipio.value = geo.features[0].properties.name;
+      select(geo.features[0].properties.name);
+    }
   </script>
 </body>
 </html>
