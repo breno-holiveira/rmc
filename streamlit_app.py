@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initial_sidebar_state="expanded")
 st.markdown(
     """
     <style>
@@ -21,8 +21,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("RMC Data")
-st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+st.title("RMC Data 📊")
+st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
 # Carregamento de dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
