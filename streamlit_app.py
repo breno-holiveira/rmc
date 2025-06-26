@@ -49,17 +49,17 @@ st.markdown(
         display: flex;
         gap: 16px;
         padding: 14px 28px;
-        background: rgba(15, 33, 64, 0.85); /* azul escuro translúcido */
+        background: rgba(20, 35, 55, 0.9); /* azul escuro translúcido discreto */
         border-radius: 14px;
         margin-bottom: 24px;
-        box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
+        box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
         user-select: none;
     }
 
     /* Abas individuais */
     div[role="tablist"] > button {
         background: transparent !important;
-        color: #a7c0e8 !important;  /* azul claro */
+        color: #a0b8d9 !important;  /* azul claro suave */
         border: none !important;
         border-bottom: 3.5px solid transparent !important;
         font-weight: 600 !important;
@@ -73,37 +73,42 @@ st.markdown(
         cursor: pointer;
     }
 
+    /* Remove a barra laranja padrão da aba ativa */
+    div[role="tablist"] > button[aria-selected="true"] {
+        border-bottom-color: transparent !important;
+    }
+
     /* Aba ativa */
     div[role="tablist"] > button[aria-selected="true"] {
-        color: #4a90e2 !important; /* azul médio */
-        border-bottom-color: #4a90e2 !important;
-        background-color: rgba(74, 144, 226, 0.12) !important;
+        color: #3f5c85 !important; /* azul médio escuro */
+        border-bottom-color: #3f5c85 !important;
+        background-color: rgba(63, 92, 133, 0.14) !important;
         font-weight: 700 !important;
-        box-shadow: 0 3px 8px rgb(74 144 226 / 0.25);
+        box-shadow: 0 3px 8px rgb(63 92 133 / 0.22);
     }
 
     /* Hover abas não ativas */
     div[role="tablist"] > button:not([aria-selected="true"]):hover {
-        color: #7aaefc !important; /* azul um pouco mais claro */
-        background-color: rgba(122, 174, 252, 0.1) !important;
-        border-bottom-color: #7aaefc !important;
+        color: #5a7ca6 !important; /* azul médio suave */
+        background-color: rgba(90, 124, 166, 0.1) !important;
+        border-bottom-color: #5a7ca6 !important;
     }
 
     /* Conteúdo da aba */
     .css-1d391kg > div[role="tabpanel"] {
-        background-color: #f7faff !important;  /* fundo azul bem claro */
+        background-color: #f2f6fb !important;  /* fundo azul muito claro */
         border-radius: 0 14px 14px 14px !important;
         padding: 30px 36px !important;
-        box-shadow: 0 6px 24px rgb(74 144 226 / 0.15);
-        border: 1.5px solid rgba(74, 144, 226, 0.15) !important;
+        box-shadow: 0 6px 20px rgb(63 92 133 / 0.12);
+        border: 1.5px solid rgba(63, 92, 133, 0.12) !important;
         margin-bottom: 48px;
     }
 
     /* Fonte geral */
     html, body, .block-container {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #1a2738;
-        background-color: #e9f0fc;
+        color: #223344;
+        background-color: #e8edf4;
     }
     </style>
     """,
