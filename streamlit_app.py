@@ -36,12 +36,14 @@ def carregar_html_template():
 
 html_template = carregar_html_template()
 
+# CSS customizado para o menu de abas
 st.markdown(
     """
     <style>
-    /* Remove borda padrão das tabs */
-    .css-1d391kg .st-cXcYtU { 
-        border-bottom: none !important;
+    /* Remove a borda laranja padrão das tabs do Streamlit */
+    div[role="tablist"] > button[aria-selected="true"] {
+        border-bottom-color: transparent !important;
+        box-shadow: none !important;
     }
 
     /* Container das abas */
@@ -73,12 +75,7 @@ st.markdown(
         cursor: pointer;
     }
 
-    /* Remove a barra laranja padrão da aba ativa */
-    div[role="tablist"] > button[aria-selected="true"] {
-        border-bottom-color: transparent !important;
-    }
-
-    /* Aba ativa */
+    /* Aba ativa com destaque azul sóbrio */
     div[role="tablist"] > button[aria-selected="true"] {
         color: #3f5c85 !important; /* azul médio escuro */
         border-bottom-color: #3f5c85 !important;
@@ -115,6 +112,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Criando as abas
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
