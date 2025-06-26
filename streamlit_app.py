@@ -8,7 +8,9 @@ st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initi
 st.title("RMC Datja 📊")
 st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
-st.markdown('A Região Metropolitana de Campinas foi criada através da Lei Complementar nº 870, de 19 de junho de 2000, do estado de São Paulo sendo constituida por 20 municípios. Em 2021, a região apresentou um PIB de 266,8 bilhões de reais, representando aproximadamente 3,07% do Produto Interno Bruto brasileiro.')
+st.markdown('A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituida por 20 municípios. Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano.')
+
+st.markdown('Em 2020, o Instituo Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras.')
 
 # Carregamento de dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
