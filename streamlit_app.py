@@ -1,21 +1,18 @@
 import streamlit as st
 
 st.set_page_config(layout="wide")
+st.markdown("<style>div[data-testid='stSidebar']{display:none !important;}</style>", unsafe_allow_html=True)
 
-# Oculta sidebar (mas deixa funcional)
-st.markdown("""
-<style>
-[data-testid="stSidebar"] {visibility: hidden;}
-</style>
-""", unsafe_allow_html=True)
+tabs = st.tabs(["Início", "Página 1", "Página 2"])
 
-page = st.sidebar.radio("Escolha a página:", ["Início", "Página 1", "Página 2"])
-
-st.write(f"Você está na página: **{page}**")
-
-if page == "Início":
+with tabs[0]:
+    st.title("Início")
     st.write("Conteúdo da página inicial.")
-elif page == "Página 1":
+
+with tabs[1]:
+    st.title("Página 1")
     st.write("Conteúdo da página 1.")
-else:
+
+with tabs[2]:
+    st.title("Página 2")
     st.write("Conteúdo da página 2.")
