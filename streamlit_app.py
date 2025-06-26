@@ -4,53 +4,49 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Ajuste básico de estilo no dicionário styles
 styles = {
     "nav": {
         "background-color": "royalblue",
         "justify-content": "left",
         "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",           # Fonte menor e mais legível
-        "padding": "0 8px",            # Menor padding horizontal para não ficar esticado
-        "height": "40px",              # Altura um pouco menor
+        "font-size": "14px",
+        "padding": "0 8px",
+        "height": "40px",
         "align-items": "center",
         "box-shadow": "0 2px 5px rgba(0,0,0,0.1)",
         "border-radius": "0 0 8px 8px",
     },
     "span": {
         "color": "white",
-        "padding": "6px 10px",         # Padding menor para deixar compacto
-        "font-weight": "400",          # Fonte normal (sem negrito)
+        "padding": "6px 10px",
+        "font-weight": "400",
         "user-select": "none",
     },
     "active": {
         "background-color": "white",
         "color": "var(--text-color)",
-        "font-weight": "400",          # Removido negrito no ativo
+        "font-weight": "400",
         "padding": "6px 10px",
         "border-radius": "6px",
         "user-select": "none",
     },
     "img": {
-        "display": "none",             # Sem ícone
+        "display": "none",
     }
 }
 
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    "open_new_tab": False,             # Mantém navegação na mesma aba
+    # Removido 'open_new_tab'
 }
 
-# Páginas do menu
 pages = ["Inicio", "Documentation", "Examples", "Community", "About"]
 
 page = st_navbar(pages, styles=styles, options=options)
 
-# Conteúdo das páginas
 if page == "Inicio":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
