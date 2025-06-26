@@ -5,6 +5,11 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initial_sidebar_state="expanded")
 
+from streamlit_navigation_bar import st_navbar
+
+page = st_navbar(["Home", "Documentation", "Examples", "Community", "About"])
+st.write(page)
+
 st.title("RMC Data 📊")
 st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
