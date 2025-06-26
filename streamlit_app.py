@@ -5,10 +5,10 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# CSS para estilizar a barra de abas e remover sidebar/header
+# CSS minimalista só para a barra das abas
 st.markdown("""
 <style>
-/* Remove barra lateral, header e footer */
+/* Remove sidebar, header e footer */
 [data-testid="stSidebar"], header, footer {
     display: none !important;
 }
@@ -16,41 +16,41 @@ st.markdown("""
     padding-top: 0rem !important;
 }
 
-/* Container das abas */
+/* Container das abas: fundo leve, borda inferior suave */
 div[data-testid="stTabs"] > div > div {
-    background-color: #f97316;  /* laranja vibrante */
-    padding: 8px 16px;
-    border-radius: 8px;
+    background-color: #fff7ed;  /* laranja muito suave e clarinho */
+    padding: 6px 12px;
+    border-bottom: 1.5px solid #fbbf24; /* laranja amarelado claro */
+    border-radius: 0 0 8px 8px;
     display: flex;
-    gap: 10px;
-    box-shadow: 0 3px 10px rgb(249 115 22 / 0.5);
+    gap: 12px;
 }
 
-/* Cada botão da aba */
+/* Cada aba: texto laranja escuro, sem fundo */
 div[data-testid="stTabs"] > div > div > div {
-    color: white;
+    color: #b45309;  /* laranja escuro */
     font-weight: 600;
-    padding: 8px 20px;
-    border-radius: 6px;
+    padding: 6px 18px;
+    border-radius: 6px 6px 0 0;
     user-select: none;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background-color 0.2s ease, color 0.2s ease;
     cursor: pointer;
 }
 
-/* Aba ativa */
+/* Aba ativa: fundo branco, texto laranja vivo, sombra discreta */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    background-color: #c2410c;  /* laranja escuro */
-    box-shadow: 0 0 8px rgb(156 40 0 / 0.8);
-    color: #fff;
+    background-color: #fff;
+    color: #ea580c;  /* laranja vivo */
+    box-shadow: 0 4px 8px rgb(234 88 12 / 0.25);
 }
 
 /* Hover nas abas não ativas */
 div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]):hover {
-    background-color: #ea580c;  /* laranja médio */
-    color: #fff;
+    color: #d97706;  /* laranja médio */
+    background-color: #fff3e0; /* fundo bem suave no hover */
 }
 
-/* Remove linha laranja default do tab ativo */
+/* Remove linha padrão da aba ativa */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
     border-bottom: none !important;
     box-shadow: none !important;
