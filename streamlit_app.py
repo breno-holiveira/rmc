@@ -3,16 +3,28 @@ import streamlit as st
 st.set_page_config(layout="wide")
 st.markdown("<style>div[data-testid='stSidebar']{display:none !important;}</style>", unsafe_allow_html=True)
 
-page = st.selectbox("Selecione a página", ["Início", "Página 1", "Página 2"])
+if "page" not in st.session_state:
+    st.session_state.page = "Início"
 
-if page == "Início":
-    st.title("Início")
+col1, col2, col3 = st.columns([1,1,1])
+
+with col1:
+    if st.button("Início"):
+        st.session_state.page = "Início"
+
+with col2:
+    if st.button("Página 1"):
+        st.session_state.page = "Página 1"
+
+with col3:
+    if st.button("Página 2"):
+        st.session_state.page = "Página 2"
+
+st.write(f"Você está na página: **{st.session_state.page}**")
+
+if st.session_state.page == "Início":
     st.write("Conteúdo da página inicial.")
-
-elif page == "Página 1":
-    st.title("Página 1")
+elif st.session_state.page == "Página 1":
     st.write("Conteúdo da página 1.")
-
 else:
-    st.title("Página 2")
     st.write("Conteúdo da página 2.")
