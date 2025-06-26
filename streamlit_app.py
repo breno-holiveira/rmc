@@ -12,21 +12,15 @@ st.set_page_config(page_title="RMC Data", layout="wide")
 # Remove barra lateral padrão
 st.markdown("""
 <style>
-/* Oculta barra lateral padrão */
 div[data-testid="stSidebar"] {display:none !important;}
-/* Ajusta área principal para ocupar 100% da largura */
 div[data-testid="stAppViewContainer"] > .main > div:first-child {
     max-width: 100% !important;
     padding-left: 1rem !important;
 }
-
-/* Barra de navegação fixa no topo */
 .navbar {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: #ff6600; /* laranja vibrante */
+    top: 0; left: 0; right: 0;
+    background-color: #ff6600;
     padding: 12px 32px;
     display: flex;
     gap: 20px;
@@ -54,8 +48,6 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
     box-shadow: 0 0 8px #cc5200;
     color: white;
 }
-
-/* Espaço para o conteúdo abaixo da navbar */
 .content {
     padding-top: 70px;
     max-width: 1200px;
@@ -71,30 +63,7 @@ if "page" not in st.session_state:
 def set_page(page_name):
     st.session_state.page = page_name
 
-# Renderiza navbar com botões
-cols = st.columns([1,1,1,1])
-with cols[0]:
-    if st.button("Início", key="home_btn", on_click=set_page, args=("home",), 
-                 type="primary" if st.session_state.page=="home" else "secondary"):
-        pass
-with cols[1]:
-    if st.button("Página 1", key="pag1_btn", on_click=set_page, args=("pag1",),
-                 type="primary" if st.session_state.page=="pag1" else "secondary"):
-        pass
-with cols[2]:
-    if st.button("Página 2", key="pag2_btn", on_click=set_page, args=("pag2",),
-                 type="primary" if st.session_state.page=="pag2" else "secondary"):
-        pass
-with cols[3]:
-    if st.button("Página 3", key="pag3_btn", on_click=set_page, args=("pag3",),
-                 type="primary" if st.session_state.page=="pag3" else "secondary"):
-        pass
-
-# OBS: Como st.button não aceita class styling direto, vamos ajustar o CSS pra "ativar" visual baseado no session_state.
-# Porém, botão do Streamlit não suporta class ativa fácil, então vamos usar workaround com javascript abaixo para melhorar.
-
-# Vamos fazer uma navbar custom via HTML + JS pra ativar botão ativo e estética exata laranja:
-
+# Barra fixa em HTML + JS para trocar página e ativar botão
 navbar_html = f"""
 <div class="navbar">
     <button id="btn-home" {'class="active"' if st.session_state.page == "home" else ""}>Início</button>
@@ -118,40 +87,37 @@ function setActive(page) {{
     buttons[page].classList.add("active");
 }}
 
-// Envia evento para Streamlit
+// Envia evento para Streamlit via window.postMessage
 for (const [key, btn] of Object.entries(buttons)) {{
     btn.onclick = () => {{
         window.parent.postMessage({{func: "setPage", page: key}}, "*");
         setActive(key);
     }};
-}}
+}};
 </script>
 """
 
 st.components.v1.html(navbar_html, height=60)
 
-# Escuta o evento postMessage vindo do JS para trocar a página via streamlit
-import streamlit.components.v1 as components
-
-components.html("""
+# JS que escuta o postMessage para atualizar st.session_state.page
+st.components.v1.html("""
 <script>
-window.addEventListener("message", (event) => {{
-    if (event.data.func === "setPage") {{
+window.addEventListener("message", (event) => {
+    if(event.data.func === "setPage"){
         window.parent.location.href = "?page=" + event.data.page;
-    }}
-}});
+    }
+});
 </script>
 """, height=0)
 
-# Atualiza a página a partir do parâmetro URL (query param)
+# Atualiza página a partir do query param (parâmetro URL)
 page = st.experimental_get_query_params().get("page", ["home"])[0]
-
 if page != st.session_state.page:
     st.session_state.page = page
 
-# Espaço para conteúdo
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
+# Conteúdo dinâmico
 if st.session_state.page == "home":
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
