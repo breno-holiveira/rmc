@@ -5,7 +5,7 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initial_sidebar_state="expanded")
 
-st.title("RMC Datja 📊")
+st.title("RMC Data 📊")
 st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
 st.markdown('A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituida por 20 municípios. Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano.')
