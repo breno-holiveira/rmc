@@ -8,7 +8,7 @@ st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initi
 st.title("RMC Data 📊")
 st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
-st.markdown('A Região Metropolitana de Campinas foi criada através da Lei Complementar nº 870, de 19 de junho de 2000, do estado de São Paulo. A RMC é constituida por 20 municípios, e  '
+st.markdown('A Região Metropolitana de Campinas foi criada através da Lei Complementar nº 870, de 19 de junho de 2000, do estado de São Paulo. A RMC é constituida por 20 municípios, e ')
 
 # Carregamento de dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
