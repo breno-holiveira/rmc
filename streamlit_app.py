@@ -4,39 +4,25 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Configurações da página
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Página ativa atual (armazenada em estado)
-if "current_page" not in st.session_state:
-    st.session_state.current_page = "Home"
-
-# Estilo profissionalizado da barra de navegação com "logo" texto
+# Estilo idêntico ao exemplo com `cubes.svg`
 styles = {
     "nav": {
-        "background-color": "#0d1f3c",
-        "padding": "0.6rem 2rem",
-        "justify-content": "center",
-        "font-family": "'Segoe UI', 'Roboto', sans-serif",
-        "font-size": "16px",
-        "border-radius": "0 0 16px 16px",
-        "box-shadow": "0 4px 12px rgba(0, 0, 0, 0.25)",
-        "position": "relative",
+        "background-color": "royalblue",
+        "justify-content": "left",
     },
     "span": {
-        "color": "#ffffff",
-        "padding": "10px 18px",
-        "transition": "background-color 0.25s, color 0.25s",
-        "border-radius": "10px",
+        "color": "white",
+        "padding": "14px",
     },
     "active": {
-        "background-color": "#ff7200",
-        "color": "white",
-        "font-weight": "600",
-        "padding": "10px 18px",
-        "border-radius": "10px",
-        "box-shadow": "0 0 6px rgba(255,114,0,0.5)",
-    },
+        "background-color": "white",
+        "color": "var(--text-color)",
+        "font-weight": "normal",
+        "padding": "14px",
+    }
 }
 
 options = {
@@ -44,36 +30,11 @@ options = {
     "show_sidebar": False,
 }
 
-# Logo textual clicável no topo esquerdo
-st.markdown("""
-<style>
-.logo-text {
-    position: absolute;
-    top: 0.65rem;
-    left: 2rem;
-    font-size: 1.4rem;
-    font-family: 'Segoe UI', 'Roboto', sans-serif;
-    color: white;
-    font-weight: 600;
-    z-index: 10000;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-.logo-text:hover {
-    color: #ff7200;
-}
-</style>
-<a href="?nav=Home"><div class="logo-text">RMC DATA</div></a>
-""", unsafe_allow_html=True)
-
-# Barra de navegação
+# Definir páginas
 pages = ["Home", "Documentation", "Examples", "Community", "About"]
 page = st_navbar(pages, styles=styles, options=options)
 
-# Atualiza estado ao mudar aba
-st.session_state.current_page = page
-
-# Lógica de exibição das páginas
+# Lógica de conteúdo conforme a aba selecionada
 if page == "Home":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -86,7 +47,6 @@ if page == "Home":
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
 
-    # Carregamento de dados
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
@@ -95,7 +55,6 @@ if page == "Home":
     df = pd.read_excel("dados_rmc.xlsx")
     df.set_index("nome", inplace=True)
 
-    # Construção do GeoJSON
     features = []
     for _, row in gdf.iterrows():
         nome = row["NM_MUN"]
@@ -107,7 +66,6 @@ if page == "Home":
     gj = {"type": "FeatureCollection", "features": features}
     geojson_js = json.dumps(gj)
 
-    # Carregar HTML refinado do mapa
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         html_template = f.read()
 
