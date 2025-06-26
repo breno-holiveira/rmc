@@ -89,7 +89,7 @@
       z-index: 1000;
     }
 
-    /* Nova caixa flutuante à esquerda abaixo da barra */
+    /* Caixa flutuante à esquerda abaixo da barra */
     #floatingInfo {
       position: absolute;
       top: 70px; /* 20px + 30px barra + 20px espaço */
@@ -105,8 +105,7 @@
       color: #1f2f45;
       overflow-y: auto;
       z-index: 1100;
-      
-      /* Começa oculta e fora da tela à esquerda */
+
       opacity: 0;
       transform: translateX(-20px);
       pointer-events: none;
@@ -150,6 +149,36 @@
       font-style: italic;
     }
 
+    /* Botão flutuante fixo no canto superior esquerdo */
+    #floatingToggleBtn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(44,62,112,0.15);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 24px;
+      color: #2c3e70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: background 0.3s ease, color 0.3s ease;
+      z-index: 1200;
+    }
+    #floatingToggleBtn:hover {
+      background: rgba(44,62,112,0.35);
+      color: white;
+    }
+    /* Esconde o botão quando a caixa está visível */
+    #floatingToggleBtn.hidden {
+      display: none;
+    }
+
+    /* Botão fechar dentro da caixa */
     #closeFloatingBtn {
       position: absolute;
       top: 16px;
@@ -169,6 +198,7 @@
       background: rgba(44,62,112,0.35);
       color: white;
     }
+
   </style>
 </head>
 <body>
@@ -201,6 +231,9 @@
     </aside>
   </div>
 
+  <!-- Botão flutuante fixo -->
+  <button id="floatingToggleBtn" aria-label="Abrir informações do município" title="Informações">ℹ️</button>
+
   <script>
     const geo = __GEOJSON_PLACEHOLDER__;
     const svg = document.querySelector("svg");
@@ -208,6 +241,7 @@
     const floatingInfo = document.getElementById("floatingInfo");
     const closeFloatingBtn = document.getElementById("closeFloatingBtn");
     const selectMunicipio = document.getElementById("municipio-select");
+    const floatingToggleBtn = document.getElementById("floatingToggleBtn");
     const paths = {};
     let selected = null;
 
@@ -239,6 +273,7 @@
         paths[name].classList.add("selected");
         showInfo(name);
         floatingInfo.classList.add("visible");
+        floatingToggleBtn.classList.add("hidden");
       }
     }
 
@@ -294,11 +329,27 @@
       if (e.target.value) select(e.target.value);
     });
 
+    // Botão flutuante abre/fecha caixa
+    floatingToggleBtn.addEventListener("click", () => {
+      if (floatingInfo.classList.contains("visible")) {
+        floatingInfo.classList.remove("visible");
+        floatingToggleBtn.classList.remove("hidden");
+        if (selected) paths[selected].classList.remove("selected");
+        selected = null;
+        selectMunicipio.value = "";
+      } else {
+        floatingInfo.classList.add("visible");
+        floatingToggleBtn.classList.add("hidden");
+      }
+    });
+
+    // Botão fechar dentro da caixa
     closeFloatingBtn.addEventListener("click", () => {
       floatingInfo.classList.remove("visible");
       if (selected) paths[selected].classList.remove("selected");
       selected = null;
       selectMunicipio.value = "";
+      floatingToggleBtn.classList.remove("hidden");
     });
   </script>
 </body>
