@@ -39,7 +39,6 @@ html_template = carregar_html_template()
 st.markdown(
     """
     <style>
-    /* --- Estilo customizado das abas --- */
     /* Remove borda padrão das tabs */
     .css-1d391kg .st-cXcYtU { 
         border-bottom: none !important;
@@ -49,74 +48,62 @@ st.markdown(
     div[role="tablist"] {
         display: flex;
         gap: 16px;
-        padding: 12px 24px;
-        background: rgba(30, 60, 90, 0.25); /* vidro fosco azul claro */
-        backdrop-filter: saturate(180%) blur(10px);
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 24px rgb(20 40 80 / 0.1);
+        padding: 14px 28px;
+        background: rgba(15, 33, 64, 0.85); /* azul escuro translúcido */
+        border-radius: 14px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 10px rgb(0 0 0 / 0.15);
+        user-select: none;
     }
 
     /* Abas individuais */
     div[role="tablist"] > button {
         background: transparent !important;
-        color: #a9c0ff !important;  /* azul claro */
+        color: #a7c0e8 !important;  /* azul claro */
         border: none !important;
-        border-bottom: 3px solid transparent !important;
+        border-bottom: 3.5px solid transparent !important;
         font-weight: 600 !important;
-        font-size: 17px !important;
-        padding: 10px 26px !important;
-        border-radius: 8px 8px 0 0 !important;
+        font-size: 16px !important;
+        padding: 12px 28px !important;
+        border-radius: 10px 10px 0 0 !important;
         transition:
-            color 0.35s ease,
-            border-bottom-color 0.35s ease,
-            background-color 0.3s ease;
+            color 0.3s ease,
+            border-bottom-color 0.3s ease,
+            background-color 0.25s ease;
         cursor: pointer;
     }
 
     /* Aba ativa */
     div[role="tablist"] > button[aria-selected="true"] {
-        color: #1e40af !important; /* azul forte */
-        border-bottom-color: #1e40af !important;
-        background-color: rgba(30, 64, 175, 0.1) !important;
+        color: #4a90e2 !important; /* azul médio */
+        border-bottom-color: #4a90e2 !important;
+        background-color: rgba(74, 144, 226, 0.12) !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 12px rgb(30 64 175 / 0.25);
+        box-shadow: 0 3px 8px rgb(74 144 226 / 0.25);
     }
 
     /* Hover abas não ativas */
     div[role="tablist"] > button:not([aria-selected="true"]):hover {
-        color: #3b82f6 !important; /* azul médio */
-        background-color: rgba(59, 130, 246, 0.1) !important;
-        border-bottom-color: #3b82f6 !important;
+        color: #7aaefc !important; /* azul um pouco mais claro */
+        background-color: rgba(122, 174, 252, 0.1) !important;
+        border-bottom-color: #7aaefc !important;
     }
 
     /* Conteúdo da aba */
     .css-1d391kg > div[role="tabpanel"] {
-        background-color: #f9fbff !important;
-        border-radius: 0 12px 12px 12px !important;
-        padding: 28px 32px !important;
-        box-shadow: 0 8px 30px rgb(30 64 175 / 0.1);
-        border: 1.5px solid rgba(30, 64, 175, 0.15) !important;
-        margin-bottom: 40px;
-    }
-
-    /* Scrollbar para conteúdo da aba (se necessário) */
-    .css-1d391kg > div[role="tabpanel"]::-webkit-scrollbar {
-        width: 10px;
-    }
-    .css-1d391kg > div[role="tabpanel"]::-webkit-scrollbar-thumb {
-        background-color: rgba(30, 64, 175, 0.3);
-        border-radius: 6px;
-    }
-    .css-1d391kg > div[role="tabpanel"]::-webkit-scrollbar-track {
-        background-color: transparent;
+        background-color: #f7faff !important;  /* fundo azul bem claro */
+        border-radius: 0 14px 14px 14px !important;
+        padding: 30px 36px !important;
+        box-shadow: 0 6px 24px rgb(74 144 226 / 0.15);
+        border: 1.5px solid rgba(74, 144, 226, 0.15) !important;
+        margin-bottom: 48px;
     }
 
     /* Fonte geral */
     html, body, .block-container {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #1e293b;
-        background-color: #f0f4ff;
+        color: #1a2738;
+        background-color: #e9f0fc;
     }
     </style>
     """,
