@@ -89,13 +89,13 @@
       z-index: 1000;
     }
 
-    /* Caixa flutuante à esquerda, deslocada para baixo */
+    /* Caixa flutuante à esquerda, ajustada para ficar mais abaixo da barra */
     #floatingInfo {
       position: absolute;
-      top: 90px; /* Espaçamento da barra */
+      top: 90px; /* Aumentado de 70px para 90px */
       left: 20px;
       width: 300px;
-      max-height: calc(100vh - 110px);
+      max-height: calc(100vh - 110px); /* Ajustado para compensar o maior top */
       background: rgba(255,255,255,0.94);
       backdrop-filter: blur(10px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.12);
@@ -122,7 +122,6 @@
       margin-top: 0;
       font-size: 20px;
       color: #2c3e70;
-      user-select: none;
     }
 
     #floatingInfo .grid {
@@ -150,25 +149,24 @@
       font-style: italic;
     }
 
-    /* Botão de fechar discreto */
     #closeFloatingBtn {
       position: absolute;
-      top: 14px;
-      right: 14px;
-      background: transparent;
+      top: 16px;
+      right: 16px;
+      background: rgba(44,62,112,0.15);
       border: none;
-      font-size: 18px;
-      font-weight: 700;
-      color: #7a8ba3;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
       cursor: pointer;
-      line-height: 1;
-      padding: 0;
-      transition: color 0.3s ease;
-      user-select: none;
+      font-size: 16px;
+      font-weight: bold;
+      color: #2c3e70;
     }
 
     #closeFloatingBtn:hover {
-      color: #2c3e70;
+      background: rgba(44,62,112,0.35);
+      color: white;
     }
   </style>
 </head>
@@ -178,7 +176,7 @@
     <div id="top-bar">
       <label for="municipio-select">Selecione um município ou clique no mapa:</label>
       <select id="municipio-select">
-        <option value="" disabled selected>Selecione...</option>
+        <option value="" selected disabled>Selecione...</option>
       </select>
     </div>
 
