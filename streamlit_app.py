@@ -4,25 +4,11 @@ import geopandas as gpd
 import json
 
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initial_sidebar_state="expanded")
-st.markdown(
-    """
-    <style>
-    /* Remove margem/padding superior do título principal */
-    .css-1d391kg h1 {
-        margin-top: 0.25rem;
-    }
-    /* Remove margem/padding superior do subtítulo */
-    .css-1d391kg h3 {
-        margin-top: 0.1rem;
-        margin-bottom: 0.5rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 st.title("RMC Data 📊")
 st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+
+st.markdown('A Região Metropolitana de Campinas foi criada através da Lei Complementar nº 870, de 19 de junho de 2000, do estado de São Paulo. A RMC é constituida por 20 municípios, e  '
 
 # Carregamento de dados
 gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
