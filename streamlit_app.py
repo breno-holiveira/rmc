@@ -7,26 +7,36 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilo da barra de navegação com fonte Inter e sem negrito no item ativo
+# Estilo customizado mais compacto e elegante
 styles = {
     "nav": {
         "background-color": "royalblue",
         "justify-content": "left",
-        "font-family": "'Inter', 'Helvetica Neue', sans-serif",
-        "font-size": "16px",
+        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-size": "14px",       # fonte menor e mais compacta
+        "padding": "0 12px",       # menos espaçamento horizontal
+        "height": "48px",          # navbar mais baixa
+        "align-items": "center",
     },
     "span": {
         "color": "white",
-        "padding": "14px",
-        "font-family": "'Inter', 'Helvetica Neue', sans-serif",
+        "padding": "8px 12px",     # botões com padding reduzido
+        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-weight": "500",
+        "transition": "color 0.25s ease, background-color 0.25s ease",
     },
     "active": {
         "background-color": "white",
-        "color": "var(--text-color)",
-        "font-weight": "500",  # Aqui, sem negrito (antes 600)
-        "padding": "14px",
-        "font-family": "'Inter', 'Helvetica Neue', sans-serif",
+        "color": "royalblue",
+        "font-weight": "600",
+        "padding": "8px 12px",
+        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "box-shadow": "0 2px 6px rgba(0,0,0,0.2)",
+        "border-radius": "6px",
+        "transition": "color 0.25s ease, background-color 0.25s ease",
+    },
+    "img": {
+        "display": "none",  # ocultar logo, pois você quer texto
     }
 }
 
@@ -35,13 +45,23 @@ options = {
     "show_sidebar": False,
 }
 
-# Páginas e urls (logo "RMC Data" clicável volta ao topo)
-pages = ["RMC Data", "Documentation", "Examples", "Community", "About"]
-urls = {"RMC Data": "#"}
+# Definir páginas
+pages = ["Início", "Documentation", "Examples", "Community", "About"]
 
+# URLs para as abas — deixamos vazio para "Início" manter na mesma página
+urls = {
+    "Início": "#",           # Mantém na mesma página ao clicar
+    "Documentation": "",
+    "Examples": "",
+    "Community": "",
+    "About": ""
+}
+
+# Barra de navegação customizada
 page = st_navbar(pages, urls=urls, styles=styles, options=options)
 
-if page == "RMC Data":
+# Conteúdo da página
+if page == "Início":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
