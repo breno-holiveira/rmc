@@ -2,82 +2,86 @@ import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
-from streamlit_community_navigation_bar import st_navbar  # Import correto
+from streamlit_navigation_bar import st_navbar
 
-# Configuração da página
-st.set_page_config(
-    page_title="RMC Data",
-    layout="wide",
-    page_icon="📊",
-    initial_sidebar_state="expanded"
-)
+# CONFIGURAÇÃO DA PÁGINA
+st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊')
 
-# Barra de navegação (obrigatoriamente logo após o set_page_config)
-page = st_navbar(
-    ["Home", "Documentação", "Exemplos", "Sobre"],
-    options={"use_padding": False}
-)
+# ESTILIZAÇÃO PERSONALIZADA DA NAVBAR
+st.markdown("""
+    <style>
+    /* Container da barra */
+    .st-navbar {
+        background-color: #f8f9fa !important;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 30px;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
-# Página principal: HOME
-if page == "Home":
-    st.title("RMC Data 📊")
-    st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+    /* Itens da barra */
+    .st-navbar span {
+        margin-right: 25px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #34495e !important;
+        text-decoration: none !important;
+    }
 
-    st.markdown("""
-    A Região Metropolitana de Campinas foi criada em 2000, através da [Lei Complementar nº 870](https://www.al.sp.gov.br/repositorio/legislacao/lei.complementar/2000/lei.complementar-870-19.06.2000.html), 
-    e é constituída por 20 municípios. Em 2021, a RMC apresentou um PIB de **R$ 266,8 bilhões**, o equivalente a **3,07%** do Produto Interno Bruto brasileiro no mesmo ano.
+    /* Aba ativa */
+    .st-navbar span.active {
+        color: #2c3e70 !important;
+        border-bottom: 2px solid #2c3e70;
+        padding-bottom: 4px;
+    }
 
-    Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras.
-    """)
+    /* Remove efeitos exagerados de hover */
+    .st-navbar span:hover {
+        color: #2c3e70 !important;
+        background-color: transparent !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-    # Carregamento de dados geográficos
-    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-    if gdf.crs != 'EPSG:4326':
-        gdf = gdf.to_crs('EPSG:4326')
-    gdf = gdf.sort_values(by='NM_MUN')
+# BARRA DE NAVEGAÇÃO
+page = st_navbar(["Início", "Documentação", "Exemplos", "Sobre"])
+st.write("")  # Espaço opcional após a barra
 
-    # Carregamento de dados estatísticos
-    df = pd.read_excel('dados_rmc.xlsx')
-    df.set_index("nome", inplace=True)
+# TÍTULO E INTRODUÇÃO
+st.title("RMC Data 📊")
+st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
-    # Construção do GeoJSON
-    features = []
-    for _, row in gdf.iterrows():
-        nome = row["NM_MUN"]
-        geom = row["geometry"].__geo_interface__
-        props = df.loc[nome].to_dict() if nome in df.index else {}
-        props["name"] = nome
-        features.append({"type": "Feature", "geometry": geom, "properties": props})
-    gj = {"type": "FeatureCollection", "features": features}
-    geojson_js = json.dumps(gj)
+st.markdown("""
+A Região Metropolitana de Campinas foi criada em 2000 por meio da Lei Complementar nº 870. 
+Atualmente, é composta por 20 municípios e representa **3,07%** do PIB brasileiro.
 
-    # Leitura do HTML externo refinado
-    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-        html_template = f.read()
+Em 2021, a RMC teve um PIB de **R$ 266,8 bilhões**, e em 2020, o IBGE classificou Campinas como uma das 15 metrópoles brasileiras.
+""")
 
-    # Inserção do GeoJSON dentro do HTML
-    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+# CARREGAMENTO DE DADOS
+gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+if gdf.crs != 'EPSG:4326':
+    gdf = gdf.to_crs('EPSG:4326')
+gdf = gdf.sort_values(by='NM_MUN')
 
-    # Exibição do gráfico interativo na página
-    st.components.v1.html(html_code, height=600, scrolling=False)
+df = pd.read_excel('dados_rmc.xlsx')
+df.set_index("nome", inplace=True)
 
-# Página: Documentação
-elif page == "Documentação":
-    st.title("📚 Documentação")
-    st.markdown("A documentação será disponibilizada em breve.")
+# CRIAÇÃO DO GEOJSON PARA O MAPA
+features = []
+for _, row in gdf.iterrows():
+    nome = row["NM_MUN"]
+    geom = row["geometry"].__geo_interface__
+    props = df.loc[nome].to_dict() if nome in df.index else {}
+    props["name"] = nome
+    features.append({"type": "Feature", "geometry": geom, "properties": props})
 
-# Página: Exemplos
-elif page == "Exemplos":
-    st.title("🔍 Exemplos")
-    st.markdown("Aqui serão apresentados exemplos de visualizações e comparações municipais.")
+geojson_js = json.dumps({"type": "FeatureCollection", "features": features})
 
-# Página: Sobre
-elif page == "Sobre":
-    st.title("ℹ️ Sobre o Projeto")
-    st.markdown("""
-    Desenvolvido por **Breno Oliveira**  
-    Dados fornecidos por: IBGE, SEADE, CONFEA  
-    Última atualização: 2025
+# INSERÇÃO DO GEOJSON NO HTML EXTERNO
+with open("grafico_rmc.html", "r", encoding="utf-8") as f:
+    html_template = f.read()
 
-    [GitHub do projeto](https://github.com/breno) (exemplo)
-    """)
+html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+
+# EXIBIÇÃO DO MAPA
+st.components.v1.html(html_code, height=620, scrolling=False)
