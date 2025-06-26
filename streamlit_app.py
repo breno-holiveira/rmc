@@ -57,8 +57,8 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-# Lê o parâmetro "page" da URL
-params = st.experimental_get_query_params()
+# Lê o parâmetro "page" da URL usando API estável
+params = st.query_params
 page = params.get("page", ["home"])[0]
 
 # Constroi HTML da navbar com o item ativo destacado dinamicamente
@@ -80,7 +80,6 @@ if page == "home":
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-    # Carregamento otimizado dos dados
     @st.cache_data
     def carregar_dados():
         gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
