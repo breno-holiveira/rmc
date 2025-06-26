@@ -15,7 +15,7 @@
     }
 
     #map {
-      width: 130vw;
+      width: 100vw;
       height: 100vh;
       position: relative;
     }
@@ -89,7 +89,7 @@
       z-index: 1000;
     }
 
-    /* Caixa flutuante à esquerda, ajustada para ficar mais abaixo da barra */
+    /* Caixa flutuante à esquerda, deslocada para baixo */
     #floatingInfo {
       position: absolute;
       top: 90px; /* Espaçamento da barra */
@@ -122,6 +122,7 @@
       margin-top: 0;
       font-size: 20px;
       color: #2c3e70;
+      user-select: none;
     }
 
     #floatingInfo .grid {
@@ -148,6 +149,27 @@
       text-align: center;
       font-style: italic;
     }
+
+    /* Botão de fechar discreto */
+    #closeFloatingBtn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      font-weight: 700;
+      color: #7a8ba3;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.3s ease;
+      user-select: none;
+    }
+
+    #closeFloatingBtn:hover {
+      color: #2c3e70;
+    }
   </style>
 </head>
 <body>
@@ -156,7 +178,7 @@
     <div id="top-bar">
       <label for="municipio-select">Selecione um município ou clique no mapa:</label>
       <select id="municipio-select">
-        <option value="" disabled>Selecione...</option>
+        <option value="" disabled selected>Selecione...</option>
       </select>
     </div>
 
@@ -165,6 +187,7 @@
     <div id="tooltip"></div>
 
     <aside id="floatingInfo" role="region" aria-label="Informações do município">
+      <button id="closeFloatingBtn" aria-label="Fechar informações">&times;</button>
       <h3>Município</h3>
       <div class="grid">
         <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
@@ -183,11 +206,11 @@
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
     const floatingInfo = document.getElementById("floatingInfo");
+    const closeFloatingBtn = document.getElementById("closeFloatingBtn");
     const selectMunicipio = document.getElementById("municipio-select");
     const paths = {};
     let selected = null;
 
-    // Construir lista de coordenadas para projeção
     let coords = [];
     geo.features.forEach(f => {
       const g = f.geometry;
@@ -271,11 +294,11 @@
       if (e.target.value) select(e.target.value);
     });
 
-    // Inicializa com "Americana" selecionada
-    window.addEventListener("load", () => {
-      const firstCity = "Americana";
-      selectMunicipio.value = firstCity;
-      select(firstCity);
+    closeFloatingBtn.addEventListener("click", () => {
+      floatingInfo.classList.remove("visible");
+      if (selected) paths[selected].classList.remove("selected");
+      selected = null;
+      selectMunicipio.value = "";
     });
   </script>
 </body>
