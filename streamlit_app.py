@@ -1,103 +1,71 @@
 import streamlit as st
+import pandas as pd
+import geopandas as gpd
+import json
+from streamlit_navigation_bar import st_navbar
 
 # Configuração da página
-st.set_page_config(page_title="RMC Navegação", layout="wide", page_icon="📊")
+st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# --- CSS para barra de navegação moderna ---
-st.markdown("""
-    <style>
-    .nav-container {
-        background: #f0f2f6;
-        border-bottom: 1px solid #ddd;
-        padding: 10px 30px;
-        display: flex;
-        gap: 30px;
-        font-family: 'Segoe UI', sans-serif;
-        font-size: 16px;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-    }
+# Barra de navegação superior com estilo padrão do pacote
+page = st_navbar(["Home", "Documentation", "Examples", "Community", "About"])
 
-    .nav-item {
-        color: #444;
-        text-decoration: none;
-        padding-bottom: 3px;
-        border-bottom: 2px solid transparent;
-        transition: all 0.3s ease;
-    }
+# Componente retorna a aba selecionada como string
+if page == "Home":
+    st.title("RMC Data 📊")
+    st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
-    .nav-item:hover {
-        border-bottom: 2px solid #8899aa;
-        color: #2c3e70;
-    }
+    st.markdown(
+        "A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituída por 20 municípios. "
+        "Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano."
+    )
+    st.markdown(
+        "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
+    )
 
-    .nav-active {
-        border-bottom: 2px solid #2c3e70;
-        font-weight: 600;
-        color: #2c3e70;
-    }
-    </style>
-""", unsafe_allow_html=True)
+    # Carregamento de dados
+    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+    if gdf.crs != "EPSG:4326":
+        gdf = gdf.to_crs("EPSG:4326")
+    gdf = gdf.sort_values(by="NM_MUN")
 
-# --- Função de navegação via query param atualizada ---
-def navigation():
-    params = st.query_params
-    if 'p' in params and len(params['p']) > 0:
-        return params['p'][0]
-    return 'home'
+    df = pd.read_excel("dados_rmc.xlsx")
+    df.set_index("nome", inplace=True)
 
-# --- Menu fixo personalizado ---
-current = navigation()
-menu_items = {
-    "home": "Início",
-    "results": "Resultados",
-    "analysis": "Análise",
-    "examples": "Exemplos",
-    "logs": "Logs",
-    "verify": "Verificação",
-    "config": "Configurações"
-}
+    # Construção do GeoJSON
+    features = []
+    for _, row in gdf.iterrows():
+        nome = row["NM_MUN"]
+        geom = row["geometry"].__geo_interface__
+        props = df.loc[nome].to_dict() if nome in df.index else {}
+        props["name"] = nome
+        features.append({"type": "Feature", "geometry": geom, "properties": props})
 
-menu_html = '<div class="nav-container">'
-for key, label in menu_items.items():
-    active = 'nav-active' if current == key else ''
-    menu_html += f'<a class="nav-item {active}" href="/?p={key}">{label}</a>'
-menu_html += '</div>'
-st.markdown(menu_html, unsafe_allow_html=True)
+    gj = {"type": "FeatureCollection", "features": features}
+    geojson_js = json.dumps(gj)
 
-# --- Conteúdo de cada página ---
-if current == "home":
-    st.title("🏠 Página Inicial")
-    st.write("Bem-vindo à visualização de dados da Região Metropolitana de Campinas.")
+    # Carregar HTML externo refinado (seu gráfico)
+    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
+        html_template = f.read()
 
-elif current == "results":
-    st.title("📋 Resultados")
-    for item in range(25):
-        st.write(f"Resultado {item+1}")
+    # Substituir placeholder pelo GeoJSON gerado
+    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
 
-elif current == "analysis":
-    st.title("📊 Análise de Dados")
-    x = st.number_input("Digite X")
-    y = st.number_input("Digite Y")
-    st.success(f"Soma: {x + y}")
+    # Exibir HTML no Streamlit
+    st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif current == "examples":
-    st.title("💡 Exemplos")
-    st.info("Aqui você poderá explorar exemplos de uso do sistema.")
+elif page == "Documentation":
+    st.title("Documentation")
+    st.write("Aqui você pode colocar a documentação do seu app...")
 
-elif current == "logs":
-    st.title("🗂 Logs")
-    st.write("Exibição de logs completos.")
+elif page == "Examples":
+    st.title("Examples")
+    st.write("Exemplos do app...")
 
-elif current == "verify":
-    st.title("🔎 Verificação")
-    st.warning("Verificando dados... aguarde.")
+elif page == "Community":
+    st.title("Community")
+    st.write("Links para a comunidade...")
 
-elif current == "config":
-    st.title("⚙️ Configurações")
-    st.write("Ajustes gerais do sistema.")
-
-else:
-    st.title("Página não encontrada")
-    st.error("Verifique a URL ou selecione um item do menu.")
+elif page == "About":
+    st.title("About")
+    st.write("Sobre o projeto...")
