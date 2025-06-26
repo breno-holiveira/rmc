@@ -15,7 +15,7 @@
     }
 
     #map {
-      width: 130vw;
+      width: 100vw;
       height: 100vh;
       position: relative;
     }
@@ -39,17 +39,11 @@
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       z-index: 10;
-      flex-wrap: nowrap; /* evita quebra */
     }
 
     #top-bar label {
       font-weight: 600;
       font-size: 14px;
-      white-space: nowrap; /* evita quebra */
-      flex-shrink: 0;
-      max-width: 230px;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     #municipio-select {
@@ -97,7 +91,7 @@
     #infoPanel {
       position: absolute;
       top: 80px;
-      left: 20px; /* mudou para esquerda */
+      right: 20px;
       width: 270px;
       background: rgba(255,255,255,0.25);
       backdrop-filter: blur(14px);
