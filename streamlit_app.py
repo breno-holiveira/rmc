@@ -5,10 +5,9 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# CSS para estilizar só a barra das abas (sem pintar body/fundo)
 st.markdown("""
 <style>
-/* Remove sidebar, header e footer */
+/* Remover barra lateral, header e footer */
 [data-testid="stSidebar"], header, footer {
     display: none !important;
 }
@@ -18,37 +17,40 @@ st.markdown("""
 
 /* Container das abas */
 div[data-testid="stTabs"] > div > div {
-    padding: 6px 12px;
+    padding: 8px 20px;
     display: flex;
-    gap: 14px;
-    border-bottom: 2px solid #ddd; /* linha discreta separando do conteúdo */
+    gap: 16px;
+    border-bottom: 1.5px solid #ddd;  /* linha suave e clara para separar */
+    background-color: white;
 }
 
 /* Cada aba */
 div[data-testid="stTabs"] > div > div > div {
     color: #555; /* texto cinza escuro */
     font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 6px 6px 0 0;
+    padding: 10px 24px;
+    border-radius: 8px 8px 0 0;
     user-select: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
+    border-bottom: none !important; /* remove underline padrão */
 }
 
 /* Aba ativa */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    background-color: #f0f0f0; /* fundo bem leve */
-    color: #0078d7; /* azul profissional */
-    box-shadow: 0 3px 8px rgb(0 120 215 / 0.3);
+    background-color: #f5f7fa;  /* fundo muito claro, quase branco */
+    color: #0d47a1; /* azul escuro profissional */
+    box-shadow: 0px 4px 8px rgb(13 71 161 / 0.15);
+    border-bottom: none !important; /* garantir sem underline */
 }
 
 /* Hover nas abas não ativas */
 div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]):hover {
-    color: #005a9e;
+    color: #0d47a1;
     background-color: #e8f0fe;
 }
 
-/* Remove linha padrão da aba ativa */
+/* Remove linha padrão da aba ativa (underline laranja do Streamlit) */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
     border-bottom: none !important;
     box-shadow: none !important;
