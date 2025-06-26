@@ -5,7 +5,7 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# CSS minimalista só para a barra das abas
+# CSS para estilizar só a barra das abas (sem pintar body/fundo)
 st.markdown("""
 <style>
 /* Remove sidebar, header e footer */
@@ -16,38 +16,36 @@ st.markdown("""
     padding-top: 0rem !important;
 }
 
-/* Container das abas: fundo leve, borda inferior suave */
+/* Container das abas */
 div[data-testid="stTabs"] > div > div {
-    background-color: #fff7ed;  /* laranja muito suave e clarinho */
     padding: 6px 12px;
-    border-bottom: 1.5px solid #fbbf24; /* laranja amarelado claro */
-    border-radius: 0 0 8px 8px;
     display: flex;
-    gap: 12px;
+    gap: 14px;
+    border-bottom: 2px solid #ddd; /* linha discreta separando do conteúdo */
 }
 
-/* Cada aba: texto laranja escuro, sem fundo */
+/* Cada aba */
 div[data-testid="stTabs"] > div > div > div {
-    color: #b45309;  /* laranja escuro */
+    color: #555; /* texto cinza escuro */
     font-weight: 600;
-    padding: 6px 18px;
+    padding: 8px 18px;
     border-radius: 6px 6px 0 0;
     user-select: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
 }
 
-/* Aba ativa: fundo branco, texto laranja vivo, sombra discreta */
+/* Aba ativa */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    background-color: #fff;
-    color: #ea580c;  /* laranja vivo */
-    box-shadow: 0 4px 8px rgb(234 88 12 / 0.25);
+    background-color: #f0f0f0; /* fundo bem leve */
+    color: #0078d7; /* azul profissional */
+    box-shadow: 0 3px 8px rgb(0 120 215 / 0.3);
 }
 
 /* Hover nas abas não ativas */
 div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]):hover {
-    color: #d97706;  /* laranja médio */
-    background-color: #fff3e0; /* fundo bem suave no hover */
+    color: #005a9e;
+    background-color: #e8f0fe;
 }
 
 /* Remove linha padrão da aba ativa */
@@ -58,7 +56,6 @@ div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
 </style>
 """, unsafe_allow_html=True)
 
-# Definição das abas
 abas = st.tabs(["Início", "PIB por Município", "Demografia", "Comparativo"])
 
 @st.cache_data
