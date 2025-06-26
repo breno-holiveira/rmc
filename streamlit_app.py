@@ -20,50 +20,53 @@ div[data-testid="stTabs"] > div > div {
     padding: 8px 20px;
     display: flex;
     gap: 16px;
-    border-bottom: 1.5px solid #ddd;  /* linha clara e única */
+    border-bottom: 1.5px solid #ddd;
     background-color: white;
 }
 
-/* Cada aba */
+/* Cada aba - estilo base permanente */
 div[data-testid="stTabs"] > div > div > div {
-    color: #444; /* texto cinza escuro */
+    color: #444;
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 16px;
-    padding: 10px 24px;
+    font-size: 18px; /* maior fonte */
+    padding: 10px 28px;
     border-radius: 8px 8px 0 0;
     user-select: none;
-    transition: color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
-    border: 1.5px solid transparent; /* contorno suave invisível */
-    border-bottom: none; /* tirar borda inferior da aba */
+    border: 1.5px solid #ccc; /* contorno cinza claro sempre visível */
+    border-bottom: none;
+    background-color: white;
+    box-shadow: none !important;
+    transition: none !important; /* desativa qualquer transição */
 }
 
-/* Aba ativa */
+/* Aba ativa - estilo permanente */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    background-color: #f5f7fa;  /* fundo muito leve */
-    color: #0d47a1; /* azul escuro profissional */
+    color: #0d47a1; /* azul escuro */
     border-color: #0d47a1; /* contorno azul */
-    border-bottom: none !important; /* sem linha debaixo */
+    background-color: white;
+    font-weight: 700;
     box-shadow: 0 4px 12px rgb(13 71 161 / 0.15);
 }
 
-/* Hover nas abas não ativas - só texto azul, sem background */
-div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]):hover {
-    color: #0d47a1;
-    background-color: transparent !important;
-    border-color: #0d47a1; /* contorno azul leve no hover */
-}
-
-/* Remover underline laranja padrão */
+/* Remove underline padrão do Streamlit */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
     border-bottom: none !important;
     box-shadow: none !important;
 }
 
-/* Remover linhas extras */
+/* Remove linhas extras */
 div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]) {
     border-bottom: none !important;
+}
+
+/* Sem efeito hover - manter cores constantes */
+div[data-testid="stTabs"] > div > div > div:hover {
+    color: #444 !important;
+    background-color: white !important;
+    border-color: #ccc !important;
+    box-shadow: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
