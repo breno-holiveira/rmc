@@ -5,17 +5,16 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# Remove barra lateral padrão
+# Remove a barra lateral
 st.markdown("""
 <style>
-/* Remove barra lateral do Streamlit */
 div[data-testid="stSidebar"] {display:none !important;}
 div[data-testid="stAppViewContainer"] > .main > div:first-child {
     max-width: 100% !important;
     padding-left: 1rem !important;
 }
 
-/* Barra fixa horizontal */
+/* Barra horizontal fixa */
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -24,7 +23,6 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
     display: flex;
     align-items: center;
     padding: 0 30px;
-    gap: 1.5rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 700;
     font-size: 1.1rem;
@@ -32,26 +30,29 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
     box-shadow: 0 4px 8px rgba(255,102,0,0.3);
     user-select: none;
 }
-.navbar button {
-    background: transparent;
-    border: none;
+
+/* Itens do menu */
+.navbar a {
     color: white;
-    cursor: pointer;
-    padding: 10px 22px;
-    border-radius: 12px;
+    text-decoration: none;
+    padding: 10px 18px;
+    margin: 0 8px;
+    border-radius: 8px;
     transition: background-color 0.3s ease;
-    font-weight: 700;
-    font-size: 1rem;
 }
-.navbar button:hover {
+
+/* Hover */
+.navbar a:hover {
     background-color: rgba(255,255,255,0.3);
 }
-.navbar button.active {
+
+/* Item ativo */
+.navbar a.active {
     background-color: #cc5200;
     box-shadow: 0 0 10px #cc5200;
 }
 
-/* Conteúdo abaixo da navbar */
+/* Espaço para conteúdo */
 .content {
     padding-top: 65px;
     max-width: 1200px;
@@ -60,39 +61,61 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializa a página ativa no estado
+# Inicializa a página ativa
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
-def nav_button(page_name, label):
-    is_active = st.session_state.page == page_name
-    css_class = "active" if is_active else ""
-    if st.button(label, key=page_name, help=f"Abrir {label}"):
-        st.session_state.page = page_name
-    # Aplicar classe ativa via JS (ou com css seletor botão pressionado) não possível direto no st.button, 
-    # então a cor do botão ativo será controlada pela renderização abaixo
+# Função para atualizar página via clique (usando URL params para funcionar direitinho)
+def set_page(page_name):
+    st.session_state.page = page_name
 
-# Barra de navegação customizada via botões (horizontal)
-st.markdown('<div class="navbar">', unsafe_allow_html=True)
-col1, col2, col3, col4 = st.columns([1,1,1,1], gap="large")
+# Renderiza a navbar com links clicáveis que atualizam st.session_state.page
+# Usando <a href="#"> + onclick JS para evitar reload da página
+# E usando Streamlit rerun para atualizar o app
 
-with col1:
-    if st.button("Início", key="home"):
-        st.session_state.page = "home"
-with col2:
-    if st.button("Página 1", key="pag1"):
-        st.session_state.page = "pag1"
-with col3:
-    if st.button("Página 2", key="pag2"):
-        st.session_state.page = "pag2"
-with col4:
-    if st.button("Página 3", key="pag3"):
-        st.session_state.page = "pag3"
-st.markdown('</div>', unsafe_allow_html=True)
+# Criando script JS para alterar o st.session_state.page via streamlit-event
+js_script = """
+<script>
+const links = document.querySelectorAll('.navbar a');
+links.forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        // Atualiza query param da URL para paginação via Streamlit rerun
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set('page', page);
+        const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
+        window.history.pushState(null, '', newRelativePathQuery);
+        window.location.reload();
+    });
+});
+</script>
+"""
 
-# Agora corrigir o estilo do botão ativo para os 4 botões (que não é trivial via st.button)
+# Atualiza página do Streamlit pelo parâmetro URL
+params = st.query_params
+page_url = params.get("page", [None])[0]
 
-# Conteúdo condicional baseado na página selecionada
+if page_url:
+    st.session_state.page = page_url
+
+# Construir navbar com links ativos e data-page para JS
+menu_items = {
+    "Início": "home",
+    "Página 1": "pag1",
+    "Página 2": "pag2",
+    "Página 3": "pag3",
+}
+
+menu_html = '<div class="navbar">\n'
+for label, p in menu_items.items():
+    active_class = "active" if st.session_state.page == p else ""
+    menu_html += f'<a href="#" class="{active_class}" data-page="{p}">{label}</a>\n'
+menu_html += '</div>\n' + js_script
+
+st.markdown(menu_html, unsafe_allow_html=True)
+
+# Conteúdo variável
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
 if st.session_state.page == "home":
@@ -146,4 +169,4 @@ elif st.session_state.page == "pag3":
 else:
     st.error("Página não encontrada.")
 
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
