@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-st.set_page_config(page_title="RMC Data", layout="wide")
+st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="expanded")
 
 st.title("RMC Data")
 st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
