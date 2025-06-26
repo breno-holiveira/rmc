@@ -89,13 +89,13 @@
       z-index: 1000;
     }
 
-    /* Caixa flutuante à esquerda abaixo da barra */
+    /* Caixa flutuante à esquerda, ajustada para ficar mais abaixo da barra */
     #floatingInfo {
       position: absolute;
-      top: 70px; /* 20px + 30px barra + 20px espaço */
+      top: 90px; /* Aumentado de 70px para 90px */
       left: 20px;
       width: 300px;
-      max-height: calc(100vh - 90px);
+      max-height: calc(100vh - 110px); /* Ajustado para compensar o maior top */
       background: rgba(255,255,255,0.94);
       backdrop-filter: blur(10px);
       box-shadow: 0 6px 20px rgba(0,0,0,0.12);
@@ -149,36 +149,6 @@
       font-style: italic;
     }
 
-    /* Botão flutuante fixo no canto superior esquerdo */
-    #floatingToggleBtn {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 40px;
-      height: 40px;
-      background: rgba(44,62,112,0.15);
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 24px;
-      color: #2c3e70;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-      transition: background 0.3s ease, color 0.3s ease;
-      z-index: 1200;
-    }
-    #floatingToggleBtn:hover {
-      background: rgba(44,62,112,0.35);
-      color: white;
-    }
-    /* Esconde o botão quando a caixa está visível */
-    #floatingToggleBtn.hidden {
-      display: none;
-    }
-
-    /* Botão fechar dentro da caixa */
     #closeFloatingBtn {
       position: absolute;
       top: 16px;
@@ -198,7 +168,6 @@
       background: rgba(44,62,112,0.35);
       color: white;
     }
-
   </style>
 </head>
 <body>
@@ -215,7 +184,6 @@
 
     <div id="tooltip"></div>
 
-    <!-- Caixa flutuante nova abaixo da barra -->
     <aside id="floatingInfo" role="region" aria-label="Informações do município">
       <button id="closeFloatingBtn" aria-label="Fechar informações">&times;</button>
       <h3>Município</h3>
@@ -231,9 +199,6 @@
     </aside>
   </div>
 
-  <!-- Botão flutuante fixo -->
-  <button id="floatingToggleBtn" aria-label="Abrir informações do município" title="Informações">ℹ️</button>
-
   <script>
     const geo = __GEOJSON_PLACEHOLDER__;
     const svg = document.querySelector("svg");
@@ -241,7 +206,6 @@
     const floatingInfo = document.getElementById("floatingInfo");
     const closeFloatingBtn = document.getElementById("closeFloatingBtn");
     const selectMunicipio = document.getElementById("municipio-select");
-    const floatingToggleBtn = document.getElementById("floatingToggleBtn");
     const paths = {};
     let selected = null;
 
@@ -273,7 +237,6 @@
         paths[name].classList.add("selected");
         showInfo(name);
         floatingInfo.classList.add("visible");
-        floatingToggleBtn.classList.add("hidden");
       }
     }
 
@@ -329,27 +292,11 @@
       if (e.target.value) select(e.target.value);
     });
 
-    // Botão flutuante abre/fecha caixa
-    floatingToggleBtn.addEventListener("click", () => {
-      if (floatingInfo.classList.contains("visible")) {
-        floatingInfo.classList.remove("visible");
-        floatingToggleBtn.classList.remove("hidden");
-        if (selected) paths[selected].classList.remove("selected");
-        selected = null;
-        selectMunicipio.value = "";
-      } else {
-        floatingInfo.classList.add("visible");
-        floatingToggleBtn.classList.add("hidden");
-      }
-    });
-
-    // Botão fechar dentro da caixa
     closeFloatingBtn.addEventListener("click", () => {
       floatingInfo.classList.remove("visible");
       if (selected) paths[selected].classList.remove("selected");
       selected = null;
       selectMunicipio.value = "";
-      floatingToggleBtn.classList.remove("hidden");
     });
   </script>
 </body>
