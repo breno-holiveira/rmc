@@ -7,74 +7,30 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# CSS personalizado para estilizar a barra de navegação do streamlit_navigation_bar
-custom_css = """
-<style>
-/* Container da navbar */
-[data-testid="stHorizontalBlock"] > div:first-child {
-    background: linear-gradient(90deg, #0d1f3c, #163466);
-    padding: 0.6rem 1rem;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: white;
-    border-radius: 0 0 15px 15px;
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-    box-shadow: 0 3px 8px rgb(0 0 0 / 0.3);
+# Definição do estilo personalizado seguindo a doc oficial
+style = {
+    "txColor": "#f0f0f0",            # Cor do texto
+    "txColorHover": "#ff7200",       # Cor do texto ao passar mouse
+    "bgColor": "#0d1f3c",            # Cor de fundo da navbar
+    "bgColorHover": "#163466",       # Fundo do item ao passar mouse
+    "bgColorActive": "#ff7200",      # Fundo do item ativo
+    "txColorActive": "#ffffff",      # Texto do item ativo
+    "height": 50,                    # Altura da navbar em px
+    "font": "Roboto, sans-serif",    # Fonte customizada
+    "fontWeight": "600",             # Peso da fonte
+    "iconName": "📊",                # Ícone no lado esquerdo
+    "iconSize": 25,                  # Tamanho do ícone
+    "iconColor": "#ff7200",          # Cor do ícone
+    "iconColorActive": "#ffffff",    # Cor do ícone ativo (mesma do texto ativo)
 }
 
-/* Itens da navbar */
-[data-testid="stHorizontalBlock"] button, 
-[data-testid="stHorizontalBlock"] div[role="tab"] {
-    color: white;
-    background-color: transparent;
-    border: none;
-    margin: 0 12px;
-    padding: 6px 14px;
-    border-radius: 8px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    cursor: pointer;
-}
+# Barra de navegação com estilo aplicado
+page = st_navbar(
+    options=["Home", "Documentation", "Examples", "Community", "About"],
+    style=style
+)
 
-/* Hover nos itens */
-[data-testid="stHorizontalBlock"] button:hover,
-[data-testid="stHorizontalBlock"] div[role="tab"]:hover {
-    background-color: #ff7200;
-    color: #fff9f0;
-}
-
-/* Item ativo */
-[data-testid="stHorizontalBlock"] button[aria-selected="true"],
-[data-testid="stHorizontalBlock"] div[role="tab"][aria-selected="true"] {
-    background-color: #ff7200;
-    color: white;
-    font-weight: 700;
-    box-shadow: 0 0 8px 1px #ff7f27;
-}
-
-/* Remover outline ao focar */
-[data-testid="stHorizontalBlock"] button:focus,
-[data-testid="stHorizontalBlock"] div[role="tab"]:focus {
-    outline: none;
-}
-
-/* Ajuste do container dos botões para centralizar */
-[data-testid="stHorizontalBlock"] > div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-</style>
-"""
-
-st.markdown(custom_css, unsafe_allow_html=True)
-
-# Barra de navegação superior com estilo customizado
-page = st_navbar(["Home", "Documentation", "Examples", "Community", "About"])
-
-# Componente retorna a aba selecionada como string
+# Conteúdo conforme aba selecionada
 if page == "Home":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
