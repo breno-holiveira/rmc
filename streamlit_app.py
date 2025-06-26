@@ -66,7 +66,7 @@ def carregar_html_base():
 
 # === Conteúdo de cada aba ===
 with abas[0]:
-    st.title("RMC Data")
+    st.title("RMC jData")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
     geojson_js = construir_geojson()
