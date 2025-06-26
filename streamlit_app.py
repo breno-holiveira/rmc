@@ -3,23 +3,14 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-st.set_page_config(page_title="RMC Data", layout="wide")
+# Configurações da página
+st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS para remover sidebar, header e footer e ajustar padding
+# CSS para esconder barra lateral completamente, mas manter header (com GitHub/fork) e footer
 st.markdown("""
 <style>
 /* Esconder barra lateral completamente */
 [data-testid="stSidebar"] {
-    display: none !important;
-}
-
-/* Esconder header (inclui GitHub fork e demais) */
-header {
-    display: none !important;
-}
-
-/* Esconder rodapé */
-footer {
     display: none !important;
 }
 
@@ -32,14 +23,14 @@ footer {
 </style>
 """, unsafe_allow_html=True)
 
-# Exemplo de navegação com abas logo no topo
+# Navegação com abas no topo
 abas = st.tabs(["Início", "Página 1", "Página 2", "Página 3"])
 
 with abas[0]:
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-    # Exemplo de carregamento de dados e gráfico simplificado
+    # Exemplo simplificado de carregamento e exibição de dados e gráfico
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != 'EPSG:4326':
         gdf = gdf.to_crs('EPSG:4326')
