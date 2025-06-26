@@ -13,85 +13,35 @@
       overflow: hidden;
     }
 
-    #sidebar {
+    /* Caixa dropdown suspensa fixa no topo esquerdo */
+    #select-container {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 260px; /* Aumentado de 240px */
-      height: 100vh;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(10px);
-      border-right: 1px solid #cdd6e4;
-      padding: 16px;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-      z-index: 10;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.04);
-      box-sizing: border-box;
-    }
-
-    #sidebar::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #sidebar::-webkit-scrollbar-thumb {
-      background-color: rgba(140, 160, 190, 0.25);
+      top: 16px;
+      left: 16px;
+      z-index: 20;
+      background: rgba(255,255,255,0.9);
+      padding: 8px 12px;
       border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      font-family: 'Segoe UI', sans-serif;
+      user-select: none;
     }
-
-    #sidebar:hover::-webkit-scrollbar-thumb {
-      background-color: rgba(100, 130, 160, 0.45);
-    }
-
-    #sidebar h2 {
-      margin: 0 0 12px;
-      color: #2e466e;
-      font-size: 16px;
-    }
-
-    #search {
-      width: 98%;
-      padding: 6px;
-      border-radius: 5px;
-      border: 1px solid #cbd7e3;
-      margin-bottom: 12px;
-      background-color: #f6f9fc;
-      font-size: 13px;
-      box-sizing: border-box;
-    }
-
-    #search:focus {
-      border-color: rgba(44, 62, 112, 0.5);
-      outline: none;
-      background-color: white;
-    }
-
-    #list div {
-      padding: 8px 8px;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #2e466e;
-      font-size: 13px;
-      transition: background 0.2s;
-      margin-bottom: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      box-sizing: border-box;
-    }
-
-    #list div:hover {
-      background: rgba(44, 62, 112, 0.1);
-    }
-
-    #list div.active {
-      background: rgba(44, 62, 112, 0.15);
-      color: #1f2f45;
+    #select-container label {
       font-weight: 600;
+      color: #2c3e70;
+      margin-right: 8px;
+    }
+    #municipio-select {
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      min-width: 180px;
+      cursor: pointer;
     }
 
     #map {
-      margin-left: 260px; /* também ajustado aqui */
+      margin-left: 0; /* Sem margem lateral, ocupa toda a largura */
       height: 100vh;
       position: relative;
       overflow: hidden;
@@ -186,11 +136,14 @@
   </style>
 </head>
 <body>
-  <div id="sidebar">
-    <h2>Municípios</h2>
-    <input id="search" placeholder="Buscar..." />
-    <div id="list"></div>
+
+  <div id="select-container">
+    <label for="municipio-select">Selecione um município:</label>
+    <select id="municipio-select">
+      <option value="" selected disabled>[Selecione um município]</option>
+    </select>
   </div>
+
   <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip"></div>
@@ -213,11 +166,11 @@
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
     const infoPanel = document.getElementById("infoPanel");
-    const list = document.getElementById("list");
-    const search = document.getElementById("search");
+    const selectMunicipio = document.getElementById("municipio-select");
     const paths = {};
     let selected = null;
 
+    // Calcular bounding box para projeção
     let coords = [];
     geo.features.forEach(f => {
       const g = f.geometry;
@@ -242,17 +195,10 @@
     function select(name) {
       if (selected) {
         paths[selected].classList.remove("selected");
-        [...list.children].forEach(d => d.classList.remove("active"));
       }
       selected = name;
       if (paths[name]) {
         paths[name].classList.add("selected");
-        [...list.children].forEach(div => {
-          if (div.dataset.name === name) {
-            div.classList.add("active");
-            div.scrollIntoView({ behavior: "smooth", block: "center" });
-          }
-        });
         showInfo(name);
       }
     }
@@ -270,6 +216,21 @@
       infoPanel.classList.add("visible");
     }
 
+    // Popula o dropdown com os municípios
+    geo.features.forEach(f => {
+      const name = f.properties.name;
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      selectMunicipio.appendChild(option);
+    });
+
+    // Seleciona o município quando o dropdown muda
+    selectMunicipio.addEventListener("change", (e) => {
+      select(e.target.value);
+    });
+
+    // Cria os paths SVG e adiciona eventos
     geo.features.forEach(f => {
       const name = f.properties.name;
       let d = "";
@@ -290,23 +251,18 @@
       });
 
       path.addEventListener("mouseleave", () => tooltip.style.display = "none");
-      path.addEventListener("click", () => select(name));
 
-      const div = document.createElement("div");
-      div.textContent = name;
-      div.dataset.name = name;
-      div.addEventListener("click", () => select(name));
-      list.appendChild(div);
-    });
-
-    search.addEventListener("input", e => {
-      const val = e.target.value.toLowerCase();
-      [...list.children].forEach(d => {
-        d.style.display = d.textContent.toLowerCase().includes(val) ? "block" : "none";
+      path.addEventListener("click", () => {
+        select(name);
+        selectMunicipio.value = name; // sincroniza dropdown com clique no mapa
       });
     });
 
-    if (geo.features.length > 0) select(geo.features[0].properties.name);
+    // Seleciona o primeiro município automaticamente
+    if (geo.features.length > 0) {
+      selectMunicipio.value = geo.features[0].properties.name;
+      select(geo.features[0].properties.name);
+    }
   </script>
 </body>
 </html>
