@@ -7,22 +7,31 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilo idêntico ao exemplo com `cubes.svg`
+# Estilo profissionalizado da barra de navegação
 styles = {
     "nav": {
-        "background-color": "royalblue",
-        "justify-content": "left",
+        "background-color": "#0d1f3c",
+        "padding": "0.6rem 2rem",
+        "justify-content": "center",
+        "font-family": "'Segoe UI', 'Roboto', sans-serif",
+        "font-size": "16px",
+        "border-radius": "0 0 16px 16px",
+        "box-shadow": "0 4px 12px rgba(0, 0, 0, 0.25)",
     },
     "span": {
-        "color": "white",
-        "padding": "14px",
+        "color": "#ffffff",
+        "padding": "10px 18px",
+        "transition": "background-color 0.25s, color 0.25s",
+        "border-radius": "10px",
     },
     "active": {
-        "background-color": "white",
-        "color": "var(--text-color)",
-        "font-weight": "normal",
-        "padding": "14px",
-    }
+        "background-color": "#ff7200",
+        "color": "white",
+        "font-weight": "600",
+        "padding": "10px 18px",
+        "border-radius": "10px",
+        "box-shadow": "0 0 6px rgba(255,114,0,0.5)",
+    },
 }
 
 options = {
@@ -30,7 +39,7 @@ options = {
     "show_sidebar": False,
 }
 
-# Definir páginas
+# Barra de navegação centralizada
 pages = ["Home", "Documentation", "Examples", "Community", "About"]
 page = st_navbar(pages, styles=styles, options=options)
 
@@ -47,6 +56,7 @@ if page == "Home":
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
 
+    # Carregamento de dados
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
@@ -55,6 +65,7 @@ if page == "Home":
     df = pd.read_excel("dados_rmc.xlsx")
     df.set_index("nome", inplace=True)
 
+    # Construção do GeoJSON
     features = []
     for _, row in gdf.iterrows():
         nome = row["NM_MUN"]
