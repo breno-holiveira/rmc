@@ -91,22 +91,22 @@
     #infoPanel {
       position: absolute;
       top: 0;
-      left: -320px;
+      right: -320px;
       width: 300px;
       height: 100%;
       background: rgba(255,255,255,0.94);
       backdrop-filter: blur(10px);
-      box-shadow: 4px 0 12px rgba(0,0,0,0.1);
+      box-shadow: -4px 0 12px rgba(0,0,0,0.1);
       padding: 24px 20px;
       font-size: 14px;
       color: #1f2f45;
       z-index: 1100;
       overflow-y: auto;
-      transition: left 0.35s ease;
+      transition: right 0.35s ease;
     }
 
     #infoPanel.visible {
-      left: 0;
+      right: 0;
     }
 
     #infoPanel h3 {
