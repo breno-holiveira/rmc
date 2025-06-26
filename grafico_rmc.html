@@ -209,8 +209,8 @@
     const minY = Math.min(...lats), maxY = Math.max(...lats);
 
     function project([lon, lat]) {
-      const x = ((lon - minX) / (maxX - minX)) * 920 + 40;
-      const y = 900 - ((lat - minY) / (maxY - minY)) * 880;
+      const x = ((lon - minX) / (maxX - minX)) * 900 + 40;
+      const y = 900 - ((lat - minY) / (maxY - minY)) * 860;
       return [x, y];
     }
 
