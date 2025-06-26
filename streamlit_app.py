@@ -1,14 +1,13 @@
 import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import json
 
-st.set_page_config(page_title="RMC Data", layout="wide")
+st.set_page_config(page_title="Teste Navegação", layout="wide")
 
 # Remove barra lateral
 st.markdown("""
 <style>
+/* Remove sidebar */
 div[data-testid="stSidebar"] {display:none !important;}
+/* Ajusta o container principal para ocupar toda largura */
 div[data-testid="stAppViewContainer"] > .main > div:first-child {
     max-width: 100% !important;
     padding-left: 1rem !important;
@@ -52,7 +51,7 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
     box-shadow: 0 0 10px #cc5200;
 }
 
-/* Espaço para conteúdo */
+/* Conteúdo com padding para não ficar por baixo da navbar */
 .content {
     padding-top: 65px;
     max-width: 1200px;
@@ -61,11 +60,11 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-# Pega o parâmetro da URL
-params = st.query_params
+# Lê parâmetro page da URL
+params = st.experimental_get_query_params()  # Obs: em versões novas usar st.query_params
 page = params.get("page", ["home"])[0]
 
-# Monta menu com links normais para recarregar a página e alterar parâmetro
+# Menu com links (recarregam página com parâmetro ?page=xxx)
 menu_items = {
     "Início": "home",
     "Página 1": "pag1",
@@ -73,6 +72,7 @@ menu_items = {
     "Página 3": "pag3",
 }
 
+# Monta HTML da navbar com destaque no ativo
 menu_html = '<div class="navbar">\n'
 for label, p in menu_items.items():
     active_class = "active" if page == p else ""
@@ -81,57 +81,26 @@ menu_html += '</div>'
 
 st.markdown(menu_html, unsafe_allow_html=True)
 
+# Conteúdo condicional
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
 if page == "home":
-    st.title("RMC Data")
-    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
-
-    @st.cache_data
-    def carregar_dados():
-        gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-        if gdf.crs != 'EPSG:4326':
-            gdf = gdf.to_crs('EPSG:4326')
-        gdf = gdf.sort_values(by='NM_MUN')
-
-        df = pd.read_excel('dados_rmc.xlsx')
-        df.set_index("nome", inplace=True)
-        return gdf, df
-
-    @st.cache_resource
-    def carregar_html():
-        with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-            return f.read()
-
-    gdf, df = carregar_dados()
-    html_template = carregar_html()
-
-    features = []
-    for _, row in gdf.iterrows():
-        nome = row["NM_MUN"]
-        geom = row["geometry"].__geo_interface__
-        props = df.loc[nome].to_dict() if nome in df.index else {}
-        props["name"] = nome
-        features.append({"type": "Feature", "geometry": geom, "properties": props})
-
-    geojson_js = json.dumps({"type": "FeatureCollection", "features": features})
-    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
-
-    st.components.v1.html(html_code, height=600, scrolling=False)
+    st.title("Início")
+    st.write("Conteúdo da página inicial")
 
 elif page == "pag1":
-    st.header("Conteúdo da Página 1")
-    st.write("Aqui vai o conteúdo da página 1.")
+    st.title("Página 1")
+    st.write("Conteúdo da página 1")
 
 elif page == "pag2":
-    st.header("Conteúdo da Página 2")
-    st.write("Aqui vai o conteúdo da página 2.")
+    st.title("Página 2")
+    st.write("Conteúdo da página 2")
 
 elif page == "pag3":
-    st.header("Conteúdo da Página 3")
-    st.write("Aqui vai o conteúdo da página 3.")
+    st.title("Página 3")
+    st.write("Conteúdo da página 3")
 
 else:
-    st.error("Página não encontrada.")
+    st.error("Página não encontrada")
 
 st.markdown('</div>', unsafe_allow_html=True)
