@@ -5,7 +5,7 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# Remove a barra lateral
+# Remove barra lateral
 st.markdown("""
 <style>
 div[data-testid="stSidebar"] {display:none !important;}
@@ -14,7 +14,7 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
     padding-left: 1rem !important;
 }
 
-/* Barra horizontal fixa */
+/* Barra fixa horizontal */
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -61,45 +61,11 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializa a página ativa
-if "page" not in st.session_state:
-    st.session_state.page = "home"
-
-# Função para atualizar página via clique (usando URL params para funcionar direitinho)
-def set_page(page_name):
-    st.session_state.page = page_name
-
-# Renderiza a navbar com links clicáveis que atualizam st.session_state.page
-# Usando <a href="#"> + onclick JS para evitar reload da página
-# E usando Streamlit rerun para atualizar o app
-
-# Criando script JS para alterar o st.session_state.page via streamlit-event
-js_script = """
-<script>
-const links = document.querySelectorAll('.navbar a');
-links.forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const page = this.getAttribute('data-page');
-        // Atualiza query param da URL para paginação via Streamlit rerun
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set('page', page);
-        const newRelativePathQuery = window.location.pathname + '?' + searchParams.toString();
-        window.history.pushState(null, '', newRelativePathQuery);
-        window.location.reload();
-    });
-});
-</script>
-"""
-
-# Atualiza página do Streamlit pelo parâmetro URL
+# Pega o parâmetro da URL
 params = st.query_params
-page_url = params.get("page", [None])[0]
+page = params.get("page", ["home"])[0]
 
-if page_url:
-    st.session_state.page = page_url
-
-# Construir navbar com links ativos e data-page para JS
+# Monta menu com links normais para recarregar a página e alterar parâmetro
 menu_items = {
     "Início": "home",
     "Página 1": "pag1",
@@ -109,16 +75,15 @@ menu_items = {
 
 menu_html = '<div class="navbar">\n'
 for label, p in menu_items.items():
-    active_class = "active" if st.session_state.page == p else ""
-    menu_html += f'<a href="#" class="{active_class}" data-page="{p}">{label}</a>\n'
-menu_html += '</div>\n' + js_script
+    active_class = "active" if page == p else ""
+    menu_html += f'<a href="?page={p}" class="{active_class}">{label}</a>\n'
+menu_html += '</div>'
 
 st.markdown(menu_html, unsafe_allow_html=True)
 
-# Conteúdo variável
 st.markdown('<div class="content">', unsafe_allow_html=True)
 
-if st.session_state.page == "home":
+if page == "home":
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
@@ -154,15 +119,15 @@ if st.session_state.page == "home":
 
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif st.session_state.page == "pag1":
+elif page == "pag1":
     st.header("Conteúdo da Página 1")
     st.write("Aqui vai o conteúdo da página 1.")
 
-elif st.session_state.page == "pag2":
+elif page == "pag2":
     st.header("Conteúdo da Página 2")
     st.write("Aqui vai o conteúdo da página 2.")
 
-elif st.session_state.page == "pag3":
+elif page == "pag3":
     st.header("Conteúdo da Página 3")
     st.write("Aqui vai o conteúdo da página 3.")
 
