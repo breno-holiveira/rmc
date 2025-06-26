@@ -7,7 +7,71 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Barra de navegação superior com estilo padrão do pacote
+# CSS personalizado para estilizar a barra de navegação do streamlit_navigation_bar
+custom_css = """
+<style>
+/* Container da navbar */
+[data-testid="stHorizontalBlock"] > div:first-child {
+    background: linear-gradient(90deg, #0d1f3c, #163466);
+    padding: 0.6rem 1rem;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: white;
+    border-radius: 0 0 15px 15px;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.3);
+}
+
+/* Itens da navbar */
+[data-testid="stHorizontalBlock"] button, 
+[data-testid="stHorizontalBlock"] div[role="tab"] {
+    color: white;
+    background-color: transparent;
+    border: none;
+    margin: 0 12px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Hover nos itens */
+[data-testid="stHorizontalBlock"] button:hover,
+[data-testid="stHorizontalBlock"] div[role="tab"]:hover {
+    background-color: #ff7200;
+    color: #fff9f0;
+}
+
+/* Item ativo */
+[data-testid="stHorizontalBlock"] button[aria-selected="true"],
+[data-testid="stHorizontalBlock"] div[role="tab"][aria-selected="true"] {
+    background-color: #ff7200;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 0 8px 1px #ff7f27;
+}
+
+/* Remover outline ao focar */
+[data-testid="stHorizontalBlock"] button:focus,
+[data-testid="stHorizontalBlock"] div[role="tab"]:focus {
+    outline: none;
+}
+
+/* Ajuste do container dos botões para centralizar */
+[data-testid="stHorizontalBlock"] > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+</style>
+"""
+
+st.markdown(custom_css, unsafe_allow_html=True)
+
+# Barra de navegação superior com estilo customizado
 page = st_navbar(["Home", "Documentation", "Examples", "Community", "About"])
 
 # Componente retorna a aba selecionada como string
