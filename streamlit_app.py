@@ -1,13 +1,15 @@
 import streamlit as st
 
 st.set_page_config(layout="wide")
-st.markdown("<style>div[data-testid='stSidebar']{display:none !important;}</style>", unsafe_allow_html=True)
 
-page = st.select_slider(
-    "Selecione a página:",
-    options=["Início", "Página 1", "Página 2"],
-    value="Início"
-)
+# Oculta sidebar (mas deixa funcional)
+st.markdown("""
+<style>
+[data-testid="stSidebar"] {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
+
+page = st.sidebar.radio("Escolha a página:", ["Início", "Página 1", "Página 2"])
 
 st.write(f"Você está na página: **{page}**")
 
