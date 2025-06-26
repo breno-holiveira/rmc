@@ -60,8 +60,8 @@ div[data-testid="stAppViewContainer"] > .main > div:first-child {
 </style>
 """, unsafe_allow_html=True)
 
-# Lê parâmetro page da URL
-params = st.experimental_get_query_params()  # Obs: em versões novas usar st.query_params
+# Lê parâmetro page da URL usando st.query_params
+params = st.query_params
 page = params.get("page", ["home"])[0]
 
 # Menu com links (recarregam página com parâmetro ?page=xxx)
