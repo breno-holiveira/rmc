@@ -21,31 +21,14 @@
       left: 16px;
       z-index: 20;
       background: rgba(255,255,255,0.9);
-      padding: 8px 14px;
+      padding: 10px 18px;
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.12);
       font-weight: 600;
-      font-size: 14px;
+      font-size: 15px;
       color: #2c3e70;
-    }
-    #select-container label {
-      margin-right: 8px;
       user-select: none;
-    }
-    #municipio-select {
-      font-size: 14px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1.5px solid #7a8ba3;
-      min-width: 200px;
-      cursor: pointer;
-      transition: border-color 0.3s;
-      color: #2c3e70;
-      background: white;
-    }
-    #municipio-select:hover, #municipio-select:focus {
-      border-color: #2c3e70;
-      outline: none;
+      pointer-events: none; /* não clicável */
     }
 
     #map {
@@ -183,10 +166,7 @@
 <body>
 
   <div id="select-container">
-    <label for="municipio-select">Selecione um município:</label>
-    <select id="municipio-select">
-      <option value="" selected disabled>[Selecione um município]</option>
-    </select>
+    Selecione um município
   </div>
 
   <div id="map">
@@ -213,7 +193,6 @@
     const tooltip = document.getElementById("tooltip");
     const infoPanel = document.getElementById("infoPanel");
     const closeBtn = document.getElementById("closeBtn");
-    const selectMunicipio = document.getElementById("municipio-select");
     const paths = {};
     let selected = null;
 
@@ -247,7 +226,6 @@
         paths[name].classList.add("selected");
         showInfo(name);
         infoPanel.classList.add("visible");
-        selectMunicipio.value = name; // sincroniza dropdown
       }
     }
 
@@ -262,18 +240,6 @@
       infoPanel.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
       infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
     }
-
-    geo.features.forEach(f => {
-      const name = f.properties.name;
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      selectMunicipio.appendChild(option);
-    });
-
-    selectMunicipio.addEventListener("change", e => {
-      if (e.target.value) select(e.target.value);
-    });
 
     geo.features.forEach(f => {
       const name = f.properties.name;
@@ -304,12 +270,8 @@
       if (selected) {
         paths[selected].classList.remove("selected");
         selected = null;
-        selectMunicipio.value = "";
       }
     });
-
-    // Não seleciona nenhum município ao carregar
-    selectMunicipio.value = "";
   </script>
 </body>
 </html>
