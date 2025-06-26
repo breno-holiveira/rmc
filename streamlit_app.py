@@ -3,96 +3,92 @@ import pandas as pd
 import geopandas as gpd
 import json
 
+# Configuração inicial
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# === CSS refinado ===
+# CSS refinado e agressivo
 st.markdown("""
 <style>
-/* Remove borda laranja residual com !important universal */
-button[kind="tab"] {
-    border-bottom: none !important;
-    box-shadow: none !important;
+/* Remove barra lateral, cabeçalho e rodapé */
+[data-testid="stSidebar"], header, footer {
+    display: none !important;
 }
 
-/* Estilo da barra de navegação por abas */
+/* Remove espaço no topo */
+.block-container {
+    padding-top: 0rem !important;
+}
+
+/* Estiliza barra de abas */
 div[role="tablist"] {
-    background-color: #1f2f45 !important;
-    padding: 12px 24px !important;
-    border-radius: 12px 12px 0 0 !important;
-    display: flex !important;
-    justify-content: flex-start;
-    gap: 18px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
-    position: sticky !important;
+    background-color: #1f2f45;
+    padding: 12px 24px;
+    gap: 16px;
+    border-radius: 12px 12px 0 0;
+    position: sticky;
     top: 0;
-    z-index: 9999;
-    margin-bottom: 0 !important;
+    z-index: 999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Abas inativas */
+/* Remove qualquer borda residual */
 div[role="tablist"] > button {
-    background-color: transparent !important;
-    color: #b0c7dd !important;
-    font-size: 15px !important;
-    padding: 10px 20px !important;
-    border: none !important;
-    border-radius: 8px 8px 0 0 !important;
+    all: unset !important;
+    padding: 12px 22px;
+    font-size: 15px;
+    color: #a0b8d9;
+    font-weight: 500;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
     transition: all 0.3s ease;
-}
-
-/* Aba ativa */
-div[role="tablist"] > button[aria-selected="true"] {
-    background-color: #2a3e5c !important;
-    color: #ffffff !important;
-    border-bottom: 3px solid #2a3e5c !important;
-    font-weight: 700;
 }
 
 /* Hover */
 div[role="tablist"] > button:hover {
-    background-color: rgba(255, 255, 255, 0.06) !important;
+    background-color: rgba(255,255,255,0.06);
+    color: #ffffff;
 }
 
-/* Conteúdo das abas */
+/* Aba ativa */
+div[role="tablist"] > button[aria-selected="true"] {
+    background-color: #2a3e5c;
+    color: #ffffff;
+    font-weight: 700;
+    border-bottom: none !important;
+    box-shadow: inset 0 -3px 0 #2a3e5c;
+}
+
+/* Conteúdo da aba */
 .css-1d391kg > div[role="tabpanel"] {
-    background-color: #f2f6fb !important;
-    padding: 30px 36px;
-    border-radius: 0 0 14px 14px;
-    border: 1px solid rgba(0,0,0,0.05);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+    background-color: #f2f6fb;
+    padding: 36px 40px;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #dee6f1;
 }
 
-/* Tipografia e layout */
-html, body, .block-container {
-    font-family: 'Segoe UI', sans-serif;
+/* Fonte e fundo geral */
+html, body {
     background-color: #e8edf4;
-    color: #223344;
-}
-
-/* Remove barra lateral e topo */
-[data-testid="stSidebar"] { display: none !important; }
-header { display: none !important; }
-footer { display: none !important; }
-.block-container {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+    font-family: 'Segoe UI', sans-serif;
+    color: #1e2d3c;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# === Dados ===
+# Dados
 @st.cache_data(show_spinner=False)
 def carregar_dados():
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-    if gdf.crs != 'EPSG:4326':
-        gdf = gdf.to_crs('EPSG:4326')
-    gdf = gdf.sort_values(by='NM_MUN')
-    df = pd.read_excel('dados_rmc.xlsx')
+    if gdf.crs != "EPSG:4326":
+        gdf = gdf.to_crs("EPSG:4326")
+    gdf = gdf.sort_values(by="NM_MUN")
+    df = pd.read_excel("dados_rmc.xlsx")
     df.set_index("nome", inplace=True)
     return gdf, df
 
 @st.cache_resource(show_spinner=False)
-def carregar_html_template():
+def carregar_html():
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         return f.read()
 
@@ -108,9 +104,9 @@ def construir_geojson(gdf, df):
 
 gdf, df = carregar_dados()
 geojson_js = json.dumps(construir_geojson(gdf, df))
-html_template = carregar_html_template()
+html_template = carregar_html()
 
-# === Abas ===
+# Abas horizontais
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
