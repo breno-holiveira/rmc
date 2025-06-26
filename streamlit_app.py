@@ -6,43 +6,48 @@ from streamlit_navigation_bar import st_navbar
 
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
+# Estilos ultrafinos, suaves e profissionais para a navbar
 styles = {
     "nav": {
-        "background-color": "royalblue",
+        "background": "linear-gradient(90deg, #1e2a38, #273544)",
         "justify-content": "left",
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-size": "14px",
-        "padding": "0 8px",
-        "height": "40px",
+        "padding": "0 12px",
+        "height": "38px",
         "align-items": "center",
-        "box-shadow": "0 2px 5px rgba(0,0,0,0.1)",
+        "box-shadow": "none",
         "border-radius": "0 0 8px 8px",
+        "letter-spacing": "0.03em",
     },
     "span": {
-        "color": "white",
+        "color": "rgba(255, 255, 255, 0.85)",
         "padding": "6px 10px",
         "font-weight": "400",
         "user-select": "none",
+        "transition": "color 0.25s ease",
     },
     "active": {
-        "background-color": "white",
-        "color": "var(--text-color)",
-        "font-weight": "400",
+        "background-color": "rgba(255, 255, 255, 0.95)",
+        "color": "#1e2a38",
+        "font-weight": "600",
         "padding": "6px 10px",
         "border-radius": "6px",
         "user-select": "none",
+        "box-shadow": "0 0 6px rgba(0,0,0,0.1)",
+        "transition": "background-color 0.3s ease, color 0.3s ease",
     },
     "img": {
-        "display": "none",
+        "display": "none",  # Ocultar logo (vamos usar texto)
     }
 }
 
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    # Removido 'open_new_tab'
 }
 
+# Definição das páginas, trocando 'Home' por 'Inicio'
 pages = ["Inicio", "Documentation", "Examples", "Community", "About"]
 
 page = st_navbar(pages, styles=styles, options=options)
