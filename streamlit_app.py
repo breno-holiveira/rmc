@@ -3,9 +3,22 @@ import pandas as pd
 import geopandas as gpd
 import json
 
+# Remove barra lateral padrão do Streamlit
+hide_streamlit_style = """
+    <style>
+        /* Remove sidebar */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        /* Remove sidebar container */
+        .css-1d391kg {padding-left: 0 !important;}
+        [data-testid="stSidebar"] {display: none;}
+    </style>
+"""
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def carregar_dados():
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != 'EPSG:4326':
@@ -29,18 +42,18 @@ def construir_geojson(gdf, df):
 
 geojson_js = json.dumps(construir_geojson(gdf, df))
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def carregar_html_template():
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         return f.read()
 
 html_template = carregar_html_template()
 
-# CSS customizado para o menu de abas
+# CSS para remover barra laranja e aplicar azul discreto nas tabs
 st.markdown(
     """
     <style>
-    /* Remove a borda laranja padrão das tabs do Streamlit */
+    /* Remove barra laranja padrão das tabs Streamlit */
     div[role="tablist"] > button[aria-selected="true"] {
         border-bottom-color: transparent !important;
         box-shadow: none !important;
@@ -51,7 +64,7 @@ st.markdown(
         display: flex;
         gap: 16px;
         padding: 14px 28px;
-        background: rgba(20, 35, 55, 0.9); /* azul escuro translúcido discreto */
+        background: rgba(20, 35, 55, 0.9);
         border-radius: 14px;
         margin-bottom: 24px;
         box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
@@ -61,23 +74,20 @@ st.markdown(
     /* Abas individuais */
     div[role="tablist"] > button {
         background: transparent !important;
-        color: #a0b8d9 !important;  /* azul claro suave */
+        color: #a0b8d9 !important;
         border: none !important;
         border-bottom: 3.5px solid transparent !important;
         font-weight: 600 !important;
         font-size: 16px !important;
         padding: 12px 28px !important;
         border-radius: 10px 10px 0 0 !important;
-        transition:
-            color 0.3s ease,
-            border-bottom-color 0.3s ease,
-            background-color 0.25s ease;
+        transition: color 0.3s ease, border-bottom-color 0.3s ease, background-color 0.25s ease;
         cursor: pointer;
     }
 
-    /* Aba ativa com destaque azul sóbrio */
+    /* Aba ativa */
     div[role="tablist"] > button[aria-selected="true"] {
-        color: #3f5c85 !important; /* azul médio escuro */
+        color: #3f5c85 !important;
         border-bottom-color: #3f5c85 !important;
         background-color: rgba(63, 92, 133, 0.14) !important;
         font-weight: 700 !important;
@@ -86,14 +96,14 @@ st.markdown(
 
     /* Hover abas não ativas */
     div[role="tablist"] > button:not([aria-selected="true"]):hover {
-        color: #5a7ca6 !important; /* azul médio suave */
+        color: #5a7ca6 !important;
         background-color: rgba(90, 124, 166, 0.1) !important;
         border-bottom-color: #5a7ca6 !important;
     }
 
-    /* Conteúdo da aba */
+    /* Conteúdo das abas */
     .css-1d391kg > div[role="tabpanel"] {
-        background-color: #f2f6fb !important;  /* fundo azul muito claro */
+        background-color: #f2f6fb !important;
         border-radius: 0 14px 14px 14px !important;
         padding: 30px 36px !important;
         box-shadow: 0 6px 20px rgb(63 92 133 / 0.12);
@@ -112,7 +122,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Criando as abas
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
