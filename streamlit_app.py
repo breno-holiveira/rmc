@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-st.set_page_config(page_title="RMC Data", layout="wide")
+st.set_page_config(page_title="gRMC Data", layout="wide")
 
 st.markdown("""
 <style>
