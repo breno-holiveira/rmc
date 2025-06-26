@@ -3,15 +3,17 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Remove barra lateral padrão do Streamlit
+# Remove barra lateral e topo Streamlit
 hide_streamlit_style = """
     <style>
         /* Remove sidebar */
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        /* Remove sidebar container */
-        .css-1d391kg {padding-left: 0 !important;}
-        [data-testid="stSidebar"] {display: none;}
+        [data-testid="stSidebar"] {display: none !important;}
+        /* Remove menu superior (header do Streamlit com Fork/Github) */
+        header {display: none !important;}
+        /* Remove rodapé padrão */
+        footer {display: none !important;}
+        /* Ajusta padding do container principal para ocupar todo espaço */
+        .css-1d391kg {padding-left: 0 !important; padding-top: 0 !important;}
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
@@ -49,11 +51,11 @@ def carregar_html_template():
 
 html_template = carregar_html_template()
 
-# CSS para remover barra laranja e aplicar azul discreto nas tabs
+# CSS para remover barra laranja e aplicar azul discreto nas tabs, além de esconder barra superior do Streamlit
 st.markdown(
     """
     <style>
-    /* Remove barra laranja padrão das tabs Streamlit */
+    /* Remove borda laranja padrão das tabs Streamlit */
     div[role="tablist"] > button[aria-selected="true"] {
         border-bottom-color: transparent !important;
         box-shadow: none !important;
