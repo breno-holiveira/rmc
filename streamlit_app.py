@@ -5,7 +5,7 @@ import json
 from streamlit_navigation_bar import st_navbar
 
 # Configuração da página
-st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
+st.set_page_config(page_title="RMCs Data", layout="wide", page_icon="📊")
 
 # CSS personalizado para estilizar a barra de navegação do streamlit_navigation_bar
 custom_css = """
