@@ -18,18 +18,28 @@
       width: 100vw;
       height: 100vh;
       position: relative;
+      display: flex;
+      /* Criar espaço fixo para sidebar esquerda */
+    }
+
+    #sidebar {
+      width: 320px; /* largura suficiente para barra + painel */
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     svg {
-      width: 100%;
-      height: 100%;
+      flex-grow: 1;
+      height: 100vh;
       display: block;
+      /* Remove width 100%, usa flex-grow para ocupar o resto */
     }
 
     #top-bar {
-      position: absolute;
-      top: 20px;
-      left: 20px;
+      /* mantido o mesmo */
       display: flex;
       align-items: center;
       gap: 10px;
@@ -89,10 +99,6 @@
     }
 
     #infoPanel {
-      position: absolute;
-      top: 80px;
-      right: 20px;
-      width: 270px;
       background: rgba(255,255,255,0.25);
       backdrop-filter: blur(14px);
       border-radius: 16px;
@@ -101,8 +107,10 @@
       font-size: 14px;
       color: #1f2f45;
       overflow-y: auto;
+      flex-grow: 1;
       display: none;
       z-index: 1100;
+      min-height: 150px;
     }
 
     #infoPanel.visible { display: block; }
@@ -139,9 +147,8 @@
     }
 
     #closeBtn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
+      position: relative;
+      align-self: flex-end;
       background: rgba(44,62,112,0.2);
       border: none;
       border-radius: 50%;
@@ -151,6 +158,8 @@
       font-size: 16px;
       font-weight: bold;
       color: #2c3e70;
+      margin-bottom: 8px;
+      transition: background 0.3s;
     }
 
     #closeBtn:hover {
@@ -162,30 +171,32 @@
 <body>
 
   <div id="map">
-    <div id="top-bar">
-      <label for="municipio-select">Selecione um município ou clique no mapa:</label>
-      <select id="municipio-select">
-        <option value="" selected disabled>Selecione...</option>
-      </select>
+    <div id="sidebar">
+      <div id="top-bar">
+        <label for="municipio-select">Selecione um município ou clique no mapa:</label>
+        <select id="municipio-select">
+          <option value="" selected disabled>Selecione...</option>
+        </select>
+      </div>
+
+      <aside id="infoPanel" aria-live="polite" aria-label="Informações do município">
+        <button id="closeBtn" aria-label="Fechar painel de informações">&times;</button>
+        <h3>Município</h3>
+        <div class="grid">
+          <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
+          <div class="label">% PIB regional:</div><div class="value" id="part"></div>
+          <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
+          <div class="label">População:</div><div class="value" id="pop"></div>
+          <div class="label">Área:</div><div class="value" id="area"></div>
+          <div class="label">Densidade:</div><div class="value" id="dens"></div>
+        </div>
+        <div class="fonte">Fonte: IBGE</div>
+      </aside>
     </div>
 
-    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet" aria-label="Mapa interativo da Região Metropolitana de Campinas"></svg>
 
     <div id="tooltip"></div>
-
-    <aside id="infoPanel">
-      <button id="closeBtn">&times;</button>
-      <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
-        <div class="label">% PIB regional:</div><div class="value" id="part"></div>
-        <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-        <div class="label">População:</div><div class="value" id="pop"></div>
-        <div class="label">Área:</div><div class="value" id="area"></div>
-        <div class="label">Densidade:</div><div class="value" id="dens"></div>
-      </div>
-      <div class="fonte">Fonte: IBGE</div>
-    </aside>
   </div>
 
   <script>
@@ -231,7 +242,7 @@
     function showInfo(name) {
       const f = geo.features.find(f => f.properties.name === name);
       if (!f) return;
-      document.querySelector("h3").textContent = name;
+      document.querySelector("#infoPanel h3").textContent = name;
       document.getElementById("pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
       document.getElementById("part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
       document.getElementById("percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
