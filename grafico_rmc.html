@@ -14,14 +14,17 @@
       overflow: hidden;
       color: #2c3e70;
       user-select: none;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-rows: 56px 1fr;
+      grid-template-columns: 1fr;
+      height: 100vh;
+      width: 100vw;
     }
 
-    /* Container da seleção no topo */
+    /* Barra de seleção no topo */
     #select-container {
       background: rgba(255,255,255,0.9);
-      padding: 12px 24px;
+      padding: 10px 20px;
       font-weight: 600;
       font-size: 14px;
       color: #2c3e70;
@@ -30,10 +33,11 @@
       align-items: center;
       gap: 12px;
       user-select: none;
-      flex-shrink: 0;
+      z-index: 10;
     }
     #select-container label {
       user-select: none;
+      white-space: nowrap;
     }
     #municipio-select {
       font-size: 14px;
@@ -51,16 +55,18 @@
       outline: none;
     }
 
-    /* Container do mapa ocupa todo espaço restante */
+    /* Container do mapa ocupa o restante da tela */
     #map {
-      flex-grow: 1;
       position: relative;
-      overflow: hidden;
-    }
-    svg {
       width: 100%;
       height: 100%;
+      overflow: hidden;
+    }
+
+    svg {
       display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* Polígonos do mapa */
@@ -102,7 +108,7 @@
     /* Painel lateral fixo (direita) - vidro esfumado */
     #infoPanel {
       position: fixed;
-      top: 72px; /* Ajustado para ficar abaixo da barra de seleção */
+      top: 72px; /* Espaço para barra */
       right: 16px;
       width: 280px;
       max-height: calc(100vh - 92px);
@@ -240,15 +246,12 @@
     const minY = Math.min(...lats), maxY = Math.max(...lats);
 
     function project([lon, lat]) {
-      // Ajusta margem para evitar corte do mapa nas bordas
-      const marginX = 60; 
-      const marginY = 60;
+      const marginX = 40;
+      const marginY = 40;
       const width = svg.clientWidth - 2 * marginX;
       const height = svg.clientHeight - 2 * marginY;
 
-      // Projeção normalizada para o espaço do SVG
       const x = ((lon - minX) / (maxX - minX)) * width + marginX;
-      // y invertido para SVG (0 topo)
       const y = height + marginY - ((lat - minY) / (maxY - minY)) * height;
       return [x, y];
     }
@@ -296,51 +299,11 @@
     });
 
     // Cria paths e eventos no mapa
-    geo.features.forEach(f => {
-      const name = f.properties.name;
-      let d = "";
-      if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-      else if (f.geometry.type === "MultiPolygon") f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("d", d.trim());
-      path.classList.add("area");
-      path.setAttribute("data-name", name);
-      svg.appendChild(path);
-      paths[name] = path;
-
-      path.addEventListener("mousemove", e => {
-        tooltip.style.left = (e.clientX + 10) + "px";
-        tooltip.style.top = (e.clientY - 20) + "px";
-        tooltip.textContent = name;
-        tooltip.style.display = "block";
-      });
-
-      path.addEventListener("mouseleave", () => tooltip.style.display = "none");
-
-      path.addEventListener("click", () => {
-        select(name);
-        selectMunicipio.value = name; // sincroniza dropdown
-      });
-    });
-
-    // Fecha painel com botão
-    closeBtn.addEventListener("click", () => {
-      infoPanel.classList.remove("visible");
-      if (selected) {
-        paths[selected].classList.remove("selected");
-        selected = null;
-        selectMunicipio.value = "";
-      }
-    });
-
-    // Ajusta o SVG para redimensionar o mapa se janela mudar de tamanho
-    window.addEventListener("resize", () => {
-      // Limpa paths e redesenha para recalcular projeção com nova dimensão
-      for (const name in paths) {
-        svg.removeChild(paths[name]);
-      }
+    function drawMap() {
+      // Remove paths antigos
+      Object.values(paths).forEach(p => svg.removeChild(p));
       Object.keys(paths).forEach(k => delete paths[k]);
-      
+
       geo.features.forEach(f => {
         const name = f.properties.name;
         let d = "";
@@ -364,22 +327,34 @@
 
         path.addEventListener("click", () => {
           select(name);
-          selectMunicipio.value = name; // sincroniza dropdown
+          selectMunicipio.value = name;
         });
       });
 
-      // Se estiver selecionado, reaplica classe
+      // Se tiver seleção mantém destaque
       if (selected && paths[selected]) {
         paths[selected].classList.add("selected");
       }
+    }
+
+    drawMap();
+
+    // Recalcula e redesenha mapa no resize
+    window.addEventListener("resize", () => {
+      drawMap();
     });
 
-    // Seleciona primeiro município ao carregar
-    // Se quiser começar sem nenhum selecionado, pode comentar as linhas abaixo
-    if (geo.features.length > 0) {
-      //selectMunicipio.value = geo.features[0].properties.name;
-      //select(geo.features[0].properties.name);
-    }
+    // Fecha painel com botão
+    closeBtn.addEventListener("click", () => {
+      infoPanel.classList.remove("visible");
+      if (selected) {
+        paths[selected].classList.remove("selected");
+        selected = null;
+        selectMunicipio.value = "";
+      }
+    });
+
+    // Não seleciona nenhum município ao carregar
   </script>
 </body>
 </html>
