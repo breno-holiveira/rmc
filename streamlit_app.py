@@ -4,7 +4,7 @@ import geopandas as gpd
 import json
 
 # Configurações iniciais
-st.set_page_config(page_title="RMC Data", layout="wide")
+st.set_page_config(page_title="RMCx Data", layout="wide")
 
 # CSS personalizado
 st.markdown("""
