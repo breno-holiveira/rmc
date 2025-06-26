@@ -1,38 +1,11 @@
 import streamlit as st
 
 def navigation():
-    params = st.query_params
+    params = st.experimental_get_query_params()
     path = params.get('p', ['home'])[0]
     return path
 
-# Barra de navegação (menu simples)
 def nav_bar():
-    st.markdown(
-        """
-        <style>
-        .nav {
-            display: flex;
-            gap: 15px;
-            background-color: #f0f2f6;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .nav a {
-            text-decoration: none;
-            color: #0366d6;
-            font-weight: 600;
-            font-size: 16px;
-        }
-        .nav a.selected {
-            color: #000000;
-            font-weight: 700;
-            border-bottom: 2px solid #0366d6;
-        }
-        </style>
-        """, unsafe_allow_html=True
-    )
-
     current = navigation()
     pages = ["home", "results", "analysis", "examples", "logs", "verify", "config"]
     labels = {
@@ -45,21 +18,15 @@ def nav_bar():
         "config": "Config"
     }
 
-    nav_html = '<nav class="nav">'
-    for p in pages:
-        cls = "selected" if p == current else ""
-        nav_html += f'<a href="?p={p}" class="{cls}">{labels[p]}</a>'
-    nav_html += '</nav>'
-
-    st.markdown(nav_html, unsafe_allow_html=True)
-
+    cols = st.columns(len(pages))
+    for i, p in enumerate(pages):
+        if cols[i].button(labels[p], key=p):
+            st.experimental_set_query_params(p=p)
 
 page = navigation()
 
-# Exibe barra de navegação no topo
 nav_bar()
 
-# Conteúdo das páginas
 if page == "home":
     st.title('Home')
     st.write('This is the home page.')
