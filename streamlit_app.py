@@ -7,64 +7,111 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilo mais compacto e suave
+# CSS injetado para hover e ajustes finos, pois o styles não permite hover
+custom_css = """
+<style>
+/* Hover nos itens da navbar */
+[data-testid="stHorizontalBlock"] button:hover,
+[data-testid="stHorizontalBlock"] div[role="tab"]:hover {
+    background-color: #e0e6f8;
+    color: #1f3c88;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 6px;
+}
+
+/* Cursor pointer */
+[data-testid="stHorizontalBlock"] button,
+[data-testid="stHorizontalBlock"] div[role="tab"] {
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Fonte suave para o texto da navbar */
+[data-testid="stHorizontalBlock"] > div {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 14px !important;
+}
+
+/* Ajuste de padding para reduzir espaço horizontal */
+[data-testid="stHorizontalBlock"] button,
+[data-testid="stHorizontalBlock"] div[role="tab"] {
+    padding: 6px 12px !important;
+    margin: 0 6px !important;
+    border-radius: 6px;
+}
+
+/* Ajuste container navbar para alinhamento esquerdo */
+[data-testid="stHorizontalBlock"] > div:first-child {
+    justify-content: flex-start !important;
+    padding-left: 12px !important;
+    background-color: #3b5998 !important; /* tom azul suave */
+    height: 44px !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 0 0 8px 8px;
+}
+
+/* Botão ativo */
+[data-testid="stHorizontalBlock"] button[aria-selected="true"],
+[data-testid="stHorizontalBlock"] div[role="tab"][aria-selected="true"] {
+    background-color: white !important;
+    color: #3b5998 !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border-radius: 6px;
+}
+</style>
+"""
+
+st.markdown(custom_css, unsafe_allow_html=True)
+
+# Definição do dicionário styles sem hover (para não quebrar)
 styles = {
     "nav": {
-        "background-color": "#3b5998",  # azul suave, menos vibrante que royalblue
+        "background-color": "#3b5998",
         "justify-content": "left",
         "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "13px",         # fonte menor para evitar "esticado"
-        "padding": "0 8px",          # padding horizontal reduzido
-        "height": "42px",            # navbar mais baixa
+        "font-size": "14px",
+        "height": "44px",
+        "padding": "0 8px",
         "align-items": "center",
-        "box-shadow": "0 2px 4px rgba(0,0,0,0.12)",
+        "box-shadow": "0 2px 5px rgba(0,0,0,0.1)",
+        "border-radius": "0 0 8px 8px",
     },
     "span": {
         "color": "white",
-        "padding": "6px 10px",       # botões mais compactos
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "padding": "6px 12px",
         "font-weight": "500",
         "border-radius": "6px",
-        "transition": "background-color 0.3s ease, color 0.3s ease",
-        "cursor": "pointer",
         "user-select": "none",
-    },
-    "span:hover": {
-        "background-color": "#2d4373",
-        "color": "#e2e6ea",
     },
     "active": {
         "background-color": "white",
         "color": "#3b5998",
         "font-weight": "600",
-        "padding": "6px 10px",
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "box-shadow": "0 2px 8px rgba(0,0,0,0.15)",
+        "padding": "6px 12px",
+        "box-shadow": "0 2px 8px rgba(0,0,0,0.2)",
         "border-radius": "6px",
+        "user-select": "none",
         "cursor": "default",
     },
     "img": {
-        "display": "none",  # ocultar logo
+        "display": "none",  # sem ícone
     }
 }
 
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    "open_new_tab": False,  # garantir que não abre em nova aba
+    "open_new_tab": False,  # importantíssimo para manter na mesma página
 }
 
-# Definir páginas
-pages = ["Início", "Documentation", "Examples", "Community", "About"]
+# Páginas do menu, “Inicio” substitui “Home”
+pages = ["Inicio", "Documentation", "Examples", "Community", "About"]
 
-# URLs vazias para manter tudo na mesma página
-urls = {page: "" for page in pages}
+page = st_navbar(pages, styles=styles, options=options)
 
-# Barra de navegação
-page = st_navbar(pages, urls=urls, styles=styles, options=options)
-
-# Conteúdo da página
-if page == "Início":
+# Lógica das páginas
+if page == "Inicio":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
 
@@ -102,17 +149,17 @@ if page == "Início":
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 elif page == "Documentation":
-    st.title("📄 Documentation")
+    st.title("Documentation")
     st.write("Aqui você pode colocar a documentação do seu app...")
 
 elif page == "Examples":
-    st.title("💡 Examples")
+    st.title("Examples")
     st.write("Exemplos do app...")
 
 elif page == "Community":
-    st.title("👥 Community")
+    st.title("Community")
     st.write("Links para a comunidade...")
 
 elif page == "About":
-    st.title("ℹ️ About")
+    st.title("About")
     st.write("Sobre o projeto...")
