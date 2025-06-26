@@ -8,4 +8,4 @@ streamlit-folium
 plotly
 openpyxl
 matplotlib
-streamlit-navigation-bar
+streamlit-community-navigation-bar
