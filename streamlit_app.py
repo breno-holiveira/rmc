@@ -3,7 +3,7 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-st.set_page_config(page_title="RMC Data", layout="wide", page_icon='📊', initial_sidebar_state="expanded")
+st.set_page_config(page_title="RMCd Data", layout="wide", page_icon='📊', initial_sidebar_state="expanded")
 
 from streamlit_navigation_bar import st_navbar
 
