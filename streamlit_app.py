@@ -3,13 +3,12 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# === Remover barra lateral, header e padding extra ===
+# CSS para estilizar a barra de abas e remover sidebar/header
 st.markdown("""
 <style>
-/* Remove barra lateral */
+/* Remove barra lateral, header e footer */
 [data-testid="stSidebar"], header, footer {
     display: none !important;
 }
@@ -17,18 +16,51 @@ st.markdown("""
     padding-top: 0rem !important;
 }
 
-/* Remove a linha laranja do st.tabs (extra) */
-div[data-testid="stTabs"] > div > div > div > div[aria-selected="true"]::after {
+/* Container das abas */
+div[data-testid="stTabs"] > div > div {
+    background-color: #f97316;  /* laranja vibrante */
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 3px 10px rgb(249 115 22 / 0.5);
+}
+
+/* Cada botão da aba */
+div[data-testid="stTabs"] > div > div > div {
+    color: white;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 6px;
+    user-select: none;
+    transition: background-color 0.25s ease, color 0.25s ease;
+    cursor: pointer;
+}
+
+/* Aba ativa */
+div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
+    background-color: #c2410c;  /* laranja escuro */
+    box-shadow: 0 0 8px rgb(156 40 0 / 0.8);
+    color: #fff;
+}
+
+/* Hover nas abas não ativas */
+div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]):hover {
+    background-color: #ea580c;  /* laranja médio */
+    color: #fff;
+}
+
+/* Remove linha laranja default do tab ativo */
+div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
     border-bottom: none !important;
     box-shadow: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# === Abas no topo ===
+# Definição das abas
 abas = st.tabs(["Início", "PIB por Município", "Demografia", "Comparativo"])
 
-# === Funções de carregamento com cache ===
 @st.cache_data
 def carregar_df():
     df = pd.read_excel('dados_rmc.xlsx')
@@ -64,7 +96,6 @@ def carregar_html_base():
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         return f.read()
 
-# === Conteúdo de cada aba ===
 with abas[0]:
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
