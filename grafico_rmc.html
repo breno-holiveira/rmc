@@ -6,44 +6,43 @@
   <title>RMC Interativo</title>
   <style>
     html, body {
-      height: 100%;
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(120deg, #f4f7fa, #e9eef4);
       overflow: hidden;
       color: #2c3e70;
-      user-select: none;
     }
 
+    /* Seleção inicial */
     #select-container {
       position: fixed;
-      top: 16px;
-      left: 16px;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.92);
+      padding: 14px 18px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      text-align: center;
       z-index: 20;
-      background: rgba(255,255,255,0.9);
-      padding: 8px 14px;
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-      font-weight: 600;
-      font-size: 14px;
-      color: #2c3e70;
     }
 
-    #select-container label {
-      margin-right: 8px;
-      user-select: none;
+    #select-container .instruction {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 8px;
     }
 
     #municipio-select {
-      font-size: 14px;
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 8px;
       border: 1.5px solid #7a8ba3;
-      min-width: 200px;
-      cursor: pointer;
-      transition: border-color 0.3s;
+      background: #fff;
+      min-width: 240px;
+      font-size: 14px;
       color: #2c3e70;
-      background: white;
+      cursor: pointer;
     }
 
     #municipio-select:hover, #municipio-select:focus {
@@ -55,7 +54,6 @@
       width: 100vw;
       height: 100vh;
       position: relative;
-      overflow: hidden;
     }
 
     svg {
@@ -69,7 +67,7 @@
       stroke: rgba(44, 62, 112, 0.4);
       stroke-width: 1;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.2s ease;
     }
 
     .area:hover {
@@ -79,112 +77,90 @@
 
     .area.selected {
       fill: rgba(44, 62, 112, 0.55);
-      stroke: rgba(30, 40, 70, 0.9);
+      stroke: rgba(30, 40, 70, 0.85);
       stroke-width: 1.7;
-      filter: drop-shadow(0 0 5px rgba(44,62,112,0.4));
     }
 
     #tooltip {
       position: fixed;
       background: rgba(44,62,112,0.9);
       color: white;
-      padding: 5px 12px;
+      padding: 5px 10px;
       font-size: 13px;
-      border-radius: 6px;
+      border-radius: 5px;
       display: none;
       pointer-events: none;
       z-index: 1000;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-      white-space: nowrap;
-      font-weight: 600;
-      user-select: none;
     }
 
     #infoPanel {
       position: fixed;
       top: 60px;
-      right: 16px;
-      width: 280px;
+      right: 20px;
+      width: 270px;
       max-height: calc(100vh - 80px);
-      background: rgba(255, 255, 255, 0.22);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(14px);
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      padding: 20px 24px 24px 24px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      padding: 20px 24px;
       font-size: 14px;
       color: #1f2f45;
       overflow-y: auto;
       display: none;
       z-index: 1100;
-      user-select: text;
-      transition: opacity 0.3s ease;
     }
 
-    #infoPanel.visible {
-      display: block;
-      opacity: 1;
-    }
+    #infoPanel.visible { display: block; }
 
     #infoPanel h3 {
       margin-top: 0;
-      margin-bottom: 16px;
-      font-size: 22px;
-      font-weight: 700;
+      font-size: 20px;
       color: #2c3e70;
-      user-select: text;
     }
 
     #infoPanel .grid {
       display: grid;
       grid-template-columns: auto 1fr;
-      row-gap: 14px;
-      column-gap: 16px;
+      row-gap: 12px;
+      column-gap: 12px;
     }
 
-    #infoPanel .label {
+    .label {
       font-weight: 600;
       color: #4d648d;
-      user-select: text;
-      align-self: center;
     }
 
-    #infoPanel .value {
-      color: #2d3f54;
+    .value {
       text-align: right;
-      user-select: text;
-      font-variant-numeric: tabular-nums;
+      color: #2d3f54;
     }
 
-    #infoPanel .fonte {
+    .fonte {
       font-size: 11px;
+      margin-top: 20px;
       color: #7a8ba3;
-      margin-top: 22px;
       text-align: center;
-      user-select: none;
       font-style: italic;
     }
 
     #closeBtn {
       position: absolute;
-      top: 14px;
-      right: 14px;
-      background: rgba(44,62,112,0.15);
+      top: 12px;
+      right: 12px;
+      background: rgba(44,62,112,0.2);
       border: none;
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
       color: #2c3e70;
-      font-weight: 700;
-      font-size: 18px;
-      line-height: 1;
-      transition: background 0.3s;
-      user-select: none;
     }
 
     #closeBtn:hover {
-      background: rgba(44,62,112,0.35);
+      background: rgba(44,62,112,0.4);
       color: white;
     }
   </style>
@@ -192,7 +168,7 @@
 <body>
 
   <div id="select-container">
-    <label for="municipio-select">Selecione um município ou clique no mapa:</label>
+    <div class="instruction">Selecione um município abaixo ou clique no mapa</div>
     <select id="municipio-select">
       <option value="" selected disabled>[Selecione um município]</option>
     </select>
@@ -201,8 +177,8 @@
   <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip"></div>
-    <aside id="infoPanel" role="region" aria-live="polite" aria-label="Informações do município">
-      <button id="closeBtn" aria-label="Fechar painel de informações">&times;</button>
+    <aside id="infoPanel">
+      <button id="closeBtn">&times;</button>
       <h3>Município</h3>
       <div class="grid">
         <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
@@ -223,17 +199,18 @@
     const infoPanel = document.getElementById("infoPanel");
     const closeBtn = document.getElementById("closeBtn");
     const selectMunicipio = document.getElementById("municipio-select");
+    const selectContainer = document.getElementById("select-container");
     const paths = {};
     let selected = null;
 
+    // Projeção simples
     let coords = [];
     geo.features.forEach(f => {
       const g = f.geometry;
       if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
       else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
     });
-    const lons = coords.map(c => c[0]);
-    const lats = coords.map(c => c[1]);
+    const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
     const minX = Math.min(...lons), maxX = Math.max(...lons);
     const minY = Math.min(...lats), maxY = Math.max(...lats);
 
@@ -248,45 +225,36 @@
     }
 
     function select(name) {
-      if (selected) paths[selected].classList.remove("selected");
+      if (selected) {
+        paths[selected].classList.remove("selected");
+      }
       selected = name;
       if (paths[name]) {
         paths[name].classList.add("selected");
         showInfo(name);
         infoPanel.classList.add("visible");
+        selectContainer.style.display = "none";
       }
     }
 
     function showInfo(name) {
       const f = geo.features.find(f => f.properties.name === name);
       if (!f) return;
-      infoPanel.querySelector("h3").textContent = name;
-      infoPanel.querySelector("#pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-      infoPanel.querySelector("#part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-      infoPanel.querySelector("#percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
-      infoPanel.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-      infoPanel.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
-      infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+      document.querySelector("h3").textContent = name;
+      document.getElementById("pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+      document.getElementById("part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+      document.getElementById("percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+      document.getElementById("pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+      document.getElementById("area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
+      document.getElementById("dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
     }
 
     geo.features.forEach(f => {
       const name = f.properties.name;
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      selectMunicipio.appendChild(option);
-    });
-
-    selectMunicipio.addEventListener("change", e => {
-      select(e.target.value);
-    });
-
-    geo.features.forEach(f => {
-      const name = f.properties.name;
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       let d = "";
       if (f.geometry.type === "Polygon") d = "M" + polygonToPath(f.geometry.coordinates[0]) + " Z";
-      else if (f.geometry.type === "MultiPolygon") f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      else f.geometry.coordinates.forEach(p => d += "M" + polygonToPath(p[0]) + " Z ");
       path.setAttribute("d", d.trim());
       path.classList.add("area");
       path.setAttribute("data-name", name);
@@ -294,13 +262,15 @@
       paths[name] = path;
 
       path.addEventListener("mousemove", e => {
-        tooltip.style.left = (e.clientX + 10) + "px";
-        tooltip.style.top = (e.clientY - 20) + "px";
+        tooltip.style.left = e.clientX + 10 + "px";
+        tooltip.style.top = e.clientY - 25 + "px";
         tooltip.textContent = name;
         tooltip.style.display = "block";
       });
 
-      path.addEventListener("mouseleave", () => tooltip.style.display = "none");
+      path.addEventListener("mouseleave", () => {
+        tooltip.style.display = "none";
+      });
 
       path.addEventListener("click", () => {
         select(name);
@@ -308,13 +278,23 @@
       });
     });
 
+    geo.features.forEach(f => {
+      const option = document.createElement("option");
+      option.value = f.properties.name;
+      option.textContent = f.properties.name;
+      selectMunicipio.appendChild(option);
+    });
+
+    selectMunicipio.addEventListener("change", e => {
+      if (e.target.value) select(e.target.value);
+    });
+
     closeBtn.addEventListener("click", () => {
       infoPanel.classList.remove("visible");
-      if (selected) {
-        paths[selected].classList.remove("selected");
-        selected = null;
-        selectMunicipio.value = "";
-      }
+      if (selected) paths[selected].classList.remove("selected");
+      selected = null;
+      selectMunicipio.value = "";
+      selectContainer.style.display = "block";
     });
   </script>
 </body>
