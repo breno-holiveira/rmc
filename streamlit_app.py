@@ -15,7 +15,7 @@ st.markdown("""
     padding-top: 0rem !important;
 }
 
-/* Container das abas */
+/* Container das abas - só container das abas (st.tabs) */
 div[data-testid="stTabs"] > div > div {
     padding: 8px 20px;
     display: flex;
@@ -24,44 +24,44 @@ div[data-testid="stTabs"] > div > div {
     background-color: white;
 }
 
-/* Cada aba - estilo base permanente */
+/* Cada aba dentro do st.tabs */
 div[data-testid="stTabs"] > div > div > div {
-    color: #444;
-    font-weight: 600;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 18px; /* maior fonte */
-    padding: 10px 28px;
-    border-radius: 8px 8px 0 0;
-    user-select: none;
-    cursor: pointer;
-    border: 1.5px solid #ccc; /* contorno cinza claro sempre visível */
-    border-bottom: none;
-    background-color: white;
+    color: #444 !important;
+    font-weight: 600 !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-size: 18px !important; /* maior fonte */
+    padding: 10px 28px !important;
+    border-radius: 8px 8px 0 0 !important;
+    user-select: none !important;
+    cursor: pointer !important;
+    border: 1.5px solid #ccc !important; /* contorno cinza claro sempre visível */
+    border-bottom: none !important;
+    background-color: white !important;
     box-shadow: none !important;
-    transition: none !important; /* desativa qualquer transição */
+    transition: none !important; /* sem transição */
 }
 
-/* Aba ativa - estilo permanente */
+/* Aba ativa */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    color: #0d47a1; /* azul escuro */
-    border-color: #0d47a1; /* contorno azul */
-    background-color: white;
-    font-weight: 700;
-    box-shadow: 0 4px 12px rgb(13 71 161 / 0.15);
+    color: #0d47a1 !important; /* azul escuro */
+    border-color: #0d47a1 !important; /* contorno azul */
+    background-color: white !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgb(13 71 161 / 0.15) !important;
 }
 
-/* Remove underline padrão do Streamlit */
+/* Remove underline padrão do Streamlit nas abas */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
     border-bottom: none !important;
     box-shadow: none !important;
 }
 
-/* Remove linhas extras */
+/* Remove linhas extras em abas inativas */
 div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]) {
     border-bottom: none !important;
 }
 
-/* Sem efeito hover - manter cores constantes */
+/* Sem efeito hover - mantém cores constantes */
 div[data-testid="stTabs"] > div > div > div:hover {
     color: #444 !important;
     background-color: white !important;
