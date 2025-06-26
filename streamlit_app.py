@@ -4,10 +4,14 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Configuração da página
+# Configurações da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilo profissionalizado da barra de navegação
+# Página ativa atual (armazenada em estado)
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Home"
+
+# Estilo profissionalizado da barra de navegação com "logo" texto
 styles = {
     "nav": {
         "background-color": "#0d1f3c",
@@ -17,6 +21,7 @@ styles = {
         "font-size": "16px",
         "border-radius": "0 0 16px 16px",
         "box-shadow": "0 4px 12px rgba(0, 0, 0, 0.25)",
+        "position": "relative",
     },
     "span": {
         "color": "#ffffff",
@@ -39,11 +44,36 @@ options = {
     "show_sidebar": False,
 }
 
-# Barra de navegação centralizada
+# Logo textual clicável no topo esquerdo
+st.markdown("""
+<style>
+.logo-text {
+    position: absolute;
+    top: 0.65rem;
+    left: 2rem;
+    font-size: 1.4rem;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+.logo-text:hover {
+    color: #ff7200;
+}
+</style>
+<a href="?nav=Home"><div class="logo-text">RMC DATA</div></a>
+""", unsafe_allow_html=True)
+
+# Barra de navegação
 pages = ["Home", "Documentation", "Examples", "Community", "About"]
 page = st_navbar(pages, styles=styles, options=options)
 
-# Lógica de conteúdo conforme a aba selecionada
+# Atualiza estado ao mudar aba
+st.session_state.current_page = page
+
+# Lógica de exibição das páginas
 if page == "Home":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -77,6 +107,7 @@ if page == "Home":
     gj = {"type": "FeatureCollection", "features": features}
     geojson_js = json.dumps(gj)
 
+    # Carregar HTML refinado do mapa
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         html_template = f.read()
 
