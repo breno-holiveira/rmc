@@ -7,7 +7,7 @@ st.set_page_config(page_title="RMC Data", layout="wide")
 
 st.markdown("""
 <style>
-/* Remover barra lateral, header e footer */
+/* Remover sidebar, header e footer */
 [data-testid="stSidebar"], header, footer {
     display: none !important;
 }
@@ -20,40 +20,50 @@ div[data-testid="stTabs"] > div > div {
     padding: 8px 20px;
     display: flex;
     gap: 16px;
-    border-bottom: 1.5px solid #ddd;  /* linha suave e clara para separar */
+    border-bottom: 1.5px solid #ddd;  /* linha clara e única */
     background-color: white;
 }
 
 /* Cada aba */
 div[data-testid="stTabs"] > div > div > div {
-    color: #555; /* texto cinza escuro */
+    color: #444; /* texto cinza escuro */
     font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
     padding: 10px 24px;
     border-radius: 8px 8px 0 0;
     user-select: none;
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    transition: color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     cursor: pointer;
-    border-bottom: none !important; /* remove underline padrão */
+    border: 1.5px solid transparent; /* contorno suave invisível */
+    border-bottom: none; /* tirar borda inferior da aba */
 }
 
 /* Aba ativa */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"] {
-    background-color: #f5f7fa;  /* fundo muito claro, quase branco */
+    background-color: #f5f7fa;  /* fundo muito leve */
     color: #0d47a1; /* azul escuro profissional */
-    box-shadow: 0px 4px 8px rgb(13 71 161 / 0.15);
-    border-bottom: none !important; /* garantir sem underline */
+    border-color: #0d47a1; /* contorno azul */
+    border-bottom: none !important; /* sem linha debaixo */
+    box-shadow: 0 4px 12px rgb(13 71 161 / 0.15);
 }
 
-/* Hover nas abas não ativas */
+/* Hover nas abas não ativas - só texto azul, sem background */
 div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]):hover {
     color: #0d47a1;
-    background-color: #e8f0fe;
+    background-color: transparent !important;
+    border-color: #0d47a1; /* contorno azul leve no hover */
 }
 
-/* Remove linha padrão da aba ativa (underline laranja do Streamlit) */
+/* Remover underline laranja padrão */
 div[data-testid="stTabs"] > div > div > div[aria-selected="true"]::after {
     border-bottom: none !important;
     box-shadow: none !important;
+}
+
+/* Remover linhas extras */
+div[data-testid="stTabs"] > div > div > div:not([aria-selected="true"]) {
+    border-bottom: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
