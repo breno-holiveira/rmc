@@ -6,29 +6,11 @@ import json
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# === Remover barra lateral, header e padding extra ===
-st.markdown("""
-<style>
-/* Remove barra lateral */
-[data-testid="stSidebar"], header, footer {
-    display: none !important;
-}
-.block-container {
-    padding-top: 0rem !important;
-}
+# Título
+st.title("RMC Data")
+st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
 
-/* Remove a linha laranja do st.tabs (extra) */
-div[data-testid="stTabs"] > div > div > div > div[aria-selected="true"]::after {
-    border-bottom: none !important;
-    box-shadow: none !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# === Abas no topo ===
-abas = st.tabs(["Início", "PIB por Município", "Demografia", "Comparativo"])
-
-# === Funções de carregamento com cache ===
+# === Carregamento dos dados ===
 @st.cache_data
 def carregar_df():
     df = pd.read_excel('dados_rmc.xlsx')
@@ -64,25 +46,25 @@ def carregar_html_base():
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         return f.read()
 
-# === Conteúdo de cada aba ===
-with abas[0]:
-    st.title("RMC Data 1")
-    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+# === Abas ===
+abas = st.tabs(["Início", "PIB por Município", "Demografia", "Comparativo"])
 
+with abas[0]:
+    st.subheader("Início")
     geojson_js = construir_geojson()
     html_template = carregar_html_base()
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 with abas[1]:
-    st.header("PIB por Município")
+    st.subheader("PIB por Município")
     st.dataframe(carregar_df()[["PIB (2021)"]])
 
 with abas[2]:
-    st.header("Demografia")
+    st.subheader("Demografia")
     st.dataframe(carregar_df()[["populacao", "área", "densidade"]])
 
 with abas[3]:
-    st.header("Comparativo")
+    st.subheader("Comparativo")
     df = carregar_df()
     st.bar_chart(df["PIB (2021)"].sort_values(ascending=False))
