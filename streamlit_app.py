@@ -7,57 +7,60 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilo customizado mais compacto e elegante
+# Estilo mais compacto e suave
 styles = {
     "nav": {
-        "background-color": "royalblue",
+        "background-color": "#3b5998",  # azul suave, menos vibrante que royalblue
         "justify-content": "left",
         "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",       # fonte menor e mais compacta
-        "padding": "0 12px",       # menos espaçamento horizontal
-        "height": "48px",          # navbar mais baixa
+        "font-size": "13px",         # fonte menor para evitar "esticado"
+        "padding": "0 8px",          # padding horizontal reduzido
+        "height": "42px",            # navbar mais baixa
         "align-items": "center",
+        "box-shadow": "0 2px 4px rgba(0,0,0,0.12)",
     },
     "span": {
         "color": "white",
-        "padding": "8px 12px",     # botões com padding reduzido
+        "padding": "6px 10px",       # botões mais compactos
         "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-weight": "500",
-        "transition": "color 0.25s ease, background-color 0.25s ease",
+        "border-radius": "6px",
+        "transition": "background-color 0.3s ease, color 0.3s ease",
+        "cursor": "pointer",
+        "user-select": "none",
+    },
+    "span:hover": {
+        "background-color": "#2d4373",
+        "color": "#e2e6ea",
     },
     "active": {
         "background-color": "white",
-        "color": "royalblue",
+        "color": "#3b5998",
         "font-weight": "600",
-        "padding": "8px 12px",
+        "padding": "6px 10px",
         "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "box-shadow": "0 2px 6px rgba(0,0,0,0.2)",
+        "box-shadow": "0 2px 8px rgba(0,0,0,0.15)",
         "border-radius": "6px",
-        "transition": "color 0.25s ease, background-color 0.25s ease",
+        "cursor": "default",
     },
     "img": {
-        "display": "none",  # ocultar logo, pois você quer texto
+        "display": "none",  # ocultar logo
     }
 }
 
 options = {
     "show_menu": False,
     "show_sidebar": False,
+    "open_new_tab": False,  # garantir que não abre em nova aba
 }
 
 # Definir páginas
 pages = ["Início", "Documentation", "Examples", "Community", "About"]
 
-# URLs para as abas — deixamos vazio para "Início" manter na mesma página
-urls = {
-    "Início": "#",           # Mantém na mesma página ao clicar
-    "Documentation": "",
-    "Examples": "",
-    "Community": "",
-    "About": ""
-}
+# URLs vazias para manter tudo na mesma página
+urls = {page: "" for page in pages}
 
-# Barra de navegação customizada
+# Barra de navegação
 page = st_navbar(pages, urls=urls, styles=styles, options=options)
 
 # Conteúdo da página
