@@ -5,9 +5,6 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-st.title("RMC Data")
-st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
-
 # Carregamento de dados e pré-processamento
 @st.cache_data
 def carregar_dados():
@@ -44,18 +41,21 @@ def carregar_html_template():
 
 html_template = carregar_html_template()
 
-# Abas horizontais
+# Abas horizontais primeiro (antes do título)
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
+    st.title("RMC Data")
+    st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
+
     # Mapa interativo
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 with tab2:
-    st.header("Página 1")
+    st.title("Página 1")
     st.write("Conteúdo e análises da Página 1 aqui.")
 
 with tab3:
-    st.header("Página 2")
+    st.title("Página 2")
     st.write("Conteúdo e análises da Página 2 aqui.")
