@@ -7,29 +7,22 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilos da barra (substitui o CSS anterior)
+# Estilo idêntico ao exemplo com `cubes.svg`
 styles = {
     "nav": {
-        "background-color": "linear-gradient(90deg, #0d1f3c, #163466)",
-        "justify-content": "center",
-        "border-radius": "0 0 15px 15px",
-        "box-shadow": "0 3px 8px rgb(0 0 0 / 0.3)",
-        "padding": "0.6rem 1rem",
+        "background-color": "royalblue",
+        "justify-content": "left",
     },
     "span": {
         "color": "white",
-        "padding": "10px 14px",
-        "font-family": "Roboto, sans-serif",
-        "font-size": "1.05rem",
-        "font-weight": "600",
+        "padding": "14px",
     },
     "active": {
-        "background-color": "#ff7200",
-        "color": "white",
-        "font-weight": "700",
-        "box-shadow": "0 0 8px 1px #ff7f27",
-        "border-radius": "8px",
-    },
+        "background-color": "white",
+        "color": "var(--text-color)",
+        "font-weight": "normal",
+        "padding": "14px",
+    }
 }
 
 options = {
@@ -37,10 +30,11 @@ options = {
     "show_sidebar": False,
 }
 
+# Definir páginas
 pages = ["Home", "Documentation", "Examples", "Community", "About"]
 page = st_navbar(pages, styles=styles, options=options)
 
-# Conteúdo das páginas
+# Lógica de conteúdo conforme a aba selecionada
 if page == "Home":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
