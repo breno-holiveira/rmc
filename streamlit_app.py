@@ -1,41 +1,18 @@
 import streamlit as st
 
 st.set_page_config(layout="wide")
+st.markdown("<style>div[data-testid='stSidebar']{display:none !important;}</style>", unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-div[data-testid="stSidebar"] {display:none !important;}
-.menu {
-    background:#f63366;
-    padding:10px 30px;
-    display:flex;
-    gap:20px;
-}
-.menu a {
-    color:white;
-    text-decoration:none;
-    font-weight:bold;
-}
-.menu a.active {
-    text-decoration:underline;
-}
-</style>
-""", unsafe_allow_html=True)
+option = st.radio("Escolha a página", ["Início", "Página 1", "Página 2"], horizontal=True)
 
-page = st.experimental_get_query_params().get("page", ["home"])[0]
+if option == "Início":
+    st.title("Início")
+    st.write("Conteúdo da página inicial.")
 
-menu = {
-    "home": "Início",
-    "pag1": "Página 1",
-    "pag2": "Página 2",
-}
+elif option == "Página 1":
+    st.title("Página 1")
+    st.write("Conteúdo da página 1.")
 
-menu_html = '<div class="menu">'
-for key, label in menu.items():
-    active = "active" if page == key else ""
-    menu_html += f'<a href="?page={key}" class="{active}">{label}</a>'
-menu_html += '</div>'
-
-st.markdown(menu_html, unsafe_allow_html=True)
-
-st.write(f"Você está na página: **{page}**")
+else:
+    st.title("Página 2")
+    st.write("Conteúdo da página 2.")
