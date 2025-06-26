@@ -1,10 +1,9 @@
 import streamlit as st
 
 def navigation():
-    # Usar st.experimental_get_query_params (ou st.query_params no Streamlit >=1.21)
-    # para obter o parâmetro 'p' da URL
-    params = st.experimental_get_query_params()
-    path = params.get('p', ['home'])[0]  # default 'home' se não houver parâmetro
+    # Obtem o parâmetro 'p' da URL usando st.query_params
+    params = st.query_params
+    path = params.get('p', ['home'])[0]  # padrão 'home' se não existir
     return path
 
 page = navigation()
