@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RMC Interativo</title>
   <style>
-    /* Reset e base */
     html, body {
       height: 100%;
       margin: 0;
@@ -16,7 +15,6 @@
       user-select: none;
     }
 
-    /* Caixa dropdown no topo esquerdo */
     #select-container {
       position: fixed;
       top: 16px;
@@ -50,7 +48,6 @@
       outline: none;
     }
 
-    /* Mapa ocupa 100% da tela */
     #map {
       width: 100vw;
       height: 100vh;
@@ -63,7 +60,6 @@
       display: block;
     }
 
-    /* Polígonos do mapa */
     .area {
       fill: rgba(44, 62, 112, 0.15);
       stroke: rgba(44, 62, 112, 0.4);
@@ -82,7 +78,6 @@
       filter: drop-shadow(0 0 5px rgba(44,62,112,0.4));
     }
 
-    /* Tooltip simples */
     #tooltip {
       position: fixed;
       background: rgba(44,62,112,0.9);
@@ -99,7 +94,6 @@
       user-select: none;
     }
 
-    /* Painel lateral fixo (direita) - vidro esfumado */
     #infoPanel {
       position: fixed;
       top: 60px;
@@ -125,7 +119,6 @@
       opacity: 1;
     }
 
-    /* Título */
     #infoPanel h3 {
       margin-top: 0;
       margin-bottom: 16px;
@@ -135,7 +128,6 @@
       user-select: text;
     }
 
-    /* Grid para os dados */
     #infoPanel .grid {
       display: grid;
       grid-template-columns: auto 1fr;
@@ -156,7 +148,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Fonte discreta no rodapé */
     #infoPanel .fonte {
       font-size: 11px;
       color: #7a8ba3;
@@ -166,7 +157,6 @@
       font-style: italic;
     }
 
-    /* Botão para fechar painel */
     #closeBtn {
       position: absolute;
       top: 14px;
@@ -227,7 +217,6 @@
     const paths = {};
     let selected = null;
 
-    // Calcula bounding box para projeção
     let coords = [];
     geo.features.forEach(f => {
       const g = f.geometry;
@@ -258,6 +247,7 @@
         paths[name].classList.add("selected");
         showInfo(name);
         infoPanel.classList.add("visible");
+        selectMunicipio.value = name; // sincroniza dropdown
       }
     }
 
@@ -273,7 +263,6 @@
       infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
     }
 
-    // Preenche dropdown
     geo.features.forEach(f => {
       const name = f.properties.name;
       const option = document.createElement("option");
@@ -282,12 +271,10 @@
       selectMunicipio.appendChild(option);
     });
 
-    // Sincroniza seleção via dropdown
     selectMunicipio.addEventListener("change", e => {
-      select(e.target.value);
+      if (e.target.value) select(e.target.value);
     });
 
-    // Cria paths e eventos no mapa
     geo.features.forEach(f => {
       const name = f.properties.name;
       let d = "";
@@ -309,13 +296,9 @@
 
       path.addEventListener("mouseleave", () => tooltip.style.display = "none");
 
-      path.addEventListener("click", () => {
-        select(name);
-        selectMunicipio.value = name; // sincroniza dropdown
-      });
+      path.addEventListener("click", () => select(name));
     });
 
-    // Fecha painel com botão
     closeBtn.addEventListener("click", () => {
       infoPanel.classList.remove("visible");
       if (selected) {
@@ -325,11 +308,8 @@
       }
     });
 
-    // Seleciona primeiro município ao carregar
-    if (geo.features.length > 0) {
-      selectMunicipio.value = geo.features[0].properties.name;
-      select(geo.features[0].properties.name);
-    }
+    // Não seleciona nenhum município ao carregar
+    selectMunicipio.value = "";
   </script>
 </body>
 </html>
