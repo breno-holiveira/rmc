@@ -3,103 +3,84 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# CSS para estilizar as tabs, remover borda laranja, barra lateral e header
-css = """
+st.set_page_config(page_title="RMC Data", layout="wide")
+
+# === CSS refinado ===
+st.markdown("""
 <style>
-/* Remove toda borda inferior laranja das abas do Streamlit */
-div[role="tablist"] > button {
-    border-bottom: 3.5px solid transparent !important;
+/* Remove borda laranja residual com !important universal */
+button[kind="tab"] {
+    border-bottom: none !important;
     box-shadow: none !important;
 }
 
-/* Aba ativa com borda azul e fundo suave */
-div[role="tablist"] > button[aria-selected="true"] {
-    border-bottom: 3.5px solid #3f5c85 !important;
-    box-shadow: 0 3px 8px rgb(63 92 133 / 0.22) !important;
-    color: #3f5c85 !important;
-    background-color: rgba(63, 92, 133, 0.14) !important;
-    font-weight: 700 !important;
-}
-
-/* Container das abas fixado no topo */
+/* Estilo da barra de navegação por abas */
 div[role="tablist"] {
+    background-color: #1f2f45 !important;
+    padding: 12px 24px !important;
+    border-radius: 12px 12px 0 0 !important;
     display: flex !important;
-    gap: 16px !important;
-    padding: 14px 28px !important;
-    background: rgba(20, 35, 55, 0.9) !important;
-    border-radius: 14px 14px 0 0 !important;
-    margin: 0 !important;
+    justify-content: flex-start;
+    gap: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
     position: sticky !important;
-    top: 0 !important;
-    z-index: 9999 !important;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 0.12) !important;
-    user-select: none !important;
+    top: 0;
+    z-index: 9999;
+    margin-bottom: 0 !important;
 }
 
-/* Estilo das abas individuais */
+/* Abas inativas */
 div[role="tablist"] > button {
-    background: transparent !important;
-    color: #a0b8d9 !important;
+    background-color: transparent !important;
+    color: #b0c7dd !important;
+    font-size: 15px !important;
+    padding: 10px 20px !important;
     border: none !important;
-    font-weight: 600 !important;
-    font-size: 16px !important;
-    padding: 12px 28px !important;
-    border-radius: 10px 10px 0 0 !important;
-    transition: color 0.3s ease, border-bottom-color 0.3s ease, background-color 0.25s ease;
-    cursor: pointer !important;
+    border-radius: 8px 8px 0 0 !important;
+    transition: all 0.3s ease;
 }
 
-/* Hover das abas inativas */
-div[role="tablist"] > button:not([aria-selected="true"]):hover {
-    color: #5a7ca6 !important;
-    background-color: rgba(90, 124, 166, 0.1) !important;
-    border-bottom-color: transparent !important;
+/* Aba ativa */
+div[role="tablist"] > button[aria-selected="true"] {
+    background-color: #2a3e5c !important;
+    color: #ffffff !important;
+    border-bottom: 3px solid #2a3e5c !important;
+    font-weight: 700;
+}
+
+/* Hover */
+div[role="tablist"] > button:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
 }
 
 /* Conteúdo das abas */
 .css-1d391kg > div[role="tabpanel"] {
     background-color: #f2f6fb !important;
-    border-radius: 0 14px 14px 14px !important;
-    padding: 30px 36px !important;
-    box-shadow: 0 6px 20px rgb(63 92 133 / 0.12) !important;
-    border: 1.5px solid rgba(63, 92, 133, 0.12) !important;
-    margin-bottom: 48px !important;
+    padding: 30px 36px;
+    border-radius: 0 0 14px 14px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
 }
 
-/* Fonte geral e cores de fundo */
+/* Tipografia e layout */
 html, body, .block-container {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-    color: #223344 !important;
-    background-color: #e8edf4 !important;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #e8edf4;
+    color: #223344;
 }
 
-/* Remove barra lateral */
-[data-testid="stSidebar"] {display: none !important;}
-
-/* Remove menu superior */
-header {display: none !important;}
-
-/* Remove rodapé */
-footer {display: none !important;}
-
-/* Ajusta container principal sem padding esquerdo e superior */
-.css-1d391kg {
-    padding-left: 0 !important;
-    padding-top: 0 !important;
-}
-
-/* Remove margem padrão da main block container */
+/* Remove barra lateral e topo */
+[data-testid="stSidebar"] { display: none !important; }
+header { display: none !important; }
+footer { display: none !important; }
 .block-container {
     padding-top: 0 !important;
     margin-top: 0 !important;
 }
 </style>
-"""
+""", unsafe_allow_html=True)
 
-st.markdown(css, unsafe_allow_html=True)
-
-st.set_page_config(page_title="RMC Data", layout="wide")
-
+# === Dados ===
 @st.cache_data(show_spinner=False)
 def carregar_dados():
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
@@ -110,7 +91,10 @@ def carregar_dados():
     df.set_index("nome", inplace=True)
     return gdf, df
 
-gdf, df = carregar_dados()
+@st.cache_resource(show_spinner=False)
+def carregar_html_template():
+    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 def construir_geojson(gdf, df):
     features = []
@@ -122,15 +106,11 @@ def construir_geojson(gdf, df):
         features.append({"type": "Feature", "geometry": geom, "properties": props})
     return {"type": "FeatureCollection", "features": features}
 
+gdf, df = carregar_dados()
 geojson_js = json.dumps(construir_geojson(gdf, df))
-
-@st.cache_resource(show_spinner=False)
-def carregar_html_template():
-    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-        return f.read()
-
 html_template = carregar_html_template()
 
+# === Abas ===
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
