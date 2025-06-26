@@ -5,29 +5,18 @@ import json
 
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# Oculta barra lateral mesmo (com CSS)
-hide_sidebar_css = """
-<style>
-    div[data-testid="stSidebar"] {display: none;}
-</style>
-"""
-st.markdown(hide_sidebar_css, unsafe_allow_html=True)
-
-# Função para carregar dados com cache
 @st.cache_data
 def carregar_dados():
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != 'EPSG:4326':
         gdf = gdf.to_crs('EPSG:4326')
     gdf = gdf.sort_values(by='NM_MUN')
-
     df = pd.read_excel('dados_rmc.xlsx')
     df.set_index("nome", inplace=True)
     return gdf, df
 
 gdf, df = carregar_dados()
 
-# Construir GeoJSON
 def construir_geojson(gdf, df):
     features = []
     for _, row in gdf.iterrows():
@@ -38,10 +27,8 @@ def construir_geojson(gdf, df):
         features.append({"type": "Feature", "geometry": geom, "properties": props})
     return {"type": "FeatureCollection", "features": features}
 
-geojson_dict = construir_geojson(gdf, df)
-geojson_js = json.dumps(geojson_dict)
+geojson_js = json.dumps(construir_geojson(gdf, df))
 
-# Carregar template HTML (com cache)
 @st.cache_resource
 def carregar_html_template():
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
@@ -49,77 +36,68 @@ def carregar_html_template():
 
 html_template = carregar_html_template()
 
-# Menu - páginas e labels
-pages = {
-    "home": "Início",
-    "pag1": "Página 1",
-    "pag2": "Página 2"
-}
+# --- Estilo customizado para as tabs ---
+st.markdown(
+    """
+    <style>
+    /* Esconde a barra padrão das tabs */
+    .css-1d391kg .st-cXcYtU { 
+        border-bottom: none !important;
+    }
+    /* Estiliza os botões das abas */
+    div[role="tablist"] > button {
+        background-color: #fff4e6 !important;  /* bege clarinho */
+        color: #d35400 !important;             /* laranja suave */
+        border: 1.5px solid #d35400 !important;
+        border-bottom: none !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+        padding: 10px 24px !important;
+        margin-right: 6px !important;
+        border-radius: 10px 10px 0 0 !important;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    /* Aba ativa */
+    div[role="tablist"] > button[aria-selected="true"] {
+        background-color: #d35400 !important;  /* laranja forte */
+        color: white !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 8px rgba(211, 84, 0, 0.4);
+    }
+    /* Hover das abas não ativas */
+    div[role="tablist"] > button:not([aria-selected="true"]):hover {
+        background-color: #f5b041 !important; /* laranja claro hover */
+        color: white !important;
+        border-color: #f5b041 !important;
+        cursor: pointer;
+    }
+    /* Conteúdo da aba */
+    .css-1d391kg > div[role="tabpanel"] {
+        border: 1.5px solid #d35400 !important;
+        border-top: none !important;
+        border-radius: 0 10px 10px 10px !important;
+        padding: 20px !important;
+        background-color: #fff9f0 !important;
+        box-shadow: 0 0 12px rgb(211 84 0 / 0.2);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# Pegar página da query params (st.query_params, não experimental)
-query_params = st.query_params
-current_page = query_params.get("page", ["home"])[0]
+# --- Criando as abas ---
+tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
-# Barra de navegação estilizada
-nav_css = """
-<style>
-.navbar {
-    display: flex;
-    gap: 20px;
-    background-color: #222;
-    padding: 12px 30px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    user-select: none;
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-}
-.navbar a {
-    color: #bbb;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    transition: background-color 0.25s ease, color 0.25s ease;
-}
-.navbar a:hover {
-    background-color: #ff7f50;  /* coral laranja suave */
-    color: white;
-}
-.navbar a.active {
-    background-color: #ff4500;  /* laranja forte */
-    color: white;
-    font-weight: 700;
-}
-</style>
-"""
-
-# Construir html da navbar com links e active class
-nav_html = '<div class="navbar">'
-for key, label in pages.items():
-    active_class = "active" if key == current_page else ""
-    nav_html += f'<a href="/?page={key}" class="{active_class}">{label}</a>'
-nav_html += "</div>"
-
-# Exibir barra de navegação
-st.markdown(nav_css + nav_html, unsafe_allow_html=True)
-
-# Conteúdo conforme página selecionada
-if current_page == "home":
+with tab1:
     st.title("RMC Data")
     st.markdown("### Dados e indicadores da Região Metropolitana de Campinas")
-
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif current_page == "pag1":
+with tab2:
     st.title("Página 1")
     st.write("Conteúdo e análises da Página 1 aqui.")
 
-elif current_page == "pag2":
+with tab3:
     st.title("Página 2")
     st.write("Conteúdo e análises da Página 2 aqui.")
-
-else:
-    st.error("Página não encontrada.")
