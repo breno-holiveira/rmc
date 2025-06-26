@@ -1,54 +1,35 @@
-import os
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Configurações iniciais
+# Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Caminho do logo (opcional)
-parent_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(parent_dir, "cubes.svg")
-
-# Definindo páginas e URLs externas
-pages = ["Home", "Documentation", "Examples", "Community", "About", "GitHub"]
-urls = {
-    "GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"
-}
-
-# Estilo refinado da barra (versão incorporada sem <style>)
+# Estilos da barra (substitui o CSS anterior)
 styles = {
     "nav": {
-        "background": "linear-gradient(90deg, #0d1f3c, #163466)",
-        "padding": "0.6rem 1rem",
-        "font-family": "Roboto, sans-serif",
-        "font-weight": "600",
-        "font-size": "1.1rem",
-        "color": "white",
-        "border-radius": "0 0 15px 15px",
-        "position": "sticky",
-        "top": "0",
-        "z-index": "9999",
-        "box-shadow": "0 3px 8px rgba(0, 0, 0, 0.3)",
+        "background-color": "linear-gradient(90deg, #0d1f3c, #163466)",
         "justify-content": "center",
-    },
-    "img": {
-        "padding-right": "14px",
+        "border-radius": "0 0 15px 15px",
+        "box-shadow": "0 3px 8px rgb(0 0 0 / 0.3)",
+        "padding": "0.6rem 1rem",
     },
     "span": {
         "color": "white",
-        "padding": "8px 14px",
-        "border-radius": "8px",
-        "transition": "background-color 0.3s ease, color 0.3s ease",
+        "padding": "10px 14px",
+        "font-family": "Roboto, sans-serif",
+        "font-size": "1.05rem",
+        "font-weight": "600",
     },
     "active": {
         "background-color": "#ff7200",
         "color": "white",
         "font-weight": "700",
         "box-shadow": "0 0 8px 1px #ff7f27",
-    }
+        "border-radius": "8px",
+    },
 }
 
 options = {
@@ -56,10 +37,10 @@ options = {
     "show_sidebar": False,
 }
 
-# Barra personalizada
-page = st_navbar(pages, logo_path=logo_path, urls=urls, styles=styles, options=options)
+pages = ["Home", "Documentation", "Examples", "Community", "About"]
+page = st_navbar(pages, styles=styles, options=options)
 
-# Conteúdo da Home
+# Conteúdo das páginas
 if page == "Home":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -95,7 +76,6 @@ if page == "Home":
         html_template = f.read()
 
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
-
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 elif page == "Documentation":
