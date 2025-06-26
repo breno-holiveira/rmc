@@ -4,7 +4,7 @@ import geopandas as gpd
 import json
 
 # Configurações da página
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="RoMC Data", layout="wide", initial_sidebar_state="collapsed")
 
 # CSS para esconder barra lateral completamente, mas manter header (com GitHub/fork) e footer
 st.markdown("""
