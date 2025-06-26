@@ -3,40 +3,37 @@ import pandas as pd
 import geopandas as gpd
 import json
 
-# Configuração inicial
 st.set_page_config(page_title="RMC Data", layout="wide")
 
-# CSS refinado e agressivo
+# === CSS personalizado ===
 st.markdown("""
 <style>
-/* Remove barra lateral, cabeçalho e rodapé */
-[data-testid="stSidebar"], header, footer {
+/* Remove cabeçalho, rodapé e barra lateral */
+header, footer, [data-testid="stSidebar"] {
     display: none !important;
 }
-
-/* Remove espaço no topo */
 .block-container {
-    padding-top: 0rem !important;
+    padding-top: 0 !important;
 }
 
-/* Estiliza barra de abas */
+/* Estilização das abas */
 div[role="tablist"] {
-    background-color: #1f2f45;
+    background-color: #1e2a38;
     padding: 12px 24px;
     gap: 16px;
     border-radius: 12px 12px 0 0;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     position: sticky;
     top: 0;
     z-index: 999;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Remove qualquer borda residual */
+/* Todas as abas */
 div[role="tablist"] > button {
     all: unset !important;
-    padding: 12px 22px;
+    padding: 10px 20px;
     font-size: 15px;
-    color: #a0b8d9;
+    color: #b5c7db;
     font-weight: 500;
     border-radius: 8px 8px 0 0;
     cursor: pointer;
@@ -45,38 +42,44 @@ div[role="tablist"] > button {
 
 /* Hover */
 div[role="tablist"] > button:hover {
-    background-color: rgba(255,255,255,0.06);
-    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #fff;
 }
 
 /* Aba ativa */
 div[role="tablist"] > button[aria-selected="true"] {
-    background-color: #2a3e5c;
-    color: #ffffff;
+    background-color: #27384c;
+    color: #fff;
     font-weight: 700;
-    border-bottom: none !important;
-    box-shadow: inset 0 -3px 0 #2a3e5c;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Remove borda inferior automática */
+div[role="tablist"] > button[aria-selected="true"]::after {
+    display: none !important;
 }
 
 /* Conteúdo da aba */
 .css-1d391kg > div[role="tabpanel"] {
-    background-color: #f2f6fb;
+    background-color: #f3f6fa;
     padding: 36px 40px;
     border-radius: 0 0 12px 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid #dee6f1;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    border: 1px solid #dde5ef;
 }
 
-/* Fonte e fundo geral */
+/* Estilo base do site */
 html, body {
-    background-color: #e8edf4;
+    background-color: #e6ecf2;
     font-family: 'Segoe UI', sans-serif;
-    color: #1e2d3c;
+    color: #1c2b3a;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# Dados
+# === Carregamento de dados
 @st.cache_data(show_spinner=False)
 def carregar_dados():
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
@@ -106,7 +109,7 @@ gdf, df = carregar_dados()
 geojson_js = json.dumps(construir_geojson(gdf, df))
 html_template = carregar_html()
 
-# Abas horizontais
+# === Abas ===
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
