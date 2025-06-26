@@ -5,133 +5,188 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>RMC Interativo</title>
   <style>
+    /* Reset e base */
     html, body {
       height: 100%;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(120deg, #f4f7fa, #e9eef4);
       overflow: hidden;
+      color: #2c3e70;
+      user-select: none;
     }
 
-    /* Caixa dropdown suspensa fixa no topo esquerdo */
+    /* Caixa dropdown no topo esquerdo */
     #select-container {
       position: fixed;
       top: 16px;
       left: 16px;
       z-index: 20;
       background: rgba(255,255,255,0.9);
-      padding: 8px 12px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      font-family: 'Segoe UI', sans-serif;
-      user-select: none;
+      padding: 8px 14px;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      font-weight: 600;
+      font-size: 14px;
+      color: #2c3e70;
     }
     #select-container label {
-      font-weight: 600;
-      color: #2c3e70;
       margin-right: 8px;
+      user-select: none;
     }
     #municipio-select {
       font-size: 14px;
-      padding: 4px 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      min-width: 180px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1.5px solid #7a8ba3;
+      min-width: 200px;
       cursor: pointer;
+      transition: border-color 0.3s;
+      color: #2c3e70;
+      background: white;
+    }
+    #municipio-select:hover, #municipio-select:focus {
+      border-color: #2c3e70;
+      outline: none;
     }
 
+    /* Mapa ocupa 100% da tela */
     #map {
-      margin-left: 0; /* Sem margem lateral, ocupa toda a largura */
+      width: 100vw;
       height: 100vh;
       position: relative;
       overflow: hidden;
     }
-
     svg {
       width: 100%;
       height: 100%;
       display: block;
     }
 
+    /* Polígonos do mapa */
     .area {
       fill: rgba(44, 62, 112, 0.15);
       stroke: rgba(44, 62, 112, 0.4);
       stroke-width: 1;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.25s ease;
     }
-
     .area:hover {
       fill: rgba(44, 62, 112, 0.35);
       stroke-width: 1.3;
     }
-
     .area.selected {
-      fill: rgba(44, 62, 112, 0.5);
-      stroke: rgba(30, 40, 70, 0.8);
-      stroke-width: 1.5;
+      fill: rgba(44, 62, 112, 0.55);
+      stroke: rgba(30, 40, 70, 0.9);
+      stroke-width: 1.7;
+      filter: drop-shadow(0 0 5px rgba(44,62,112,0.4));
     }
 
+    /* Tooltip simples */
     #tooltip {
       position: fixed;
-      background: rgba(44,62,112,0.88);
+      background: rgba(44,62,112,0.9);
       color: white;
-      padding: 6px 10px;
+      padding: 5px 12px;
       font-size: 13px;
-      border-radius: 5px;
+      border-radius: 6px;
       display: none;
       pointer-events: none;
       z-index: 1000;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.25);
+      white-space: nowrap;
+      font-weight: 600;
+      user-select: none;
     }
 
+    /* Painel lateral fixo (direita) - vidro esfumado */
     #infoPanel {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      background: rgba(255,255,255,0.88);
-      backdrop-filter: blur(12px);
-      padding: 16px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      width: 250px;
-      font-size: 13px;
-      display: none;
-      height: auto;
-      max-height: calc(100vh - 48px);
+      position: fixed;
+      top: 60px;
+      right: 16px;
+      width: 280px;
+      max-height: calc(100vh - 80px);
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      padding: 20px 24px 24px 24px;
+      font-size: 14px;
+      color: #1f2f45;
       overflow-y: auto;
-      z-index: 1001;
+      display: none;
+      z-index: 1100;
+      user-select: text;
+      transition: opacity 0.3s ease;
+    }
+    #infoPanel.visible {
+      display: block;
+      opacity: 1;
     }
 
-    #infoPanel.visible { display: block; }
-
+    /* Título */
     #infoPanel h3 {
-      margin: 0 0 10px;
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 22px;
+      font-weight: 700;
       color: #2c3e70;
+      user-select: text;
     }
 
+    /* Grid para os dados */
     #infoPanel .grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px 12px;
+      grid-template-columns: auto 1fr;
+      row-gap: 14px;
+      column-gap: 16px;
     }
 
     #infoPanel .label {
       font-weight: 600;
       color: #4d648d;
+      user-select: text;
+      align-self: center;
     }
-
     #infoPanel .value {
-      text-align: right;
       color: #2d3f54;
+      text-align: right;
+      user-select: text;
+      font-variant-numeric: tabular-nums;
     }
 
+    /* Fonte discreta no rodapé */
     #infoPanel .fonte {
-      font-size: 10px;
-      grid-column: 1/-1;
+      font-size: 11px;
       color: #7a8ba3;
-      margin-top: 10px;
-      text-align: right;
+      margin-top: 22px;
+      text-align: center;
+      user-select: none;
+      font-style: italic;
+    }
+
+    /* Botão para fechar painel */
+    #closeBtn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(44,62,112,0.15);
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      color: #2c3e70;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1;
+      transition: background 0.3s;
+      user-select: none;
+    }
+    #closeBtn:hover {
+      background: rgba(44,62,112,0.35);
+      color: white;
     }
   </style>
 </head>
@@ -147,7 +202,8 @@
   <div id="map">
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
     <div id="tooltip"></div>
-    <div id="infoPanel">
+    <aside id="infoPanel" role="region" aria-live="polite" aria-label="Informações do município">
+      <button id="closeBtn" aria-label="Fechar painel de informações">&times;</button>
       <h3>Município</h3>
       <div class="grid">
         <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
@@ -156,9 +212,9 @@
         <div class="label">População:</div><div class="value" id="pop"></div>
         <div class="label">Área:</div><div class="value" id="area"></div>
         <div class="label">Densidade:</div><div class="value" id="dens"></div>
-        <div class="fonte">Fonte: IBGE</div>
       </div>
-    </div>
+      <div class="fonte">Fonte: IBGE</div>
+    </aside>
   </div>
 
   <script>
@@ -166,11 +222,12 @@
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
     const infoPanel = document.getElementById("infoPanel");
+    const closeBtn = document.getElementById("closeBtn");
     const selectMunicipio = document.getElementById("municipio-select");
     const paths = {};
     let selected = null;
 
-    // Calcular bounding box para projeção
+    // Calcula bounding box para projeção
     let coords = [];
     geo.features.forEach(f => {
       const g = f.geometry;
@@ -200,6 +257,7 @@
       if (paths[name]) {
         paths[name].classList.add("selected");
         showInfo(name);
+        infoPanel.classList.add("visible");
       }
     }
 
@@ -213,10 +271,9 @@
       infoPanel.querySelector("#pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
       infoPanel.querySelector("#area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace(".", ",") + " km²" : "-";
       infoPanel.querySelector("#dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
-      infoPanel.classList.add("visible");
     }
 
-    // Popula o dropdown com os municípios
+    // Preenche dropdown
     geo.features.forEach(f => {
       const name = f.properties.name;
       const option = document.createElement("option");
@@ -225,12 +282,12 @@
       selectMunicipio.appendChild(option);
     });
 
-    // Seleciona o município quando o dropdown muda
-    selectMunicipio.addEventListener("change", (e) => {
+    // Sincroniza seleção via dropdown
+    selectMunicipio.addEventListener("change", e => {
       select(e.target.value);
     });
 
-    // Cria os paths SVG e adiciona eventos
+    // Cria paths e eventos no mapa
     geo.features.forEach(f => {
       const name = f.properties.name;
       let d = "";
@@ -254,11 +311,21 @@
 
       path.addEventListener("click", () => {
         select(name);
-        selectMunicipio.value = name; // sincroniza dropdown com clique no mapa
+        selectMunicipio.value = name; // sincroniza dropdown
       });
     });
 
-    // Seleciona o primeiro município automaticamente
+    // Fecha painel com botão
+    closeBtn.addEventListener("click", () => {
+      infoPanel.classList.remove("visible");
+      if (selected) {
+        paths[selected].classList.remove("selected");
+        selected = null;
+        selectMunicipio.value = "";
+      }
+    });
+
+    // Seleciona primeiro município ao carregar
     if (geo.features.length > 0) {
       selectMunicipio.value = geo.features[0].properties.name;
       select(geo.features[0].properties.name);
