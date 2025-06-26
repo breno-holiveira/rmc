@@ -1,71 +1,43 @@
 import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import json
-from streamlit_navigation_bar import st_navbar
 
-# Configuração da página
-st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
+def navigation():
+    # Usar st.experimental_get_query_params (ou st.query_params no Streamlit >=1.21)
+    # para obter o parâmetro 'p' da URL
+    params = st.experimental_get_query_params()
+    path = params.get('p', ['home'])[0]  # default 'home' se não houver parâmetro
+    return path
 
-# Barra de navegação superior com estilo padrão do pacote
-page = st_navbar(["Home", "Documentation", "Examples", "Community", "About"])
+page = navigation()
 
-# Componente retorna a aba selecionada como string
-if page == "Home":
-    st.title("RMC Data 📊")
-    st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+if page == "home":
+    st.title('Home')
+    st.write('This is the home page.')
 
-    st.markdown(
-        "A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituída por 20 municípios. "
-        "Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano."
-    )
-    st.markdown(
-        "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
-    )
+elif page == "results":
+    st.title('Results List')
+    for item in range(25):
+        st.write(f'Results {item}')
 
-    # Carregamento de dados
-    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-    if gdf.crs != "EPSG:4326":
-        gdf = gdf.to_crs("EPSG:4326")
-    gdf = gdf.sort_values(by="NM_MUN")
+elif page == "analysis":
+    st.title('Analysis')
+    x, y = st.number_input('Input X'), st.number_input('Input Y')
+    st.write('Result: ' + str(x + y))
 
-    df = pd.read_excel("dados_rmc.xlsx")
-    df.set_index("nome", inplace=True)
+elif page == "examples":
+    st.title('Examples Menu')
+    st.write('Select an example.')
 
-    # Construção do GeoJSON
-    features = []
-    for _, row in gdf.iterrows():
-        nome = row["NM_MUN"]
-        geom = row["geometry"].__geo_interface__
-        props = df.loc[nome].to_dict() if nome in df.index else {}
-        props["name"] = nome
-        features.append({"type": "Feature", "geometry": geom, "properties": props})
+elif page == "logs":
+    st.title('View all of the logs')
+    st.write('Here you may view all of the logs.')
 
-    gj = {"type": "FeatureCollection", "features": features}
-    geojson_js = json.dumps(gj)
+elif page == "verify":
+    st.title('Data verification is started...')
+    st.write('Please stand by....')
 
-    # Carregar HTML externo refinado (seu gráfico)
-    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-        html_template = f.read()
+elif page == "config":
+    st.title('Configuration of the app.')
+    st.write('Here you can configure the application')
 
-    # Substituir placeholder pelo GeoJSON gerado
-    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
-
-    # Exibir HTML no Streamlit
-    st.components.v1.html(html_code, height=600, scrolling=False)
-
-elif page == "Documentation":
-    st.title("Documentation")
-    st.write("Aqui você pode colocar a documentação do seu app...")
-
-elif page == "Examples":
-    st.title("Examples")
-    st.write("Exemplos do app...")
-
-elif page == "Community":
-    st.title("Community")
-    st.write("Links para a comunidade...")
-
-elif page == "About":
-    st.title("About")
-    st.write("Sobre o projeto...")
+else:
+    st.error('Page not found.')
