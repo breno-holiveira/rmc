@@ -36,56 +36,93 @@ def carregar_html_template():
 
 html_template = carregar_html_template()
 
-# --- Estilo customizado para as tabs ---
 st.markdown(
     """
     <style>
-    /* Esconde a barra padrão das tabs */
+    /* --- Estilo customizado das abas --- */
+    /* Remove borda padrão das tabs */
     .css-1d391kg .st-cXcYtU { 
         border-bottom: none !important;
     }
-    /* Estiliza os botões das abas */
+
+    /* Container das abas */
+    div[role="tablist"] {
+        display: flex;
+        gap: 16px;
+        padding: 12px 24px;
+        background: rgba(30, 60, 90, 0.25); /* vidro fosco azul claro */
+        backdrop-filter: saturate(180%) blur(10px);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgb(20 40 80 / 0.1);
+    }
+
+    /* Abas individuais */
     div[role="tablist"] > button {
-        background-color: #fff4e6 !important;  /* bege clarinho */
-        color: #d35400 !important;             /* laranja suave */
-        border: 1.5px solid #d35400 !important;
-        border-bottom: none !important;
+        background: transparent !important;
+        color: #a9c0ff !important;  /* azul claro */
+        border: none !important;
+        border-bottom: 3px solid transparent !important;
         font-weight: 600 !important;
-        font-size: 16px !important;
-        padding: 10px 24px !important;
-        margin-right: 6px !important;
-        border-radius: 10px 10px 0 0 !important;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    /* Aba ativa */
-    div[role="tablist"] > button[aria-selected="true"] {
-        background-color: #d35400 !important;  /* laranja forte */
-        color: white !important;
-        font-weight: 700 !important;
-        box-shadow: 0 4px 8px rgba(211, 84, 0, 0.4);
-    }
-    /* Hover das abas não ativas */
-    div[role="tablist"] > button:not([aria-selected="true"]):hover {
-        background-color: #f5b041 !important; /* laranja claro hover */
-        color: white !important;
-        border-color: #f5b041 !important;
+        font-size: 17px !important;
+        padding: 10px 26px !important;
+        border-radius: 8px 8px 0 0 !important;
+        transition:
+            color 0.35s ease,
+            border-bottom-color 0.35s ease,
+            background-color 0.3s ease;
         cursor: pointer;
     }
+
+    /* Aba ativa */
+    div[role="tablist"] > button[aria-selected="true"] {
+        color: #1e40af !important; /* azul forte */
+        border-bottom-color: #1e40af !important;
+        background-color: rgba(30, 64, 175, 0.1) !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 12px rgb(30 64 175 / 0.25);
+    }
+
+    /* Hover abas não ativas */
+    div[role="tablist"] > button:not([aria-selected="true"]):hover {
+        color: #3b82f6 !important; /* azul médio */
+        background-color: rgba(59, 130, 246, 0.1) !important;
+        border-bottom-color: #3b82f6 !important;
+    }
+
     /* Conteúdo da aba */
     .css-1d391kg > div[role="tabpanel"] {
-        border: 1.5px solid #d35400 !important;
-        border-top: none !important;
-        border-radius: 0 10px 10px 10px !important;
-        padding: 20px !important;
-        background-color: #fff9f0 !important;
-        box-shadow: 0 0 12px rgb(211 84 0 / 0.2);
+        background-color: #f9fbff !important;
+        border-radius: 0 12px 12px 12px !important;
+        padding: 28px 32px !important;
+        box-shadow: 0 8px 30px rgb(30 64 175 / 0.1);
+        border: 1.5px solid rgba(30, 64, 175, 0.15) !important;
+        margin-bottom: 40px;
+    }
+
+    /* Scrollbar para conteúdo da aba (se necessário) */
+    .css-1d391kg > div[role="tabpanel"]::-webkit-scrollbar {
+        width: 10px;
+    }
+    .css-1d391kg > div[role="tabpanel"]::-webkit-scrollbar-thumb {
+        background-color: rgba(30, 64, 175, 0.3);
+        border-radius: 6px;
+    }
+    .css-1d391kg > div[role="tabpanel"]::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    /* Fonte geral */
+    html, body, .block-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1e293b;
+        background-color: #f0f4ff;
     }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# --- Criando as abas ---
 tab1, tab2, tab3 = st.tabs(["Mapa RMC", "Página 1", "Página 2"])
 
 with tab1:
