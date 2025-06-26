@@ -17,7 +17,7 @@
     #map {
       width: 100vw;
       height: 100vh;
-      position: relative;
+      position: absolute;
     }
 
     svg {
@@ -31,14 +31,15 @@
       top: 20px;
       left: 20px;
       display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
       background: rgba(255,255,255,0.9);
       backdrop-filter: blur(8px);
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       z-index: 10;
+      max-width: 320px;
     }
 
     #top-bar label {
@@ -51,10 +52,50 @@
       border-radius: 8px;
       border: 1.5px solid #7a8ba3;
       background: #fff;
-      min-width: 180px;
       font-size: 14px;
       color: #2c3e70;
       cursor: pointer;
+    }
+
+    .info-panel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(255,255,255,0.25);
+      backdrop-filter: blur(14px);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #1f2f45;
+      font-size: 14px;
+    }
+
+    .info-panel.visible {
+      display: flex;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      row-gap: 10px;
+      column-gap: 10px;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #4d648d;
+    }
+
+    .value {
+      text-align: right;
+      color: #2d3f54;
+    }
+
+    .fonte {
+      font-size: 11px;
+      color: #7a8ba3;
+      text-align: center;
+      font-style: italic;
+      margin-top: 10px;
     }
 
     .area {
@@ -87,78 +128,6 @@
       pointer-events: none;
       z-index: 1000;
     }
-
-    #infoPanel {
-      position: absolute;
-      top: 0;
-      right: -320px;
-      width: 300px;
-      height: 100%;
-      background: rgba(255,255,255,0.94);
-      backdrop-filter: blur(10px);
-      box-shadow: -4px 0 12px rgba(0,0,0,0.1);
-      padding: 24px 20px;
-      font-size: 14px;
-      color: #1f2f45;
-      z-index: 1100;
-      overflow-y: auto;
-      transition: right 0.35s ease;
-    }
-
-    #infoPanel.visible {
-      right: 0;
-    }
-
-    #infoPanel h3 {
-      margin-top: 0;
-      font-size: 20px;
-      color: #2c3e70;
-    }
-
-    #infoPanel .grid {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      row-gap: 12px;
-      column-gap: 12px;
-    }
-
-    .label {
-      font-weight: 600;
-      color: #4d648d;
-    }
-
-    .value {
-      text-align: right;
-      color: #2d3f54;
-    }
-
-    .fonte {
-      font-size: 11px;
-      margin-top: 20px;
-      color: #7a8ba3;
-      text-align: center;
-      font-style: italic;
-    }
-
-    #closeBtn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(44,62,112,0.15);
-      border: none;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: bold;
-      color: #2c3e70;
-    }
-
-    #closeBtn:hover {
-      background: rgba(44,62,112,0.35);
-      color: white;
-    }
   </style>
 </head>
 <body>
@@ -169,34 +138,32 @@
       <select id="municipio-select">
         <option value="" selected disabled>Selecione...</option>
       </select>
+
+      <div id="infoPanel" class="info-panel">
+        <h3 id="info-title">Município</h3>
+        <div class="grid">
+          <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
+          <div class="label">% PIB regional:</div><div class="value" id="part"></div>
+          <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
+          <div class="label">População:</div><div class="value" id="pop"></div>
+          <div class="label">Área:</div><div class="value" id="area"></div>
+          <div class="label">Densidade:</div><div class="value" id="dens"></div>
+        </div>
+        <div class="fonte">Fonte: IBGE</div>
+      </div>
     </div>
 
     <svg viewBox="0 0 1000 950" preserveAspectRatio="xMidYMid meet"></svg>
-
     <div id="tooltip"></div>
-
-    <aside id="infoPanel">
-      <button id="closeBtn">&times;</button>
-      <h3>Município</h3>
-      <div class="grid">
-        <div class="label">PIB (2021):</div><div class="value" id="pib"></div>
-        <div class="label">% PIB regional:</div><div class="value" id="part"></div>
-        <div class="label">PIB per capita:</div><div class="value" id="percapita"></div>
-        <div class="label">População:</div><div class="value" id="pop"></div>
-        <div class="label">Área:</div><div class="value" id="area"></div>
-        <div class="label">Densidade:</div><div class="value" id="dens"></div>
-      </div>
-      <div class="fonte">Fonte: IBGE</div>
-    </aside>
   </div>
 
   <script>
     const geo = __GEOJSON_PLACEHOLDER__;
     const svg = document.querySelector("svg");
     const tooltip = document.getElementById("tooltip");
-    const infoPanel = document.getElementById("infoPanel");
-    const closeBtn = document.getElementById("closeBtn");
     const selectMunicipio = document.getElementById("municipio-select");
+    const infoPanel = document.getElementById("infoPanel");
+    const infoTitle = document.getElementById("info-title");
     const paths = {};
     let selected = null;
 
@@ -206,7 +173,6 @@
       if (g.type === "Polygon") g.coordinates[0].forEach(c => coords.push(c));
       else if (g.type === "MultiPolygon") g.coordinates.forEach(p => p[0].forEach(c => coords.push(c)));
     });
-
     const lons = coords.map(c => c[0]), lats = coords.map(c => c[1]);
     const minX = Math.min(...lons), maxX = Math.max(...lons);
     const minY = Math.min(...lats), maxY = Math.max(...lats);
@@ -221,6 +187,18 @@
       return coords.map(c => project(c).join(",")).join(" ");
     }
 
+    function showInfo(name) {
+      const f = geo.features.find(f => f.properties.name === name);
+      if (!f) return;
+      infoTitle.textContent = name;
+      document.getElementById("pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
+      document.getElementById("part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
+      document.getElementById("percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
+      document.getElementById("pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
+      document.getElementById("area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
+      document.getElementById("dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
+    }
+
     function select(name) {
       if (selected) paths[selected].classList.remove("selected");
       selected = name;
@@ -229,18 +207,6 @@
         showInfo(name);
         infoPanel.classList.add("visible");
       }
-    }
-
-    function showInfo(name) {
-      const f = geo.features.find(f => f.properties.name === name);
-      if (!f) return;
-      document.querySelector("h3").textContent = name;
-      document.getElementById("pib").textContent = f.properties.pib_2021 ? "R$ " + f.properties.pib_2021.toLocaleString("pt-BR") : "-";
-      document.getElementById("part").textContent = f.properties.participacao_rmc ? (f.properties.participacao_rmc * 100).toFixed(2).replace('.', ',') + "%" : "-";
-      document.getElementById("percapita").textContent = f.properties.per_capita_2021 ? "R$ " + f.properties.per_capita_2021.toLocaleString("pt-BR") : "-";
-      document.getElementById("pop").textContent = f.properties.populacao_2022 ? f.properties.populacao_2022.toLocaleString("pt-BR") : "-";
-      document.getElementById("area").textContent = f.properties.area ? f.properties.area.toFixed(2).replace('.', ',') + " km²" : "-";
-      document.getElementById("dens").textContent = f.properties.densidade_demografica_2022 ? f.properties.densidade_demografica_2022.toLocaleString("pt-BR") + " hab/km²" : "-";
     }
 
     geo.features.forEach(f => {
@@ -281,13 +247,6 @@
 
     selectMunicipio.addEventListener("change", e => {
       if (e.target.value) select(e.target.value);
-    });
-
-    closeBtn.addEventListener("click", () => {
-      infoPanel.classList.remove("visible");
-      if (selected) paths[selected].classList.remove("selected");
-      selected = null;
-      selectMunicipio.value = "";
     });
   </script>
 </body>
