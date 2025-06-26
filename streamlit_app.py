@@ -7,21 +7,26 @@ from streamlit_navigation_bar import st_navbar
 # Configuração da página
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilo idêntico ao exemplo com `cubes.svg`
+# Estilo idêntico ao exemplo com `cubes.svg`, com fonte suavizada
 styles = {
     "nav": {
         "background-color": "royalblue",
         "justify-content": "left",
+        "font-family": "'Segoe UI', 'Roboto', sans-serif",
+        "font-size": "16px",
     },
     "span": {
         "color": "white",
         "padding": "14px",
+        "font-family": "'Segoe UI', 'Roboto', sans-serif",
+        "font-weight": "500",
     },
     "active": {
         "background-color": "white",
         "color": "var(--text-color)",
-        "font-weight": "normal",
+        "font-weight": "600",
         "padding": "14px",
+        "font-family": "'Segoe UI', 'Roboto', sans-serif",
     }
 }
 
