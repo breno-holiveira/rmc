@@ -5,19 +5,16 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg na pasta raiz (se não usar, pode remover essa variável)
-logo_path = os.path.join(os.getcwd(), "cubes.svg")
-
-# Importar fonte Inter para suavidade e legibilidade
+# Importar fonte Inter para suavidade e legibilidade e custom CSS
 st.markdown(
     """
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* Estilo base dos itens da navbar */
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 15px !important;
+            font-size: 14px !important;  /* fonte um pouco menor */
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -28,27 +25,18 @@ st.markdown(
             position: relative;
             transition: color 0.25s ease;
         }
-        /* Hover suave: só muda a cor */
+        /* Hover suave: muda a cor para feedback */
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Destaque do item ativo */
+        /* Item ativo: só negrito, sem mudar cor */
         .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: #ff9e3b !important;
+            font-weight: 700 !important;
+            color: rgba(255,255,255,0.85) !important;
         }
-        /* Linha animada embaixo do item ativo */
+        /* Remove linha animada embaixo do item ativo */
         .stHorizontalBlock [aria-selected="true"] span::after {
-            content: '';
-            position: absolute;
-            left: 10%;
-            bottom: 0;
-            height: 3px;
-            width: 80%;
-            background-color: #ff9e3b;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            animation: underlineExpand 0.3s forwards;
+            content: none;
         }
         /* Container da navbar */
         .stHorizontalBlock {
@@ -62,10 +50,6 @@ st.markdown(
             justify-content: left !important;
             user-select: none;
         }
-        @keyframes underlineExpand {
-            from { width: 0; }
-            to { width: 80%; }
-        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -76,21 +60,21 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "15px",
+        "font-size": "14px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "15px",
+        "font-size": "14px",
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
     },
     "active": {
-        "color": "#ff9e3b",
-        "font-weight": "500",
+        "color": "rgba(255,255,255,0.85)",  # mesma cor normal
+        "font-weight": "700",  # só negrito
     },
 }
 
@@ -109,7 +93,7 @@ pages = [
     "Contato",
 ]
 
-page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
+page = st_navbar(pages, styles=styles, options=options)
 
 # Conteúdo por página
 
@@ -151,7 +135,7 @@ if page == "RMC Data":
 
 elif page == "Economia":
     st.title("Economia")
-    st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
+    st.write("Conteúdo relacionado à economia da RMC.")
 
 elif page == "Finanças Públicas":
     st.title("Finanças Públicas")
@@ -163,7 +147,7 @@ elif page == "Segurança":
 
 elif page == "Arquivos":
     st.title("Arquivos")
-    st.write("Documentos e arquivos relacionados ao projeto.")
+    st.write("Área para arquivos relacionados.")
 
 elif page == "Sobre":
     st.title("Sobre")
@@ -171,4 +155,4 @@ elif page == "Sobre":
 
 elif page == "Contato":
     st.title("Contato")
-    st.write("Informações para contato e comunicação.")
+    st.write("Formas de contato e informações adicionais.")
