@@ -1,7 +1,7 @@
 import streamlit as st
 
 def show_home():
-    st.markdown('# RMC Data')
+    st.markdown('# RMfC Data')
     
     st.markdown("""
     O **RMC Data** é um site de domínio público, criado com o propósito de reunir, produzir e divulgar indicadores econômicos e sociais dos municípios 
