@@ -1,15 +1,6 @@
-import os
 import streamlit as st
-import pandas as pd
-import geopandas as gpd
-import json
 from streamlit_navigation_bar import st_navbar
 
-# Estado inicial
-if "page" not in st.session_state:
-    st.session_state.page = "RMC Data"
-
-# Configuração da página
 st.set_page_config(
     page_title="RMC Data",
     layout="wide",
@@ -17,86 +8,35 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Fonte DM Sans + CSS igual ao da OUP, mantendo azul escuro
-st.markdown(
-    """
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        .stHorizontalBlock {
-            background-color: #1f2937 !important;
-            height: 56px !important;
-            padding: 0 32px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: left !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .stHorizontalBlock span {
-            font-family: 'DM Sans', sans-serif !important;
-            font-weight: 400 !important;
-            font-size: 16px !important;
-            color: rgba(255, 255, 255, 0.88) !important;
-            margin: 0 10px !important;
-            padding: 6px 12px !important;
-            border-radius: 6px;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
-        .stHorizontalBlock span:hover {
-            background-color: rgba(255,255,255,0.08);
-        }
-        .stHorizontalBlock [aria-selected="true"] span {
-            background-color: rgba(255,255,255,0.14);
-            color: #f4a259 !important;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# Páginas da navbar
+pages = ["RMC Data", "Economia", "Finanças Públicas", "Segurança", "Arquivos", "Sobre", "Contato"]
 
-# Estilos do st_navbar (compatíveis com o CSS acima)
+# Estilos EXATAMENTE iguais ao seu exemplo, só trocando o fundo por azul escuro
 styles = {
     "nav": {
         "background-color": "#1f2937",
-        "justify-content": "left",
-        "font-family": "'DM Sans', sans-serif",
-        "font-size": "16px",
+    },
+    "div": {
+        "max-width": "32rem",
     },
     "span": {
-        "color": "rgba(255, 255, 255, 0.88)",
-        "padding": "6px 12px",
-        "margin": "0 10px",
-        "font-weight": "400",
-        "border-radius": "6px",
+        "border-radius": "0.5rem",
+        "color": "rgb(49, 51, 63)",
+        "margin": "0 0.125rem",
+        "padding": "0.4375rem 0.625rem",
     },
     "active": {
-        "color": "#f4a259",
-        "background-color": "rgba(255,255,255,0.14)",
+        "background-color": "rgba(255, 255, 255, 0.25)",
+    },
+    "hover": {
+        "background-color": "rgba(255, 255, 255, 0.35)",
     },
 }
 
-options = {
-    "show_menu": False,
-    "show_sidebar": False,
-}
+# Renderiza a navbar
+page = st_navbar(pages, styles=styles)
 
-pages = [
-    "RMC Data",
-    "Economia",
-    "Finanças Públicas",
-    "Segurança",
-    "Arquivos",
-    "Sobre",
-    "Contato",
-]
-
-clicked_page = st_navbar(pages, logo_path=None, styles=styles, options=options)
-
-if clicked_page and clicked_page != st.session_state.page:
-    st.session_state.page = clicked_page
-
-page = st.session_state.page
-
-# Página: RMC Data
+# Conteúdo para cada aba
 if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -107,34 +47,6 @@ if page == "RMC Data":
     st.markdown(
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
-
-    # Carregamento de dados
-    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
-    if gdf.crs != "EPSG:4326":
-        gdf = gdf.to_crs("EPSG:4326")
-    gdf = gdf.sort_values(by="NM_MUN")
-
-    df = pd.read_excel("dados_rmc.xlsx")
-    df.set_index("nome", inplace=True)
-
-    features = []
-    for _, row in gdf.iterrows():
-        nome = row["NM_MUN"]
-        geom = row["geometry"].__geo_interface__
-        props = df.loc[nome].to_dict() if nome in df.index else {}
-        props["name"] = nome
-        features.append({"type": "Feature", "geometry": geom, "properties": props})
-
-    gj = {"type": "FeatureCollection", "features": features}
-    geojson_js = json.dumps(gj)
-
-    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
-        html_template = f.read()
-
-    html_code = html_template.replace(
-        "const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};"
-    )
-    st.components.v1.html(html_code, height=600, scrolling=False)
 
 elif page == "Economia":
     st.title("Economia")
@@ -159,3 +71,7 @@ elif page == "Sobre":
 elif page == "Contato":
     st.title("Contato")
     st.write("Informações para contato e comunicação.")
+
+# Exemplo de conteúdo na barra lateral (opcional)
+with st.sidebar:
+    st.write("Sidebar")
