@@ -83,8 +83,8 @@ styles = {
 }
 
 options = {
-    "show_menu": True,
-    "show_sidebar": False,
+    "show_menu": False,
+    "show_sidebar": True,
 }
 
 # Menu sem os sub-itens "Example 1", "Example 2", "Example 3"
