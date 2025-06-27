@@ -55,6 +55,7 @@ functions = {
     "API": pg.show_api,
     "Examples": pg.show_examples,
     "Community": pg.show_community,
+    "Início": pg.show_home,
 }
 go_to = functions.get(page)
 if go_to:
