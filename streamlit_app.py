@@ -13,18 +13,13 @@ styles = {
     },
     "span": {
         "border-radius": "0.5rem",
-        "color": "#E0E6F0",  # azul clarinho para texto
+        "color": "#E0E6F0",  # texto azul clarinho
         "margin": "0 0.125rem",
         "padding": "0.4375rem 0.625rem",
-        "font-weight": "500",
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",
-        "transition": "background-color 0.3s ease, color 0.3s ease",
     },
     "active": {
-        "background-color": "#2E4A7D",  # azul intermediário para ativo
+        "background-color": "#2E4A7D",  # azul intermediário
         "color": "#FFFFFF",
-        "font-weight": "700",
     },
     "hover": {
         "background-color": "#1F355A",  # hover azul escuro suave
