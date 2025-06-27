@@ -1,2 +1,2 @@
-streamlit
+streamlit==1.26.0
 streamlit-community-navigation-bar
