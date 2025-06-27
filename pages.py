@@ -24,22 +24,18 @@ def show_about():
     """Display the about page content"""
     st.title("About RMC Data")
     
-    col1, col2 = st.columns([1, 3])
+    st.write("""
+    This application provides comprehensive data analysis solutions for financial and economic metrics.
+    Our mission is to deliver accurate and timely information to our users.
+    """)
     
-    with col1:
-        st.image("https://placehold.co/300x300?text=RMC+Team",
-                 width=250)
-    
-    with col2:
-        st.write("""
-        ### Our Mission
-        We provide comprehensive data analysis solutions for financial and economic metrics.
-        
-        ## Team Members
-        - Breno Holiveira (Founder)
-        - Data Science Team
-        - Financial Analysts
-        """)
+    st.markdown("---")
+    st.write("""
+    ### Team Members
+    - Breno Holiveira (Founder)
+    - Data Science Team
+    - Financial Analysts
+    """)
     
     st.markdown("---")
     st.write("""
