@@ -1,32 +1,48 @@
 import streamlit as st
-from streamlit_navigation_bar import st_navbar
 
-st.set_page_config(initial_sidebar_state="collapsed")
+st.set_page_config(page_title="App com Navbar", layout="wide", initial_sidebar_state="collapsed")
 
+# Simula o navbar com st.radio horizontal
+st.markdown("""
+    <style>
+        .navbar-container {
+            background-color: rgb(123, 209, 146);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar-container label {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: rgb(49, 51, 63);
+            border-radius: 0.5rem;
+            margin: 0 0.25rem;
+            padding: 0.4rem 0.75rem;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .navbar-container input:checked + div {
+            background-color: rgba(255, 255, 255, 0.35) !important;
+            font-weight: bold;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Cria o "navbar"
 pages = ["Home", "Library", "Tutorials", "Development", "Download"]
-styles = {
-    "nav": {
-        "background-color": "rgb(123, 209, 146)",
-    },
-    "div": {
-        "max-width": "32rem",
-    },
-    "span": {
-        "border-radius": "0.5rem",
-        "color": "rgb(49, 51, 63)",
-        "margin": "0 0.125rem",
-        "padding": "0.4375rem 0.625rem",
-    },
-    "active": {
-        "background-color": "rgba(255, 255, 255, 0.25)",
-    },
-    "hover": {
-        "background-color": "rgba(255, 255, 255, 0.35)",
-    },
-}
+selected = st.radio("",
+    pages,
+    horizontal=True,
+    key="main_nav",
+    label_visibility="collapsed"
+)
 
-page = st_navbar(pages, styles=styles)
-st.write(page)
+# Conteúdo condicional da página
+st.write(f"Você está na página: **{selected}**")
 
+# Sidebar opcional
 with st.sidebar:
-    st.write("Sidebar")
+    st.write("Sidebar aqui")
