@@ -4,7 +4,7 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Fonte Inter via Google Fonts
+# Fonte Inter via Google Fonts para suavidade e legibilidade
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -12,61 +12,100 @@ st.markdown(
         /* Navbar container */
         .stHorizontalBlock {
             background-color: #1f2937 !important;
-            padding: 0 !important;
-            height: 42px !important;
+            padding: 0 12px !important;
+            height: 44px !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             display: flex !important;
             align-items: center !important;
-            justify-content: left !important;
+            justify-content: space-between !important; /* espaço entre logo e GitHub */
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-size: 14px !important;
             letter-spacing: 0.02em !important;
+            position: relative;
         }
 
-        /* Logo + texto fixado no topo */
-        .navbar-logo {
+        /* Logo + texto à esquerda */
+        .navbar-left {
             display: flex;
             align-items: center;
-            position: absolute;
-            left: 16px;
-            top: 7px;
             cursor: pointer;
             user-select: none;
-            text-decoration: none;
             color: #a3bffa;
             font-weight: 600;
             font-size: 18px;
+            letter-spacing: 0.03em;
+            gap: 8px;
+            flex-shrink: 0;
+            text-decoration: none;
             transition: color 0.3s ease;
-            z-index: 9999;
+            padding-left: 8px;
         }
-        .navbar-logo:hover {
+        .navbar-left:hover {
             color: #7c90f4;
         }
-        .navbar-logo img {
-            height: 26px;
-            width: 26px;
-            margin-right: 8px;
+        .navbar-left img {
+            height: 28px;
+            width: 28px;
+            object-fit: contain;
         }
 
-        /* Navbar items */
-        .stHorizontalBlock span {
+        /* Itens da navbar central */
+        .navbar-center {
+            flex-grow: 1;
+            display: flex !important;
+            justify-content: center !important;
+            gap: 8px !important; /* espaçamento entre opções */
+        }
+        .navbar-center span {
             color: rgba(255,255,255,0.85) !important;
-            padding: 8px 12px !important;
-            margin: 0 6px !important;
+            padding: 8px 14px !important;
+            margin: 0 !important;
             font-weight: 400 !important;
             cursor: pointer;
             user-select: none;
-            transition: color 0.2s ease, box-shadow 0.3s ease;
+            border-radius: 4px;
+            transition: color 0.2s ease, background-color 0.2s ease;
         }
-        .stHorizontalBlock span:hover {
+        .navbar-center span:hover {
             color: #a3bffa !important;
-            box-shadow: inset 0 -2px 0 #a3bffa;
+            background-color: rgba(163, 191, 250, 0.1) !important;
         }
-        .stHorizontalBlock [aria-selected="true"] span {
+        .navbar-center [aria-selected="true"] span {
             color: #7c90f4 !important;
             font-weight: 600 !important;
-            box-shadow: inset 0 -3px 0 #7c90f4;
+            background-color: rgba(124, 144, 244, 0.15) !important;
+        }
+
+        /* GitHub no canto direito */
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            gap: 12px;
+        }
+        .navbar-right a {
+            color: #a3bffa;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+        .navbar-right a:hover {
+            color: #7c90f4;
+        }
+        .navbar-right img {
+            height: 24px;
+            width: 24px;
+            object-fit: contain;
+        }
+
+        /* Ajuste para a barra central, deixando espaço para esquerda e direita */
+        .stHorizontalBlock > div:nth-child(2) {
+            flex-grow: 1;
+            justify-content: center !important;
+            gap: 8px !important;
+            margin: 0 150px; /* deixa espaço para logo e github */
         }
     </style>
     """,
@@ -76,23 +115,25 @@ st.markdown(
 styles = {
     "nav": {
         "background-color": "#1f2937",
-        "justify-content": "left",
-        "padding-left": "100px",  # espaço para logo fixo
+        "justify-content": "center",
+        "padding": "0 150px",  # Espaço para logo à esquerda e GitHub à direita
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "8px 12px",
+        "padding": "8px 14px",
         "font-weight": "400",
         "font-size": "14px",
         "letter-spacing": "0.02em",
         "cursor": "pointer",
         "user-select": "none",
-        "transition": "color 0.2s ease, box-shadow 0.3s ease",
+        "border-radius": "4px",
+        "transition": "color 0.2s ease, background-color 0.2s ease",
+        "margin": "0 4px",
     },
     "active": {
         "color": "#7c90f4",
         "font-weight": "600",
-        "box-shadow": "inset 0 -3px 0 #7c90f4",
+        "background-color": "rgba(124, 144, 244, 0.15)",
     }
 }
 
@@ -103,19 +144,28 @@ options = {
 
 pages = ["Inicio", "Sobre", "Economia", "Finanças Públicas", "Segurança", "População"]
 
-page = st_navbar(
-    pages,
-    styles=styles,
-    options=options,
-)
+# Barra de navegação principal, mas o logo e GitHub serão custom com CSS
+page = st_navbar(pages, styles=styles, options=options)
 
-# Logo + texto clicável fixo no topo esquerdo, abrindo seu GitHub em nova aba
+# --- Logo + texto clicável no canto esquerdo ---
 st.markdown(
-    f"""
-    <a href="https://github.com/breno-holiveira/rmc" target="_blank" rel="noopener noreferrer" class="navbar-logo">
-        <img src="git.svg" alt="Logo" />
+    """
+    <a href="https://github.com/breno-holiveira/rmc" target="_blank" rel="noopener noreferrer" class="navbar-left">
+        <img src="cubes.svg" alt="Cubos Logo" />
         RMC Data
     </a>
+    """,
+    unsafe_allow_html=True,
+)
+
+# --- Ícone GitHub no canto direito ---
+st.markdown(
+    """
+    <div class="navbar-right">
+        <a href="https://github.com/breno-holiveira/rmc" target="_blank" rel="noopener noreferrer" title="GitHub Repository">
+            <img src="git.svg" alt="GitHub Logo" />
+        </a>
+    </div>
     """,
     unsafe_allow_html=True,
 )
