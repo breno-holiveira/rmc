@@ -1,3 +1,2 @@
-Python >= 3.8
-Streamlit >= 1.33
-Streamlit Theme >= 1.2.3
+streamlit
+streamlit-navigation-bar
