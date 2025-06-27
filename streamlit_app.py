@@ -1,28 +1,34 @@
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
 
-
 st.set_page_config(initial_sidebar_state="collapsed")
 
 pages = ["Home", "Library", "Tutorials", "Development", "Download"]
 styles = {
     "nav": {
-        "background-color": "rgb(123, 209, 146)",
+        "background-color": "#0B1D3A",  # azul-marinho escuro
     },
     "div": {
         "max-width": "32rem",
     },
     "span": {
         "border-radius": "0.5rem",
-        "color": "rgb(49, 51, 63)",
+        "color": "#E0E6F0",  # azul clarinho para texto
         "margin": "0 0.125rem",
         "padding": "0.4375rem 0.625rem",
+        "font-weight": "500",
+        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-size": "14px",
+        "transition": "background-color 0.3s ease, color 0.3s ease",
     },
     "active": {
-        "background-color": "rgba(255, 255, 255, 0.25)",
+        "background-color": "#2E4A7D",  # azul intermediário para ativo
+        "color": "#FFFFFF",
+        "font-weight": "700",
     },
     "hover": {
-        "background-color": "rgba(255, 255, 255, 0.35)",
+        "background-color": "#1F355A",  # hover azul escuro suave
+        "color": "#FFFFFF",
     },
 }
 
