@@ -8,35 +8,41 @@ st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
 styles = {
     "nav": {
-        "background": "linear-gradient(90deg, #1e2a38, #273544)",
+        "background": "#1f2937",  # Cinza escuro sóbrio, quase antracite
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-size": "14px",
-        "padding": "0 10px",
-        "height": "38px",
+        "padding": "0 12px",
+        "height": "40px",
         "align-items": "center",
         "box-shadow": "none",
-        "border-radius": "0",  # Remove bordas arredondadas da navbar
-        "letter-spacing": "0.03em",
+        "border-radius": "0",  # Sem bordas arredondadas
+        "letter-spacing": "0.04em",
     },
     "span": {
         "color": "rgba(255, 255, 255, 0.85)",
-        "padding": "6px 18px",  # Espaçamento lateral simétrico e maior para todas as opções
+        "padding": "8px 16px",  # Compacto, espaçamento uniforme
         "font-weight": "400",
         "user-select": "none",
-        "transition": "color 0.25s ease",
-        "margin": "0 6px",  # Margem para garantir espaçamento uniforme
+        "transition": "color 0.3s ease",
+        "margin": "0 6px",
     },
     "active": {
-        "background-color": "rgba(255, 255, 255, 0.18)",  # Fundo suave e translúcido
-        "color": "#e6e6e6",  # Texto claro, mas não branco puro
+        "background-color": "rgba(255, 255, 255, 0.1)",  # Fundo ativo suave e transparente
+        "color": "#ffffff",  # Texto branco para destaque claro
         "font-weight": "600",
-        "padding": "6px 18px",
-        "border-radius": "2px",  # Bordas levemente arredondadas só para suavizar
+        "padding": "8px 16px",
+        "border-radius": "2px",  # Bordas levemente arredondadas para suavidade
         "user-select": "none",
-        "box-shadow": "none",  # Remove sombra para menos destaque pesado
+        "box-shadow": "none",
+        "border": "1px solid rgba(255, 255, 255, 0.2)",  # Borda fina para separar discretamente
         "transition": "background-color 0.3s ease, color 0.3s ease",
-        "margin": "0 6px",  # Mesma margem para alinhamento
+        "margin": "0 6px",
+    },
+    "span_hover": {
+        "color": "#ff7f50",  # Coral suave no hover para sutileza
+        "cursor": "pointer",
+        "transition": "color 0.3s ease",
     },
     "img": {
         "display": "none",  # Ocultar logo, só texto
