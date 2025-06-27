@@ -5,16 +5,18 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Inicializa estado da aba ativa
+# Inicializa a página padrão no estado da sessão
 if "page" not in st.session_state:
     st.session_state.page = "RMC Data"
 
 # Configuração da página
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed", page_icon="📊")
+st.set_page_config(
+    page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed", page_icon="📊"
+)
 
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-# CSS personalizado para navbar
+# CSS para a navbar e fonte
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -23,7 +25,6 @@ st.markdown(
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
             font-size: 14.5px !important;
-            letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
             color: rgba(255,255,255,0.85) !important;
@@ -54,7 +55,6 @@ st.markdown(
             justify-content: left !important;
             user-select: none;
         }
-        /* Ajuste largura e padding da página */
         .css-18e3th9 { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
         .css-1d391kg { padding-left: 0 !important; padding-right: 0 !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
     </style>
@@ -74,7 +74,6 @@ styles = {
         "padding": "6px 6px",
         "font-weight": "400",
         "font-size": "14.5px",
-        "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
@@ -88,7 +87,7 @@ styles = {
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    "logo_href": "#",  # Para permitir detectar clique no logo
+    # NÃO passe parâmetro 'logo_href' ou 'default' para evitar erro!
 }
 
 pages = [
@@ -101,13 +100,13 @@ pages = [
     "Contato",
 ]
 
-# Detectar clique no logo pelo parâmetro query 'logo_clicked'
-query_params = st.experimental_get_query_params()
+# Usar st.query_params para detectar clique no logo (se quiser fazer isso)
+query_params = st.query_params
 if query_params.get("logo_clicked") == ["1"]:
     st.session_state.page = "RMC Data"
-    st.experimental_set_query_params()  # limpa query params para não ficar clicando sempre
+    st.experimental_set_query_params()  # Limpa a query para evitar loop
 
-# Chama navbar, retorna a aba clicada (não passa default)
+# Chamar a navbar (SEM passar default)
 clicked_page = st_navbar(
     pages,
     logo_path=logo_path,
@@ -115,11 +114,11 @@ clicked_page = st_navbar(
     options=options,
 )
 
-# Atualiza o estado da aba só se mudou (para manter o controle da aba)
-if clicked_page != st.session_state.page and clicked_page is not None:
+# Atualizar o estado se mudou de página
+if clicked_page and clicked_page != st.session_state.page:
     st.session_state.page = clicked_page
 
-# Conteúdo da aba atual
+# Conteúdo da página ativa
 if st.session_state.page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -153,7 +152,9 @@ if st.session_state.page == "RMC Data":
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         html_template = f.read()
 
-    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+    html_code = html_template.replace(
+        "const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};"
+    )
     st.components.v1.html(html_code, height=600, scrolling=False)
 
 elif st.session_state.page == "Economia":
