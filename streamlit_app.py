@@ -1,53 +1,32 @@
-import os
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
-import pages as pg
 
 st.set_page_config(initial_sidebar_state="collapsed")
 
-pages = ["Install", "User Guide", "API", "Examples", "Community", "GitHub"]
-parent_dir = os.path.dirname(os.path.abspath(__file__))
-urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
+pages = ["Home", "Library", "Tutorials", "Development", "Download"]
 styles = {
     "nav": {
-        "background-color": "royalblue",
-        "justify-content": "left",
+        "background-color": "rgb(123, 209, 146)",
     },
-    "img": {
-        "padding-right": "14px",
+    "div": {
+        "max-width": "32rem",
     },
     "span": {
-        "color": "white",
-        "padding": "14px",
+        "border-radius": "0.5rem",
+        "color": "rgb(49, 51, 63)",
+        "margin": "0 0.125rem",
+        "padding": "0.4375rem 0.625rem",
     },
     "active": {
-        "background-color": "white",
-        "color": "var(--text-color)",
-        "font-weight": "normal",
-        "padding": "14px",
-    }
-}
-options = {
-    "show_menu": False,
-    "show_sidebar": False,
+        "background-color": "rgba(255, 255, 255, 0.25)",
+    },
+    "hover": {
+        "background-color": "rgba(255, 255, 255, 0.35)",
+    },
 }
 
-page = st_navbar(
-    pages,
-    logo_path=logo_path,
-    urls=urls,
-    styles=styles,
-    options=options,
-)
+page = st_navbar(pages, styles=styles)
+st.write(page)
 
-functions = {
-    "Home": pg.show_home,
-    "Install": pg.show_install,
-    "User Guide": pg.show_user_guide,
-    "API": pg.show_api,
-    "Examples": pg.show_examples,
-    "Community": pg.show_community,
-}
-go_to = functions.get(page)
-if go_to:
-    go_to()
+with st.sidebar:
+    st.write("Sidebar")
