@@ -2,34 +2,43 @@
   <defs>
     <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#E0E6F0"/>
-      <stop offset="100%" stop-color="#A9B8C9"/>
+      <stop offset="100%" stop-color="#B0BFD2"/>
     </linearGradient>
     <linearGradient id="bar2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#BFD6F2"/>
-      <stop offset="100%" stop-color="#7FB3FF"/>
+      <stop offset="0%" stop-color="#C7D7F7"/>
+      <stop offset="100%" stop-color="#85A9E6"/>
     </linearGradient>
     <linearGradient id="bar3" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#96B3D5"/>
-      <stop offset="100%" stop-color="#3D5B87"/>
+      <stop offset="0%" stop-color="#9CB7D7"/>
+      <stop offset="100%" stop-color="#5679A9"/>
     </linearGradient>
+
+    <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#000" flood-opacity="0.07"/>
+    </filter>
+
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#7FB3FF" flood-opacity="0.18"/>
+    </filter>
 
     <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#E0E6F0"/>
-      <stop offset="100%" stop-color="#C4CCD6"/>
+      <stop offset="0%" stop-color="#E3E9F2"/>
+      <stop offset="100%" stop-color="#B8C4D1"/>
     </linearGradient>
-
-    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity="0.06"/>
-    </filter>
   </defs>
 
-  <!-- Barras -->
-  <rect x="20" y="28" width="8" height="20" rx="2" fill="url(#bar1)" filter="url(#shadow)" />
-  <rect x="36" y="20" width="8" height="28" rx="2" fill="url(#bar2)" filter="url(#shadow)" />
-  <rect x="52" y="10" width="8" height="38" rx="2" fill="url(#bar3)" filter="url(#shadow)" />
+  <!-- Barras com borda branca translúcida e glow -->
+  <rect x="20" y="28" width="10" height="20" rx="4" fill="url(#bar1)" filter="url(#glow)" />
+  <rect x="20" y="28" width="10" height="20" rx="4" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
 
-  <!-- Texto ajustado -->
-  <text x="80" y="40" fill="url(#textGrad)" font-family="'Poppins', sans-serif" font-size="26" font-weight="600" letter-spacing="0.03em">
+  <rect x="38" y="20" width="10" height="28" rx="4" fill="url(#bar2)" filter="url(#glow)" />
+  <rect x="38" y="20" width="10" height="28" rx="4" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+
+  <rect x="56" y="10" width="10" height="38" rx="4" fill="url(#bar3)" filter="url(#glow)" />
+  <rect x="56" y="10" width="10" height="38" rx="4" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1" />
+
+  <!-- Texto suave com sombra leve -->
+  <text x="80" y="42" fill="url(#textGrad)" font-family="'Poppins', sans-serif" font-size="24" font-weight="500" letter-spacing="0.04em" style="text-transform: uppercase; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.12));">
     RMC DATA
   </text>
 </svg>
