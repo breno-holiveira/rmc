@@ -13,10 +13,10 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 13px !important;
+            font-size: 15px !important;              /* Aumentei aqui */
             letter-spacing: 0em !important;
-            padding: 6px 8px !important;
-            margin: 0 4px !important;
+            padding: 6px 6px !important;             /* Reduzi o padding horizontal */
+            margin: 0 2px !important;                 /* Reduzi margem horizontal */
             color: rgba(255,255,255,0.8) !important;
             cursor: pointer;
             user-select: none;
@@ -52,7 +52,7 @@ st.markdown(
         .stHorizontalBlock {
             background-color: #1f2937 !important;
             padding: 0 !important;
-            height: 38px !important;
+            height: 42px !important;                 /* Ajustei um pouco a altura para melhor proporção */
             box-shadow: none !important;
             border-radius: 0 !important;
             display: flex !important;
@@ -76,11 +76,11 @@ styles = {
     },
     "span": {
         "color": "rgba(255,255,255,0.8)",
-        "padding": "6px 8px",
+        "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "13px",
+        "font-size": "15px",
         "letter-spacing": "0em",
-        "margin": "0 4px",
+        "margin": "0 2px",
         "white-space": "nowrap",
         "position": "relative",
     },
