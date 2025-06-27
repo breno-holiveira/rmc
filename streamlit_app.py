@@ -15,7 +15,7 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Fonte DM Sans com tamanho levemente maior (15px)
+# Fonte DM Sans com destaque por cor suave (sem negrito)
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -37,8 +37,8 @@ st.markdown(
             color: #ff9e3b !important;
         }
         .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: rgba(255,255,255,0.85) !important;
+            font-weight: 400 !important;
+            color: #f4a259 !important; /* tom suave, sem negrito */
         }
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
@@ -76,8 +76,8 @@ styles = {
         "position": "relative",
     },
     "active": {
-        "color": "rgba(255,255,255,0.85)",
-        "font-weight": "500",
+        "color": "#f4a259",  # mesma cor usada no CSS
+        "font-weight": "400",
     },
 }
 
