@@ -56,16 +56,6 @@ st.markdown(
             from { width: 0; }
             to { width: 100%; }
         }
-        /* Visual indent para sub-itens */
-        .sub-item {
-            font-size: 13px !important;
-            padding-left: 18px !important;
-            color: rgba(255,255,255,0.65) !important;
-        }
-        .sub-item[aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: #ffb374 !important;
-        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -97,59 +87,67 @@ options = {
     "show_sidebar": False,
 }
 
-# Lista com itens principais e sub-itens (os sub-itens começam com tabulação para hierarquia visual)
+# Menu sem os sub-itens "Example 1", "Example 2", "Example 3"
 pages = [
     "Inicio",
     "Documentation",
     "Examples",
-    "  Example 1",
-    "  Example 2",
-    "  Example 3",
     "Community",
     "About"
 ]
 
 page = st_navbar(pages, styles=styles, options=options)
 
-# Lógica de seleção — ajustar para reconhecer sub-itens (com espaços no início)
-def is_subitem(p):
-    return p.startswith("  ")
-
-if is_subitem(page):
-    # Se for sub-item, remove os espaços para o título e decide conteúdo
-    page_main = None
-    page_sub = page.strip()
-else:
-    page_main = page
-    page_sub = None
-
 # Conteúdo conforme a seleção
-if page_main == "Inicio":
+if page == "Inicio":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
-    # seu conteúdo da Home aqui...
 
-elif page_main == "Documentation":
+    st.markdown(
+        "A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituída por 20 municípios. "
+        "Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano."
+    )
+    st.markdown(
+        "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
+    )
+
+    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+    if gdf.crs != "EPSG:4326":
+        gdf = gdf.to_crs("EPSG:4326")
+    gdf = gdf.sort_values(by="NM_MUN")
+
+    df = pd.read_excel("dados_rmc.xlsx")
+    df.set_index("nome", inplace=True)
+
+    features = []
+    for _, row in gdf.iterrows():
+        nome = row["NM_MUN"]
+        geom = row["geometry"].__geo_interface__
+        props = df.loc[nome].to_dict() if nome in df.index else {}
+        props["name"] = nome
+        features.append({"type": "Feature", "geometry": geom, "properties": props})
+
+    gj = {"type": "FeatureCollection", "features": features}
+    geojson_js = json.dumps(gj)
+
+    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
+        html_template = f.read()
+
+    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+    st.components.v1.html(html_code, height=600, scrolling=False)
+
+elif page == "Documentation":
     st.title("Documentation")
     st.write("Aqui você pode colocar a documentação do seu app...")
 
-elif page_main == "Examples" or page_sub in ["Example 1", "Example 2", "Example 3"]:
+elif page == "Examples":
     st.title("Examples")
+    st.write("Exemplos do app...")
 
-    # Se for subitem, mostra conteúdo do subitem, senão default para Example 1
-    if page_sub == "Example 1":
-        st.write("Conteúdo do Example 1")
-    elif page_sub == "Example 2":
-        st.write("Conteúdo do Example 2")
-    elif page_sub == "Example 3":
-        st.write("Conteúdo do Example 3")
-    else:
-        st.write("Conteúdo padrão para Examples")
-
-elif page_main == "Community":
+elif page == "Community":
     st.title("Community")
     st.write("Links para a comunidade...")
 
-elif page_main == "About":
+elif page == "About":
     st.title("About")
     st.write("Sobre o projeto...")
