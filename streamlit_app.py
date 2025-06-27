@@ -26,15 +26,15 @@ st.markdown(
         .stHorizontalBlock span:hover {
             color: #ffa366 !important;
         }
-        /* Destaque do item ativo: cor mais brilhante, sem barra */
+        /* Destaque do item ativo: cor branca com barra inferior ultrafina */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
-            color: #fff !important;
+            color: #ffffff !important;
+            border-bottom: 2px solid rgba(255, 163, 102, 0.5) !important;
+            padding-bottom: 4px !important;
             background-color: transparent !important;
-            box-shadow: none !important;
             border-radius: 0 !important;
-            /* sombra leve para destacar texto */
-            text-shadow: 0 0 6px rgba(255, 163, 102, 0.7);
+            box-shadow: none !important;
         }
         /* Container da navbar */
         .stHorizontalBlock {
@@ -67,8 +67,8 @@ styles = {
     "active": {
         "color": "#ffffff",
         "font-weight": "500",
-        "padding-bottom": "0",
-        "border-bottom": "none",
+        "border-bottom": "2px solid rgba(255, 163, 102, 0.5)",
+        "padding-bottom": "4px",
     }
 }
 
