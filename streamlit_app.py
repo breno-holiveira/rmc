@@ -1,138 +1,108 @@
-import streamlit as st
-import streamlit.components.v1 as components
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RMC Data</title>
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7fc;
+        }
 
-from pages import inicio, sobre, economia, financas, despesas, arrecadacao
+        /* Navbar */
+        nav {
+            background-color: #0B1D3A;
+            display: flex;
+            justify-content: flex-start;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
 
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
+        .logo {
+            height: 40px;
+            margin-right: 15px;
+        }
 
-# Inicializa a página padrão
-if "page" not in st.session_state:
-    st.session_state.page = "inicio"
+        .navbar-item {
+            color: #E0E6F0;
+            padding: 14px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.3s, color 0.3s;
+        }
 
-# JS para alterar a página via clique na navbar HTML
-components.html("""
-<script>
-function navigateTo(page) {
-    const streamlitEvent = new CustomEvent("streamlit:message", {
-        detail: { type: "streamlit:setComponentValue", key: "page", value: page }
-    });
-    window.parent.dispatchEvent(streamlitEvent);
-}
-</script>
-""", height=0)
+        .navbar-item:hover {
+            background-color: #1F355A;
+            color: #FFFFFF;
+        }
 
-# Navbar estilizada com dropdowns e links que usam navigateTo('page')
-st.markdown("""
-<style>
-    .navbar {
-        background-color: #0B1D3A;
-        padding: 0 2rem;
-        height: 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-family: Arial, sans-serif;
-    }
-    .navbar-title {
-        color: white;
-        font-size: 22px;
-        font-weight: bold;
-        margin-right: 30px;
-    }
-    .nav-links {
-        display: flex;
-        gap: 0;
-        height: 100%;
-    }
-    .nav-item {
-        position: relative;
-        height: 100%;
-    }
-    .nav-link {
-        color: #E0E6F0;
-        text-decoration: none;
-        padding: 0 20px;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        transition: all 0.1s ease;
-        cursor: pointer;
-    }
-    .nav-link:hover {
-        color: white;
-        background-color: #1F355A;
-    }
-    .dropdown-content {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        background-color: #0B1D3A;
-        min-width: 180px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        z-index: 1;
-        display: none;
-        border-top: 2px solid #2D4375;
-    }
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
-    .dropdown-item {
-        color: #E0E6F0;
-        padding: 12px 16px;
-        text-decoration: none;
-        display: block;
-        font-size: 13px;
-        transition: all 0.1s ease;
-        border-left: 3px solid transparent;
-        cursor: pointer;
-    }
-    .dropdown-item:hover {
-        background-color: #1F355A;
-        border-left: 3px solid #4F46E5;
-    }
-</style>
+        .navbar-item.active {
+            background-color: #1F355A;
+            color: #FFFFFF;
+        }
 
-<div class="navbar">
-    <div class="navbar-title">RMC Data</div>
-    <div class="nav-links">
-        <div class="nav-item">
-            <div class="nav-link" onclick="navigateTo('inicio')">Início</div>
-        </div>
-        <div class="nav-item">
-            <div class="nav-link" onclick="navigateTo('sobre')">Sobre</div>
-        </div>
-        <div class="nav-item">
-            <div class="nav-link" onclick="navigateTo('economia')">Economia</div>
-        </div>
-        <div class="nav-item dropdown">
-            <div class="nav-link">Finanças</div>
-            <div class="dropdown-content">
-                <div class="dropdown-item" onclick="navigateTo('financas')">📊 Finanças</div>
-                <div class="dropdown-item" onclick="navigateTo('despesas')">💸 Despesas</div>
-                <div class="dropdown-item" onclick="navigateTo('arrecadacao')">💰 Arrecadação</div>
-            </div>
-        </div>
+        .main-content {
+            margin-top: 60px; /* Adjusted for fixed navbar */
+            padding: 20px;
+            background-color: #ffffff;
+            min-height: 500px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <nav>
+        <img src="cubes.svg" alt="Logo" class="logo">
+        <a href="#" class="navbar-item active" onclick="changeContent('home')">Início</a>
+        <a href="#" class="navbar-item" onclick="changeContent('sobre')">Sobre</a>
+        <a href="#" class="navbar-item" onclick="changeContent('economia')">Economia</a>
+        <a href="#" class="navbar-item" onclick="changeContent('financas')">Finanças</a>
+        <a href="#" class="navbar-item" onclick="changeContent('seguranca')">Segurança</a>
+        <a href="https://github.com/breno-holiveira/rmc" class="navbar-item">GitHub</a>
+    </nav>
+
+    <div class="main-content">
+        <div id="home" class="content-section">Bem-vindo à página inicial do RMC Data.</div>
+        <div id="sobre" class="content-section hidden">Aqui você pode aprender mais sobre o projeto.</div>
+        <div id="economia" class="content-section hidden">Esta seção aborda a economia.</div>
+        <div id="financas" class="content-section hidden">Aqui discutimos sobre finanças.</div>
+        <div id="seguranca" class="content-section hidden">A seção de segurança contém as melhores práticas.</div>
     </div>
-</div>
-""", unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
+    <script>
+        function changeContent(page) {
+            // Esconde todas as seções
+            let sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.classList.add('hidden'));
+            
+            // Mostra a seção correspondente
+            let activeSection = document.getElementById(page);
+            if (activeSection) {
+                activeSection.classList.remove('hidden');
+            }
 
-# Roteia para função render de cada página
-page = st.session_state.page
+            // Atualiza a navegação ativa
+            let navItems = document.querySelectorAll('.navbar-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            document.querySelector(`[onclick="changeContent('${page}')"]`).classList.add('active');
+        }
 
-if page == "inicio":
-    inicio.render()
-elif page == "sobre":
-    sobre.render()
-elif page == "economia":
-    economia.render()
-elif page == "financas":
-    financas.render()
-elif page == "despesas":
-    despesas.render()
-elif page == "arrecadacao":
-    arrecadacao.render()
-else:
-    st.error("Página não encontrada.")
+        // Inicializa a página com a seção "Início"
+        changeContent('home');
+    </script>
+
+</body>
+</html>
