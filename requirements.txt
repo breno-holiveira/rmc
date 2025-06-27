@@ -1,2 +1,2 @@
-streamlit==1.26.0
-streamlit-community-navigation-bar==0.2.6
+streamlit
+streamlit-community-navigation-bar
