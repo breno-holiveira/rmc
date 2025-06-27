@@ -1,79 +1,37 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
-st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
+# Configurações da página
+st.set_page_config(page_title='RMC Data', page_icon='icon.svg', layout='wide')
 
-# HTML do menu de navegação
-html_navbar = """
-<style>
-/* Container principal */
-.navbar {
-    display: flex;
-    align-items: center;
-    background-color: #0B1D3A;
-    padding: 0.5rem 1rem;
-    font-family: 'Segoe UI', sans-serif;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
+# Função para criar a barra de navegação
+def navbar():
+    st.sidebar.title("Navegação")
+    pages = ['Início', 'Sobre', 'Economia', 'Finanças', 'Segurança', 'GitHub']
+    selection = st.sidebar.radio("Ir para", pages)
 
-/* Logo */
-.navbar img {
-    height: 32px;
-    margin-right: 16px;
-}
+    return selection
 
-/* Links */
-.navbar a {
-    color: #E0E6F0;
-    text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 6px;
-    margin-right: 6px;
-    transition: background-color 0.3s ease;
-    font-size: 15px;
-}
+# Chama a função de navegação
+page = navbar()
 
-/* Hover */
-.navbar a:hover {
-    background-color: #1F355A;
-    color: #FFFFFF;
-}
+# Conteúdo das páginas
+if page == 'Início':
+    st.title("Bem-vindo ao RMC Data")
+    st.write("Conteúdo da página Início.")
+elif page == 'Sobre':
+    st.title("Sobre")
+    st.write("Conteúdo da página Sobre.")
+elif page == 'Economia':
+    st.title("Economia")
+    st.write("Conteúdo da página Economia.")
+elif page == 'Finanças':
+    st.title("Finanças")
+    st.write("Conteúdo da página Finanças.")
+elif page == 'Segurança':
+    st.title("Segurança")
+    st.write("Conteúdo da página Segurança.")
+elif page == 'GitHub':
+    st.title("GitHub")
+    st.write("Visite nosso repositório no GitHub.")
+    st.markdown("[GitHub Repository](https://github.com/breno-holiveira/rmc)")
 
-/* Ativo */
-.navbar a.active {
-    background-color: #1F355A;
-    font-weight: bold;
-}
-</style>
-
-<div class="navbar">
-    <img src="https://raw.githubusercontent.com/breno-holiveira/rmc/main/cubes.svg" alt="Logo">
-    <a href="/?page=inicio" class="active">Início</a>
-    <a href="/?page=sobre">Sobre</a>
-    <a href="/?page=economia">Economia</a>
-    <a href="/?page=financas">Finanças</a>
-    <a href="/?page=seguranca">Segurança</a>
-    <a href="https://github.com/breno-holiveira/rmc" target="_blank">GitHub</a>
-</div>
-"""
-
-# Exibir a navbar HTML
-components.html(html_navbar, height=60)
-
-# Lógica de navegação por parâmetro de URL
-query_params = st.experimental_get_query_params()
-page = query_params.get("page", ["inicio"])[0]
-
-# Lógica de renderização baseada no "page"
-if page == "inicio":
-    st.title("Página Início")
-elif page == "sobre":
-    st.title("Página Sobre")
-elif page == "economia":
-    st.title("Página Economia")
-elif page == "financas":
-    st.title("Página Finanças")
-elif page == "seguranca":
-    st.title("Página Segurança")
-else:
-    st.title("Página não encontrada")
