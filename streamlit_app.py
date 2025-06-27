@@ -17,7 +17,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14px !important;  /* diminuiu de 15px para 14px */
+            font-size: 15px !important;
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -76,13 +76,13 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",  # diminuiu de 15px para 14px
+        "font-size": "15px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "14px",  # diminuiu de 15px para 14px
+        "font-size": "15px",
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
