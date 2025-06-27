@@ -9,37 +9,48 @@ st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Fonte e estilo base dos itens da navbar */
+        /* Base dos itens da navbar */
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
             font-size: 13px !important;
-            letter-spacing: 0.0em !important;  /* Remove espaçamento entre letras */
-            padding: 6px 6px !important;      /* Padding horizontal menor */
-            margin: 0 3px !important;         /* Margem lateral reduzida */
-            color: rgba(255,255,255,0.85) !important;
-            transition: color 0.2s ease;
+            letter-spacing: 0em !important;
+            padding: 6px 8px !important;
+            margin: 0 4px !important;
+            color: rgba(255,255,255,0.8) !important;
             cursor: pointer;
             user-select: none;
-            white-space: nowrap;              /* Evita quebra de linha */
+            white-space: nowrap;
+            position: relative;
+            transition: color 0.25s ease;
         }
-        /* Hover suave: muda só a cor, sem fundo */
+
+        /* Hover suave só muda cor */
         .stHorizontalBlock span:hover {
             color: #ffa366 !important;
         }
-        /* Destaque do item ativo: cor branca com barra inferior ultrafina */
+
+        /* Indicador underline animado do item selecionado */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
-            color: #ffffff !important;
-            border-bottom: 2px solid rgba(255, 163, 102, 0.5) !important;
-            padding-bottom: 4px !important;
-            background-color: transparent !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
+            color: #ff8c42 !important;
         }
-        /* Container da navbar */
+        .stHorizontalBlock [aria-selected="true"] span::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 2px;
+            width: 100%;
+            background-color: #ff8c42;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            animation: underlineExpand 0.3s forwards;
+        }
+
+        /* Container navbar */
         .stHorizontalBlock {
-            background-color: #1f2937 !important;  /* cinza escuro */
+            background-color: #1f2937 !important;
             padding: 0 !important;
             height: 38px !important;
             box-shadow: none !important;
@@ -47,6 +58,11 @@ st.markdown(
             display: flex !important;
             align-items: center !important;
             justify-content: left !important;
+        }
+
+        @keyframes underlineExpand {
+            from { width: 0; }
+            to { width: 100%; }
         }
     </style>
     """,
@@ -59,20 +75,19 @@ styles = {
         "justify-content": "left",
     },
     "span": {
-        "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 6px",
+        "color": "rgba(255,255,255,0.8)",
+        "padding": "6px 8px",
         "font-weight": "400",
         "font-size": "13px",
-        "letter-spacing": "0.0em",
-        "margin": "0 3px",
+        "letter-spacing": "0em",
+        "margin": "0 4px",
         "white-space": "nowrap",
+        "position": "relative",
     },
     "active": {
-        "color": "#ffffff",
+        "color": "#ff8c42",
         "font-weight": "500",
-        "border-bottom": "2px solid rgba(255, 163, 102, 0.5)",
-        "padding-bottom": "4px",
-    }
+    },
 }
 
 options = {
