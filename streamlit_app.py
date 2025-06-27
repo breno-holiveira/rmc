@@ -1,80 +1,141 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
-st.set_page_config(page_title='RMC Data', layout='wide')
+st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 
-# Inicializa
+# Inicia a página padrão
 if "page" not in st.session_state:
     st.session_state.page = "inicio"
 
-# Função para mudar de página
-def mudar_pagina(p):
-    st.session_state.page = p
+# Controle de navegação via mensagem JS
+components.html("""
+<script>
+function navigateTo(page) {
+    const streamlitEvent = new CustomEvent("streamlit:message", {
+        detail: { type: "streamlit:setComponentValue", key: "page", value: page }
+    });
+    window.parent.dispatchEvent(streamlitEvent);
+}
+</script>
+""", height=0)
 
-# Estilo + HTML da navbar
+# HTML + CSS da navbar estilizada com dropdown
 st.markdown("""
 <style>
-.navbar {
-    background-color: #0B1D3A;
-    padding: 1rem;
-    display: flex;
-    gap: 1rem;
-}
-.nav-link {
-    color: #E0E6F0;
-    background: none;
-    border: none;
-    font-size: 14px;
-    padding: 8px 16px;
-    cursor: pointer;
-}
-.nav-link:hover {
-    background-color: #1F355A;
-    color: white;
-    border-radius: 4px;
-}
+    .navbar {
+        background-color: #0B1D3A;
+        padding: 0 2rem;
+        height: 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: Arial, sans-serif;
+    }
+    .navbar-title {
+        color: white;
+        font-size: 22px;
+        font-weight: bold;
+        margin-right: 30px;
+    }
+    .nav-links {
+        display: flex;
+        gap: 0;
+        height: 100%;
+    }
+    .nav-item {
+        position: relative;
+        height: 100%;
+    }
+    .nav-link {
+        color: #E0E6F0;
+        text-decoration: none;
+        padding: 0 20px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        transition: all 0.1s ease;
+        cursor: pointer;
+    }
+    .nav-link:hover {
+        color: white;
+        background-color: #1F355A;
+    }
+    .dropdown-content {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background-color: #0B1D3A;
+        min-width: 180px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        z-index: 1;
+        display: none;
+        border-top: 2px solid #2D4375;
+    }
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    .dropdown-item {
+        color: #E0E6F0;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 13px;
+        transition: all 0.1s ease;
+        border-left: 3px solid transparent;
+        cursor: pointer;
+    }
+    .dropdown-item:hover {
+        background-color: #1F355A;
+        border-left: 3px solid #4F46E5;
+    }
 </style>
+
+<div class="navbar">
+    <div class="navbar-title">RMC Data</div>
+    <div class="nav-links">
+        <div class="nav-item">
+            <div class="nav-link" onclick="navigateTo('inicio')">Início</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-link" onclick="navigateTo('sobre')">Sobre</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-link" onclick="navigateTo('economia')">Economia</div>
+        </div>
+        <div class="nav-item dropdown">
+            <div class="nav-link">Finanças</div>
+            <div class="dropdown-content">
+                <div class="dropdown-item" onclick="navigateTo('financas')">📊 Finanças</div>
+                <div class="dropdown-item" onclick="navigateTo('despesas')">💸 Despesas</div>
+                <div class="dropdown-item" onclick="navigateTo('arrecadacao')">💰 Arrecadação</div>
+            </div>
+        </div>
+    </div>
+</div>
 """, unsafe_allow_html=True)
 
-# Barra com botões (em linha)
-col1, col2, col3, col4, col5, col6 = st.columns(6)
-with col1:
-    if st.button("Início", key="inicio", help="Página inicial", use_container_width=True):
-        mudar_pagina("inicio")
-with col2:
-    if st.button("Sobre", key="sobre", use_container_width=True):
-        mudar_pagina("sobre")
-with col3:
-    if st.button("Economia", key="economia", use_container_width=True):
-        mudar_pagina("economia")
-with col4:
-    if st.button("Finanças", key="financas", use_container_width=True):
-        mudar_pagina("financas")
-with col5:
-    if st.button("Despesas", key="despesas", use_container_width=True):
-        mudar_pagina("despesas")
-with col6:
-    if st.button("Arrecadação", key="arrecadacao", use_container_width=True):
-        mudar_pagina("arrecadacao")
+# Atualiza a página com base na variável
+page = st.session_state.page
 
-# Conteúdo das páginas
-st.markdown("<br>", unsafe_allow_html=True)
-if st.session_state.page == "inicio":
+# Conteúdo de cada "página"
+if page == "inicio":
     st.title("Início")
-    st.write("Bem-vindo ao Sistema RMC Data.")
-elif st.session_state.page == "sobre":
+    st.write("Bem-vindo ao RMC Data.")
+elif page == "sobre":
     st.title("Sobre")
     st.write("Informações sobre o projeto.")
-elif st.session_state.page == "economia":
+elif page == "economia":
     st.title("Economia")
-    st.write("Dados econômicos regionais.")
-elif st.session_state.page == "financas":
+    st.write("Dados econômicos da RMC.")
+elif page == "financas":
     st.title("Finanças")
-    st.write("Informações financeiras gerais.")
-elif st.session_state.page == "despesas":
+    st.write("Resumo financeiro.")
+elif page == "despesas":
     st.title("Finanças > Despesas")
-    st.write("Despesas públicas da RMC.")
-elif st.session_state.page == "arrecadacao":
+    st.write("Dados sobre despesas públicas.")
+elif page == "arrecadacao":
     st.title("Finanças > Arrecadação")
-    st.write("Receita e arrecadação dos municípios.")
+    st.write("Informações sobre arrecadação municipal.")
 else:
     st.warning("Página não encontrada.")
