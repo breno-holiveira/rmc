@@ -26,18 +26,28 @@ st.markdown(
             user-select: none;
             white-space: nowrap;
             position: relative;
-            transition: color 0.15s ease;
+            transition: color 0.15s ease, background-color 0.15s ease;
         }
         /* Hover suave: só muda a cor */
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Destaque do item ativo */
-        .stHorizontalBlock [aria-selected="true"] span {
+        /* Destaque do item ativo para todas as abas (menos RMC Data) */
+        .stHorizontalBlock [aria-selected="true"] span:not(.rmc-data) {
             font-weight: 500 !important;
-            color: #a1c0f0 !important; /* Azul acinzentado suave para destaque */
+            color: rgba(255,255,255,0.95) !important;
+            background-color: transparent !important;
         }
-        /* Linha sublinhada fixa e discreta embaixo do item ativo */
+        /* Fundo branco sutil para RMC Data quando ativo */
+        .stHorizontalBlock [aria-selected="true"] span.rmc-data {
+            font-weight: 500 !important;
+            color: rgba(255,255,255,0.95) !important;
+            background-color: rgba(255,255,255,0.12) !important;
+            border-radius: 6px;
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+        /* Linha sublinhada discreta fixa embaixo do item ativo */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: '';
             position: absolute;
@@ -45,7 +55,7 @@ st.markdown(
             bottom: 0;
             height: 2px;
             width: 80%;
-            background-color: #a1c0f0; /* mesma cor do texto ativo */
+            background-color: #ff9e3b;
             border-radius: 3px;
         }
         /* Container da navbar */
@@ -83,8 +93,9 @@ styles = {
         "position": "relative",
     },
     "active": {
-        "color": "#a1c0f0",  # Azul acinzentado suave para o texto ativo
+        "color": "rgba(255,255,255,0.95)",
         "font-weight": "500",
+        "background-color": "transparent",
     },
 }
 
@@ -94,7 +105,7 @@ options = {
 }
 
 pages = [
-    "📊 RMC Data",
+    "RMC Data",
     "Sobre",
     "Economia",
     "Finanças Públicas",
@@ -102,7 +113,14 @@ pages = [
     "População",
 ]
 
-page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    styles=styles,
+    options=options,
+    # Adiciona a classe rmc-data só ao span do primeiro item para CSS específico
+    item_classnames=["rmc-data"] + [""] * (len(pages) - 1),
+)
 
 # Conteúdo por página
 
