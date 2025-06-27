@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="48" viewBox="0 0 220 48" fill="none">
+  <!-- Fundo transparente -->
+
+  <!-- Barras com cantos arredondados -->
+  <rect x="14" y="24" width="8" height="14" fill="#FFFFFF" rx="3"></rect>
+  <rect x="30" y="18" width="8" height="20" fill="#FFFFFF" rx="3"></rect>
+  <rect x="46" y="12" width="8" height="26" fill="#FFFFFF" rx="3"></rect>
+
+  <!-- Curva crescente conectando os topos -->
+  <path d="M18 24 Q38 10 54 12" stroke="#D87F3A" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+
+  <!-- Texto destacado -->
+  <text x="70" y="36" fill="#FFFFFF" font-family="'Segoe UI', sans-serif" font-size="26" font-weight="900" letter-spacing="0.01em" style="text-transform: uppercase;">
+    RMC DATA
+  </text>
+</svg>
