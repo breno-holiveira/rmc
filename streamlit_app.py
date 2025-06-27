@@ -5,17 +5,14 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg na pasta raiz
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-# Importar fonte Inter para suavidade e legibilidade
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
-        /* Container navbar */
         .stHorizontalBlock {
-            background-color: #1f2937 !important; /* cinza escuro */
+            background-color: #1f2937 !important;
             padding: 0 !important;
             height: 44px !important;
             box-shadow: none !important;
@@ -25,8 +22,6 @@ st.markdown(
             justify-content: left !important;
             user-select: none;
         }
-
-        /* Itens da navbar */
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
@@ -43,45 +38,35 @@ st.markdown(
             display: inline-flex !important;
             align-items: center !important;
         }
-
-        /* Hover suave */
         .stHorizontalBlock span:hover {
-            color: #9bbaff !important;  /* Azul claro, muito suave */
+            color: #9bbaff !important;
         }
-
-        /* Item ativo: só muda cor da fonte para azul suave, sem efeitos */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 600 !important;
-            color: #7892c2 !important;  /* Azul pastel suave */
+            color: #7892c2 !important;
             background-color: transparent !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             padding-left: 8px !important;
             padding-right: 8px !important;
         }
-
-        /* Remove underline ou ::after */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
         }
-
-        /* Classe custom para RMC Data */
-        .stHorizontalBlock .rmc-data span {
+        /* Estilo especial para o primeiro item (RMC Data) */
+        .stHorizontalBlock span:nth-child(1) {
             font-weight: 700 !important;
-            color: #8ca3cc !important; /* Azul acinzentado, discreto */
+            color: #8ca3cc !important;
             padding-left: 10px !important;
             padding-right: 10px !important;
         }
-
-        /* RMC Data ativo: mantém negrito, cor levemente mais escura */
-        .stHorizontalBlock .rmc-data[aria-selected="true"] span {
+        .stHorizontalBlock [aria-selected="true"]:nth-child(1) span {
             color: #5a6b8c !important;
             font-weight: 700 !important;
             background-color: transparent !important;
         }
-
-        /* Ajusta tamanho do logo SVG e margem */
-        .stHorizontalBlock .rmc-data span svg {
+        /* Ajusta o tamanho do logo SVG e margem se estiver dentro do primeiro item */
+        .stHorizontalBlock span:nth-child(1) svg {
             height: 20px !important;
             margin-right: 6px !important;
         }
@@ -132,16 +117,7 @@ pages = [
     "População",
 ]
 
-# Define classe "rmc-data" só para o primeiro item "RMC Data"
-item_classnames = ["rmc-data"] + [""] * (len(pages) - 1)
-
-page = st_navbar(
-    pages,
-    logo_path=logo_path,
-    styles=styles,
-    options=options,
-    item_classnames=item_classnames,
-)
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
 # Conteúdo por página
 
