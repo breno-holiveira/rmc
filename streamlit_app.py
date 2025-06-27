@@ -4,14 +4,14 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Importar fonte Inter via Google Fonts para suavidade e legibilidade
+# Fonte Inter via Google Fonts
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         /* Navbar container */
         .stHorizontalBlock {
-            background-color: #1f2937 !important;  /* cinza escuro */
+            background-color: #1f2937 !important;
             padding: 0 !important;
             height: 42px !important;
             box-shadow: none !important;
@@ -24,12 +24,13 @@ st.markdown(
             letter-spacing: 0.02em !important;
         }
 
-        /* Logo container */
+        /* Logo + texto fixado no topo */
         .navbar-logo {
             display: flex;
             align-items: center;
-            margin-left: 16px;
-            margin-right: 24px;
+            position: absolute;
+            left: 16px;
+            top: 7px;
             cursor: pointer;
             user-select: none;
             text-decoration: none;
@@ -37,6 +38,7 @@ st.markdown(
             font-weight: 600;
             font-size: 18px;
             transition: color 0.3s ease;
+            z-index: 9999;
         }
         .navbar-logo:hover {
             color: #7c90f4;
@@ -57,12 +59,10 @@ st.markdown(
             user-select: none;
             transition: color 0.2s ease, box-shadow 0.3s ease;
         }
-        /* Hover nos itens */
         .stHorizontalBlock span:hover {
             color: #a3bffa !important;
             box-shadow: inset 0 -2px 0 #a3bffa;
         }
-        /* Item ativo */
         .stHorizontalBlock [aria-selected="true"] span {
             color: #7c90f4 !important;
             font-weight: 600 !important;
@@ -77,6 +77,7 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
+        "padding-left": "100px",  # espaço para logo fixo
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
@@ -102,38 +103,24 @@ options = {
 
 pages = ["Inicio", "Sobre", "Economia", "Finanças Públicas", "Segurança", "População"]
 
-# Definindo o logo_path e link para o GitHub
-logo_path = "git.svg"
-logo_url = "https://github.com/breno-holiveira/rmc"
-
-# Exibe o navbar com logo e texto customizados
 page = st_navbar(
     pages,
-    logo_path=logo_path,
-    logo_link=logo_url,
-    logo_text="RMC Data",
     styles=styles,
     options=options,
 )
 
-# Inject custom HTML para o logo + texto no navbar
-# Aqui usamos um hack para forçar o clique do logo e texto abrirem link externo
-# Essa parte aparece antes da navbar e usa css para posicionar corretamente
-st.markdown(f"""
-    <style>
-    .stHorizontalBlock > div {{
-        display: flex !important;
-        align-items: center !important;
-    }}
-    </style>
-    <a href="{logo_url}" target="_blank" rel="noopener noreferrer" class="navbar-logo" style="position: absolute; left: 16px; top: 7px; z-index: 9999;">
-        <img src="{logo_path}" alt="Logo" />
+# Logo + texto clicável fixo no topo esquerdo, abrindo seu GitHub em nova aba
+st.markdown(
+    f"""
+    <a href="https://github.com/breno-holiveira/rmc" target="_blank" rel="noopener noreferrer" class="navbar-logo">
+        <img src="git.svg" alt="Logo" />
         RMC Data
     </a>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
 
-
-# Conteúdo da página conforme seleção
+# === Conteúdo das páginas ===
 if page == "Inicio":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
