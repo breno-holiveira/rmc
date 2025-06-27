@@ -6,12 +6,16 @@ from streamlit_navigation_bar import st_navbar
 import pages as pg
 
 
-st.set_page_config(initial_sidebar_state="collapsed")
+st.set_page_config(page_title='RMC Data',
+                   initial_sidebar_state='collapsed',
+                   page_icon='📈',
+                   layout='wide',
+)
 
-pages = ["Install", "User Guide", "API", "Examples", "Community", "GitHub"]
+pages = ['Início', 'Sobre', 'Economia', 'Finanças Públicas', 'Segurança', 'GitHub']
 parent_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(parent_dir, "cubes.svg")
-urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
+logo_path = os.path.join(parent_dir, 'cubes.svg')
+urls = {'GitHub': 'https://github.com/breno-holiveira/rmc'}
 styles = {
     "nav": {
         "background-color": "royalblue",
