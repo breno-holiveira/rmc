@@ -8,13 +8,25 @@ from streamlit_navigation_bar import st_navbar
 # Importar fonte Inter para suavidade e legibilidade e custom CSS
 st.markdown(
     """
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        /* Container da navbar */
+        .stHorizontalBlock {
+            background-color: #1f2937 !important; /* cinza escuro */
+            padding: 0 !important;
+            height: 44px !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: left !important;
+            user-select: none;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        }
         /* Estilo base dos itens da navbar */
         .stHorizontalBlock span {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14px !important;  /* fonte um pouco menor */
+            font-size: 14px !important;
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -29,26 +41,30 @@ st.markdown(
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Item ativo: só negrito, sem mudar cor */
+        /* Item ativo: negrito menos forte */
         .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 700 !important;
+            font-weight: 600 !important; /* menos forte que 700 */
             color: rgba(255,255,255,0.85) !important;
         }
-        /* Remove linha animada embaixo do item ativo */
+        /* Remove underline embaixo do item ativo */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none;
         }
-        /* Container da navbar */
-        .stHorizontalBlock {
-            background-color: #1f2937 !important; /* cinza escuro */
-            padding: 0 !important;
-            height: 44px !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: left !important;
+        /* Estilo do logo-texto no início */
+        .custom-logo {
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            padding: 0 14px;
+            cursor: pointer;
             user-select: none;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            height: 44px;
+        }
+        .custom-logo:hover {
+            color: #ff9e3b;
         }
     </style>
     """,
@@ -73,8 +89,8 @@ styles = {
         "position": "relative",
     },
     "active": {
-        "color": "rgba(255,255,255,0.85)",  # mesma cor normal
-        "font-weight": "700",  # só negrito
+        "color": "rgba(255,255,255,0.85)",
+        "font-weight": "600",
     },
 }
 
@@ -92,6 +108,18 @@ pages = [
     "Sobre",
     "Contato",
 ]
+
+# Função para renderizar o logo-texto clicável no topo
+def render_logo():
+    logo_html = """
+    <div class="custom-logo" onclick="window.location.href='?page=RMC Data'">
+        RMC DATA
+    </div>
+    """
+    st.markdown(logo_html, unsafe_allow_html=True)
+
+# Renderiza o logo antes da navbar
+render_logo()
 
 page = st_navbar(pages, styles=styles, options=options)
 
