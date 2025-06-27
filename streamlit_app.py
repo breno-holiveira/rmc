@@ -1,10 +1,14 @@
+import os
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Importar fonte Inter para legibilidade e suavidade
+# Caminho para o logo cubes.svg na pasta raiz
+logo_path = os.path.join(os.getcwd(), "cubes.svg")
+
+# Importar fonte Inter para suavidade e legibilidade
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -71,6 +75,8 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
+        "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-size": "15px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
@@ -94,7 +100,7 @@ options = {
 }
 
 pages = [
-    "RMC DATA",
+    "RMC Data",
     "Sobre",
     "Economia",
     "Finanças Públicas",
@@ -102,11 +108,11 @@ pages = [
     "População",
 ]
 
-page = st_navbar(pages, styles=styles, options=options)
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
 # Conteúdo por página
 
-if page == "RMC DATA":
+if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
     st.markdown(
