@@ -5,11 +5,25 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# ======== CONFIGURAÇÃO DA FONTE E CSS ========
+# =================== INÍCIO: FONTE E BARRA SUPERIOR ===================
+st.set_page_config(initial_sidebar_state="collapsed")
+
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        .rmc-logo {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            text-decoration: none;
+            padding: 12px 18px;
+            display: inline-block;
+        }
+        .rmc-logo:hover {
+            color: #ff9e3b;
+        }
         .stHorizontalBlock span {
             font-family: 'DM Sans', sans-serif !important;
             font-weight: 400 !important;
@@ -18,14 +32,13 @@ st.markdown(
             margin: 0 6px !important;
             white-space: nowrap;
             position: relative;
-            transition: color 0.25s ease;
         }
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
-            color: #ff9e3b !important;
+            color: rgba(255,255,255,0.95) !important;
         }
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: '';
@@ -50,11 +63,14 @@ st.markdown(
             to { width: 80%; }
         }
     </style>
+
+    <a href="/?page=RMC%20Data" class="rmc-logo">RMC DATA</a>
     """,
     unsafe_allow_html=True,
 )
 
-# ======== DEFINIÇÃO DOS PARÂMETROS ========
+# =================== NAVEGAÇÃO ===================
+
 styles = {
     "nav": {
         "background-color": "#1f2937",
@@ -62,16 +78,13 @@ styles = {
         "font-family": "'DM Sans', sans-serif",
         "font-size": "14.5px",
     },
-    "logo": {
-        "padding-right": "16px",
-    },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "font-weight": "400",
         "font-size": "14.5px",
     },
     "active": {
-        "color": "#ff9e3b",
+        "color": "rgba(255,255,255,0.95)",
         "font-weight": "500",
     },
 }
@@ -80,9 +93,6 @@ options = {
     "show_menu": False,
     "show_sidebar": False,
 }
-
-# Substituindo o logo por texto clicável
-logo_html = '<a href="/?page=RMC%20Data" style="text-decoration: none; font-family: DM Sans, sans-serif; font-weight: 600; font-size: 15px; color: white;">RMC DATA</a>'
 
 pages = [
     "RMC Data",
@@ -94,15 +104,12 @@ pages = [
     "Contato",
 ]
 
-# ========== NAVEGAÇÃO ==========
-page = st_navbar(
-    pages,
-    logo_path=logo_html,
-    styles=styles,
-    options=options
-)
+query_params = st.query_params
+default_page = query_params.get("page", "RMC Data")
 
-# ========== CONTEÚDO DE CADA PÁGINA ==========
+page = st_navbar(pages, styles=styles, options=options, default=default_page)
+
+# =================== CONTEÚDO DAS PÁGINAS ===================
 
 if page == "RMC Data":
     st.title("RMC Data 📊")
