@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="40" viewBox="0 0 180 40" fill="none">
+  <!-- Fundo branco para contraste -->
+  <rect width="180" height="40" fill="white"></rect>
+
+  <!-- Ícone gráfico de barras minimalista -->
+  <rect x="12" y="18" width="6" height="12" fill="#0B1D3A" rx="1"></rect>
+  <rect x="24" y="14" width="6" height="16" fill="#0B1D3A" rx="1"></rect>
+  <rect x="36" y="8" width="6" height="22" fill="#0B1D3A" rx="1"></rect>
+
+  <!-- Linha conectando os topos das barras -->
+  <polyline points="15,18 27,14 39,8" stroke="#2978B5" stroke-width="2" fill="none" stroke-linejoin="round"></polyline>
+
+  <!-- Texto -->
+  <text x="55" y="27" fill="#0B1D3A" font-family="Segoe UI, sans-serif" font-size="18" font-weight="600" letter-spacing="0.02em">
+    RMC Data
+  </text>
+</svg>
