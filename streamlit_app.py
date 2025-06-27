@@ -136,4 +136,4 @@ st.markdown(nav_html, unsafe_allow_html=True)
 
 # Conteúdo principal
 st.title("Sistema RMC Data")
-st.write("Selecione uma opção no menu superior para navegar")
+st.write("Selecione uma opção no menu superior para navegar.")
