@@ -11,7 +11,7 @@ logo_path = os.path.join(os.getcwd(), "cubes.svg")
 # Importa fonte Inter
 st.markdown(
     """
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
     <style>
         /* Container navbar */
         .stHorizontalBlock {
@@ -39,46 +39,48 @@ st.markdown(
             user-select: none;
             white-space: nowrap;
             position: relative;
-            transition: color 0.15s ease, background-color 0.15s ease;
+            transition: color 0.2s ease;
             display: inline-flex !important;
             align-items: center !important;
         }
-        /* Hover suave para itens */
+
+        /* Hover suave */
         .stHorizontalBlock span:hover {
-            color: #7dd3fc !important;  /* Azul claro ao passar o mouse */
+            color: #7dd3fc !important;  /* Azul claro */
         }
 
-        /* Destaque do item ativo: fundo colorido moderno */
+        /* Item ativo: só muda cor da fonte */
         .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: white !important;
-            background-color: #2563eb !important; /* Azul sutil moderno */
-            border-radius: 5px;
-            padding-left: 10px !important;
-            padding-right: 10px !important;
+            font-weight: 600 !important;
+            color: #3b82f6 !important;  /* Azul sutil para ativo */
+            background-color: transparent !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            padding-left: 8px !important;
+            padding-right: 8px !important;
         }
-        /* Remover linha de underline */
+
+        /* Remove underline ou qualquer ::after no item ativo */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
         }
 
-        /* Estilo fixo para RMC Data: negrito e sempre cor branca */
-        /* O item com texto exato 'RMC Data' */
+        /* RMC Data sempre em negrito e cor diferente */
         .stHorizontalBlock span:has-text("RMC Data") {
             font-weight: 700 !important;
-            color: white !important;
+            color: #60a5fa !important; /* Azul claro e discreto */
             padding-left: 10px !important;
             padding-right: 10px !important;
         }
 
-        /* Quando RMC Data estiver selecionado, só adiciona fundo mais escuro */
+        /* RMC Data ativo: mantém negrito, só muda a cor para um azul mais forte */
         .stHorizontalBlock [aria-selected="true"] span:has-text("RMC Data") {
-            background-color: #1e40af !important; /* Azul mais escuro */
-            color: white !important;
+            color: #2563eb !important;
             font-weight: 700 !important;
+            background-color: transparent !important;
         }
 
-        /* Ajustar tamanho do logo inline SVG e margem para alinhamento */
+        /* Ajustar tamanho do logo inline SVG e margem */
         .stHorizontalBlock span:has-text("RMC Data") svg {
             height: 20px !important;
             margin-right: 6px !important;
@@ -88,7 +90,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Lê e prepara o SVG para inline no menu
+# Preparar SVG para inline no menu
 with open(logo_path, "r", encoding="utf-8") as f:
     svg_logo = f.read()
 svg_logo_inline = svg_logo.replace('\n', '').replace('"', "'").replace('<svg ', '<svg style="height:20px; margin-right:6px;" ')
@@ -113,12 +115,11 @@ styles = {
         "align-items": "center",
     },
     "active": {
-        "color": "white",
-        "font-weight": "500",
-        "background-color": "#2563eb",
-        "border-radius": "5px",
-        "padding-left": "10px",
-        "padding-right": "10px",
+        "color": "#3b82f6",
+        "font-weight": "600",
+        "background-color": "transparent",
+        "padding-left": "8px",
+        "padding-right": "8px",
     },
 }
 
@@ -138,7 +139,7 @@ pages = [
 
 page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
-# Inject JS para substituir o texto do primeiro item da navbar por SVG + texto
+# JS para substituir texto do primeiro item por SVG + texto
 js_code = f"""
 <script>
     const navItems = document.querySelectorAll('.stHorizontalBlock span');
@@ -146,7 +147,9 @@ js_code = f"""
         const firstItem = navItems[0];
         firstItem.innerHTML = `{svg_logo_inline} RMC Data`;
         firstItem.style.fontWeight = '700';
-        firstItem.style.color = 'white';
+        firstItem.style.color = '#60a5fa';
+        firstItem.style.paddingLeft = '10px';
+        firstItem.style.paddingRight = '10px';
     }}
 </script>
 """
