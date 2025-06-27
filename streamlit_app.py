@@ -5,70 +5,90 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo (cubes.svg)
+# Caminho para o logo cubes.svg (deve estar na raiz do projeto)
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-# Fonte moderna e equilibrada
-st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap" rel="stylesheet">
-<style>
-.stHorizontalBlock span {
-    font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-    font-weight: 400 !important;
-    font-size: 15px !important;
-    letter-spacing: 0.01em !important;
-    padding: 6px 8px !important;
-    margin: 0 6px !important;
-    color: rgba(255,255,255,0.85) !important;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    position: relative;
-    transition: color 0.25s ease;
-}
-.stHorizontalBlock span:hover {
-    color: #ff9e3b !important;
-}
-.stHorizontalBlock [aria-selected="true"] span {
-    font-weight: 500 !important;
-    color: rgba(255,255,255,0.85) !important;
-}
-.stHorizontalBlock [aria-selected="true"] span::after {
-    content: none !important;
-}
-.stHorizontalBlock {
-    background-color: #1f2937 !important;
-    padding: 0 !important;
-    height: 44px !important;
-    border-radius: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: left !important;
-}
-</style>
-""", unsafe_allow_html=True)
+# Fonte moderna e compacta (DM Sans)
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Fonte geral da navbar */
+        .stHorizontalBlock span {
+            font-family: 'DM Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 14.5px !important;
+            letter-spacing: 0em !important;
+            padding: 6px 6px !important;
+            margin: 0 6px !important;
+            color: rgba(255,255,255,0.85) !important;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            position: relative;
+            transition: color 0.25s ease;
+        }
+        /* Hover */
+        .stHorizontalBlock span:hover {
+            color: #ff9e3b !important;
+        }
+        /* Item ativo */
+        .stHorizontalBlock [aria-selected="true"] span {
+            font-weight: 500 !important;
+            color: #ff9e3b !important;
+        }
+        /* Linha animada */
+        .stHorizontalBlock [aria-selected="true"] span::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            bottom: 0;
+            height: 3px;
+            width: 80%;
+            background-color: #ff9e3b;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            animation: underlineExpand 0.3s forwards;
+        }
+        /* Container da navbar */
+        .stHorizontalBlock {
+            background-color: #1f2937 !important;
+            padding: 0 !important;
+            height: 44px !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: left !important;
+            user-select: none;
+        }
+        @keyframes underlineExpand {
+            from { width: 0; }
+            to { width: 80%; }
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# Estilo da navbar
+# Definições da navbar
 styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "15px",
-        "letter-spacing": "0.01em",
+        "font-family": "'DM Sans', 'Segoe UI', sans-serif",
+        "font-size": "14.5px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 8px",
+        "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "15px",
-        "letter-spacing": "0.01em",
+        "font-size": "14.5px",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
     },
     "active": {
-        "color": "rgba(255,255,255,0.85)",
+        "color": "#ff9e3b",
         "font-weight": "500",
     },
 }
@@ -88,9 +108,21 @@ pages = [
     "Contato",
 ]
 
-page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options, default="RMC Data")
+# Função para reiniciar na página RMC Data
+def go_home():
+    st.experimental_set_query_params(page="RMC Data")
 
-# Conteúdo das páginas
+# Barra de navegação
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    styles=styles,
+    options=options,
+    on_logo_click=go_home,  # Clique no logo leva à página inicial
+)
+
+# ------------------ CONTEÚDO DE CADA PÁGINA ------------------
+
 if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -102,6 +134,7 @@ if page == "RMC Data":
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
 
+    # Carregamento de dados
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
