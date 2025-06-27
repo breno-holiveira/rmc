@@ -4,48 +4,72 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
+# Import Google Fonts Inter para garantir a fonte suave
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Aplicar Inter na navbar */
+        .stHorizontalBlock span {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 14px !important;
+            letter-spacing: 0.04em !important;
+        }
+        /* Estilo para item ativo */
+        .stHorizontalBlock [aria-selected="true"] span {
+            font-weight: 600 !important;
+            background-color: rgba(255,255,255,0.1) !important;
+            border-radius: 2px !important;
+            padding: 6px 16px !important;
+            color: #fff !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+        }
+        /* Espaçamento uniforme para todos os itens */
+        .stHorizontalBlock span {
+            padding: 6px 16px !important;
+            margin: 0 6px !important;
+            color: rgba(255,255,255,0.85) !important;
+            transition: color 0.3s ease;
+        }
+        /* Hover suave */
+        .stHorizontalBlock span:hover {
+            color: #ff7f50 !important;
+            cursor: pointer;
+        }
+        /* Navbar background */
+        .stHorizontalBlock {
+            background-color: #1f2937 !important;  /* cinza escuro */
+            padding: 0 !important;
+            height: 40px !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: left !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 styles = {
     "nav": {
-        "background": "#1f2937",  # Cinza escuro sóbrio, quase antracite
+        "background-color": "#1f2937",  # Cinza escuro (funcional, mas o css acima faz o principal)
         "justify-content": "left",
-        "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",
-        "padding": "0 12px",
-        "height": "40px",
-        "align-items": "center",
-        "box-shadow": "none",
-        "border-radius": "0",  # Sem bordas arredondadas
-        "letter-spacing": "0.04em",
     },
     "span": {
-        "color": "rgba(255, 255, 255, 0.85)",
-        "padding": "8px 16px",  # Compacto, espaçamento uniforme
+        "color": "rgba(255,255,255,0.85)",
+        "padding": "6px 16px",
         "font-weight": "400",
-        "user-select": "none",
-        "transition": "color 0.3s ease",
-        "margin": "0 6px",
     },
     "active": {
-        "background-color": "rgba(255, 255, 255, 0.1)",  # Fundo ativo suave e transparente
-        "color": "#ffffff",  # Texto branco para destaque claro
+        "background-color": "rgba(255,255,255,0.1)",
+        "color": "#ffffff",
         "font-weight": "600",
-        "padding": "8px 16px",
-        "border-radius": "2px",  # Bordas levemente arredondadas para suavidade
-        "user-select": "none",
-        "box-shadow": "none",
-        "border": "1px solid rgba(255, 255, 255, 0.2)",  # Borda fina para separar discretamente
-        "transition": "background-color 0.3s ease, color 0.3s ease",
-        "margin": "0 6px",
-    },
-    "span_hover": {
-        "color": "#ff7f50",  # Coral suave no hover para sutileza
-        "cursor": "pointer",
-        "transition": "color 0.3s ease",
-    },
-    "img": {
-        "display": "none",  # Ocultar logo, só texto
+        "padding": "6px 16px",
+        "border-radius": "2px",
+        "border": "1px solid rgba(255,255,255,0.2)",
     }
 }
 
