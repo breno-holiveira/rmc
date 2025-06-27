@@ -15,7 +15,7 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Importa fonte DM Sans via Google Fonts e aplica no CSS
+# Fonte DM Sans com tamanho levemente maior (15px)
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -23,7 +23,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'DM Sans', sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14.5px !important;
+            font-size: 15px !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
             color: rgba(255,255,255,0.85) !important;
@@ -64,13 +64,13 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'DM Sans', sans-serif",
-        "font-size": "14.5px",
+        "font-size": "15px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "14.5px",
+        "font-size": "15px",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
