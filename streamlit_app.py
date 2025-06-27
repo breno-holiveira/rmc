@@ -18,25 +18,25 @@ logo_path = os.path.join(parent_dir, 'cubes.svg')
 urls = {'GitHub': 'https://github.com/breno-holiveira/rmc'}
 styles = {
     "nav": {
-        "background-color": "#0B1D3A",  # Azul-marinho escuro
+        "background-color": "#0B1D3A",
         "justify-content": "left",
     },
     "img": {
         "padding-right": "14px",
     },
     "span": {
-        "color": "#E0E6F0",  # Azul claro acinzentado para texto
+        "color": "#E0E6F0",
         "padding": "14px",
     },
     "active": {
-        "background-color": "#1F355A",  # Azul intermediário para aba ativa
+        "background-color": "#1F355A",
         "color": "#FFFFFF",
         "font-weight": "normal",
         "padding": "14px",
     }
 }
 options = {
-    "show_menu": False,
+    "show_menu": True,
     "show_sidebar": False,
 }
 
