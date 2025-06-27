@@ -6,7 +6,7 @@ import json
 from streamlit_navigation_bar import st_navbar
 
 if "page" not in st.session_state:
-    st.session_state.page = "RMC DATA"
+    st.session_state.page = "RMC Data"
 
 st.set_page_config(
     page_title="RMC Data",
