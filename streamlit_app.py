@@ -6,26 +6,26 @@ st.set_page_config(page_title='RMC Data',
                    page_icon='📈',
                    layout='wide')
 
-pages = ["Home", "Library", "Tutorials", "Development", "Download"]
+pages = ['Início', 'Sobre', 'Economia', 'Finanças Públicas', 'Segurança']
 styles = {
     "nav": {
-        "background-color": "#0B1D3A",  # azul-marinho escuro
+        "background-color": "#0B1D3A",
     },
     "div": {
         "max-width": "32rem",
     },
     "span": {
         "border-radius": "0.5rem",
-        "color": "#E0E6F0",  # texto azul clarinho
+        "color": "#E0E6F0",
         "margin": "0 0.125rem",
         "padding": "0.4375rem 0.625rem",
     },
     "active": {
-        "background-color": "#2E4A7D",  # azul intermediário
+        "background-color": "#2E4A7D",
         "color": "#FFFFFF",
     },
     "hover": {
-        "background-color": "#1F355A",  # hover azul escuro suave
+        "background-color": "#1F355A",
         "color": "#FFFFFF",
     },
 }
