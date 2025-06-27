@@ -17,81 +17,37 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Fonte DM Sans com estilo da OUP
-st.markdown(
-    """
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        .stHorizontalBlock {
-            background-color: #1f2937 !important;
-            padding: 0 40px !important;
-            height: 56px !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-        }
-        .stHorizontalBlock span {
-            font-family: 'DM Sans', sans-serif !important;
-            font-weight: 400 !important;
-            font-size: 16px !important;
-            color: rgba(255,255,255,0.88) !important;
-            margin: 0 20px !important;
-            padding: 6px 0 !important;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .stHorizontalBlock span:hover {
-            color: #ff9e3b !important;
-        }
-        .stHorizontalBlock [aria-selected="true"] span {
-            color: #f4a259 !important;
-        }
-        .stHorizontalBlock [aria-selected="true"] span::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: -6px;
-            width: 100%;
-            height: 3px;
-            background-color: #f4a259;
-            border-radius: 2px;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Estilos visuais do menu
+# Estilo baseado no exemplo fornecido, adaptado para azul-escuro (#1f2937)
 styles = {
     "nav": {
         "background-color": "#1f2937",
-        "justify-content": "center",
-        "font-family": "'DM Sans', sans-serif",
-        "font-size": "16px",
+    },
+    "div": {
+        "max-width": "32rem",
     },
     "span": {
-        "color": "rgba(255,255,255,0.88)",
-        "padding": "6px 0",
-        "margin": "0 20px",
-        "font-weight": "400",
-        "position": "relative",
-        "transition": "color 0.2s ease",
+        "border-radius": "0.5rem",
+        "color": "rgba(255, 255, 255, 0.9)",
+        "margin": "0 0.125rem",
+        "padding": "0.4375rem 0.625rem",
+        "font-family": "'DM Sans', sans-serif",
+        "font-size": "15px",
     },
     "active": {
-        "color": "#f4a259",
-        "font-weight": "400",
+        "background-color": "rgba(255, 255, 255, 0.2)",
+    },
+    "hover": {
+        "background-color": "rgba(255, 255, 255, 0.1)",
     },
 }
 
-# Opções do navbar
+# Opções visuais
 options = {
     "show_menu": False,
     "show_sidebar": False,
 }
 
-# Lista de páginas
+# Páginas da barra
 pages = [
     "RMC Data",
     "Economia",
@@ -102,14 +58,14 @@ pages = [
     "Contato",
 ]
 
-# Renderiza a barra de navegação
-clicked_page = st_navbar(pages, logo_path=None, styles=styles, options=options)
+# Barra de navegação
+clicked_page = st_navbar(pages, styles=styles, options=options)
 if clicked_page and clicked_page != st.session_state.page:
     st.session_state.page = clicked_page
 
 page = st.session_state.page
 
-# Lógica de cada página
+# Conteúdo da página selecionada
 if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -121,7 +77,7 @@ if page == "RMC Data":
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
 
-    # Carregamento dos dados espaciais e estatísticos
+    # Dados do mapa
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
