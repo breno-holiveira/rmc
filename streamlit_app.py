@@ -4,29 +4,41 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Importar fonte Inter via Google Fonts para suavidade e legibilidade
+# Importa fonte Inter via Google Fonts para suavidade e legibilidade
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Fonte e estilo base dos itens da navbar */
+        /* Container navbar */
+        .stHorizontalBlock {
+            background-color: #1f2937 !important;
+            padding: 0 !important;
+            height: 38px !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: left !important;
+        }
+        /* Itens da navbar - remover padding/margin padrão e aplicar espaçamento pequeno */
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
             font-size: 13px !important;
             letter-spacing: 0.02em !important;
-            padding: 6px 10px !important;
-            margin: 0 3px !important;  /* Reduzido aqui */
+            padding: 6px 8px !important; /* menor padding */
+            margin: 0 4px !important;   /* margem lateral menor para reduzir espaçamento */
             color: rgba(255,255,255,0.85) !important;
             transition: color 0.2s ease;
             cursor: pointer;
             user-select: none;
+            white-space: nowrap;
         }
-        /* Hover suave: muda só a cor, sem fundo */
+        /* Hover suave */
         .stHorizontalBlock span:hover {
             color: #ffa366 !important;
         }
-        /* Destaque do item ativo: só cor mais branca e peso médio */
+        /* Item ativo - só borda inferior e cor */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: #ffffff !important;
@@ -35,17 +47,6 @@ st.markdown(
             background-color: transparent !important;
             border-radius: 0 !important;
             box-shadow: none !important;
-        }
-        /* Container da navbar */
-        .stHorizontalBlock {
-            background-color: #1f2937 !important;  /* cinza escuro */
-            padding: 0 !important;
-            height: 38px !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: left !important;
         }
     </style>
     """,
@@ -59,11 +60,11 @@ styles = {
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 10px",
+        "padding": "6px 8px",
         "font-weight": "400",
         "font-size": "13px",
         "letter-spacing": "0.02em",
-        "margin": "0 3px",  # Também ajustado aqui para coerência
+        "margin": "0 4px",
     },
     "active": {
         "color": "#ffffff",
