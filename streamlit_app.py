@@ -5,7 +5,6 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Página inicial fixa
 if "page" not in st.session_state:
     st.session_state.page = "RMC DATA"
 
@@ -16,16 +15,13 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Aqui não usamos logo_path para evitar erro, pois vamos colocar "RMC DATA" como primeira aba
-logo_path = None
-
-# Fonte e CSS para navbar com negrito leve na aba ativa, fonte 14.5px
+# Remove importação do Inter, pois não vamos usar mais
+# Estilo CSS do navbar atualizado para usar Segoe UI e sem Inter
 st.markdown(
     """
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
         .stHorizontalBlock span {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
             font-size: 14.5px !important;
             padding: 6px 6px !important;
@@ -67,7 +63,7 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-size": "14.5px",
     },
     "span": {
@@ -90,7 +86,6 @@ options = {
     "show_sidebar": False,
 }
 
-# Páginas, incluindo "RMC DATA" como primeira aba (será nosso "logo clicável")
 pages = [
     "RMC DATA",
     "Economia",
@@ -101,16 +96,13 @@ pages = [
     "Contato",
 ]
 
-# Navbar sem logo_path para evitar erro, clique em "RMC DATA" volta para essa página
-clicked_page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
+clicked_page = st_navbar(pages, logo_path=None, styles=styles, options=options)
 
-# Atualiza página atual no estado
 if clicked_page and clicked_page != st.session_state.page:
     st.session_state.page = clicked_page
 
 page = st.session_state.page
 
-# Conteúdo das páginas
 if page == "RMC DATA":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
