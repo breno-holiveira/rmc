@@ -5,7 +5,7 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg na pasta raiz (se não usar, pode remover essa variável)
+# Caminho para o logo cubes.svg na pasta raiz
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
 # Importar fonte Inter para suavidade e legibilidade
@@ -101,12 +101,11 @@ options = {
 
 pages = [
     "RMC Data",
+    "Sobre",
     "Economia",
     "Finanças Públicas",
     "Segurança",
-    "Arquivos",
-    "Sobre",
-    "Contato",
+    "População",
 ]
 
 page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
@@ -149,9 +148,13 @@ if page == "RMC Data":
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
+elif page == "Sobre":
+    st.title("Sobre")
+    st.write("Informações institucionais e gerais sobre o projeto.")
+
 elif page == "Economia":
     st.title("Economia")
-    st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
+    st.write("Conteúdo relacionado à economia da RMC.")
 
 elif page == "Finanças Públicas":
     st.title("Finanças Públicas")
@@ -161,14 +164,6 @@ elif page == "Segurança":
     st.title("Segurança")
     st.write("Dados e análises sobre segurança.")
 
-elif page == "Arquivos":
-    st.title("Arquivos")
-    st.write("Documentos e arquivos relacionados ao projeto.")
-
-elif page == "Sobre":
-    st.title("Sobre")
-    st.write("Informações institucionais e gerais sobre o projeto.")
-
-elif page == "Contato":
-    st.title("Contato")
-    st.write("Informações para contato e comunicação.")
+elif page == "População":
+    st.title("População")
+    st.write("Indicadores populacionais da Região Metropolitana de Campinas.")
