@@ -1,39 +1,97 @@
 import os
 import streamlit as st
+import pandas as pd
+import geopandas as gpd
+import json
 from streamlit_navigation_bar import st_navbar
 
-import pages as pg
+# Caminho para o logo cubes.svg na pasta raiz
+logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊", initial_sidebar_state="collapsed")
-
-pages = ["Home", "Install", "User Guide", "API", "Examples", "Community", "GitHub"]
-
-urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
+# Importar fonte Inter para suavidade e legibilidade
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Estilo base dos itens da navbar */
+        .stHorizontalBlock span {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 15px !important;
+            letter-spacing: 0em !important;
+            padding: 6px 6px !important;
+            margin: 0 6px !important;
+            color: rgba(255,255,255,0.85) !important;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            position: relative;
+            transition: color 0.25s ease;
+        }
+        /* Hover suave: só muda a cor */
+        .stHorizontalBlock span:hover {
+            color: #ff9e3b !important;
+        }
+        /* Destaque do item ativo */
+        .stHorizontalBlock [aria-selected="true"] span {
+            font-weight: 500 !important;
+            color: #ff9e3b !important;
+        }
+        /* Linha animada embaixo do item ativo */
+        .stHorizontalBlock [aria-selected="true"] span::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            bottom: 0;
+            height: 3px;
+            width: 80%;
+            background-color: #ff9e3b;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            animation: underlineExpand 0.3s forwards;
+        }
+        /* Container da navbar */
+        .stHorizontalBlock {
+            background-color: #1f2937 !important; /* cinza escuro */
+            padding: 0 !important;
+            height: 44px !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: left !important;
+            user-select: none;
+        }
+        @keyframes underlineExpand {
+            from { width: 0; }
+            to { width: 80%; }
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 styles = {
     "nav": {
-        "background-color": "#1e293b",  # azul escuro sóbrio
+        "background-color": "#1f2937",
         "justify-content": "left",
-        "position": "relative",  # Para o texto absoluto funcionar
-        "padding": "0 2rem",
-        "height": "60px",
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "1rem",
+        "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-size": "15px",
     },
     "span": {
-        "color": "white",
-        "padding": "14px",
-        "font-weight": "600",
+        "color": "rgba(255,255,255,0.85)",
+        "padding": "6px 6px",
+        "font-weight": "400",
+        "font-size": "15px",
+        "letter-spacing": "0em",
+        "margin": "0 6px",
+        "white-space": "nowrap",
+        "position": "relative",
     },
     "active": {
-        "background-color": "#334155",  # fundo ativo suave
-        "color": "#facc15",  # amarelo queimado
-        "font-weight": "700",
-        "padding": "14px",
+        "color": "#ff9e3b",
+        "font-weight": "500",
     },
-    "img": {  # mantido só para manter compatibilidade
-        "display": "none",  # escondendo o ícone
-    }
 }
 
 options = {
@@ -41,59 +99,71 @@ options = {
     "show_sidebar": False,
 }
 
-page = st_navbar(
-    pages,
-    logo_path=None,  # retirando ícone para usar texto
-    urls=urls,
-    styles=styles,
-    options=options,
-)
+pages = [
+    "RMC Data",
+    "Sobre",
+    "Economia",
+    "Finanças Públicas",
+    "Segurança",
+    "População",
+]
 
-# CSS para o logo-text clicável "RMC DATA"
-logo_text_css = """
-<style>
-.logo-text {
-    position: absolute;
-    top: 50%;
-    left: 2rem;
-    transform: translateY(-50%);
-    font-size: 1.4rem;
-    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-    color: #ddd;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color 0.3s ease;
-    text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
-    user-select: none;
-    z-index: 10000;
-}
-.logo-text:hover {
-    color: #d97722; /* laranja queimado suave */
-}
-</style>
-"""
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
-st.markdown(logo_text_css, unsafe_allow_html=True)
+# Conteúdo por página
 
-# Logo-text clicável com link para página Home
-st.markdown(
-    """
-    <a href='/?page=Home' class='logo-text'>RMC DATA</a>
-    """,
-    unsafe_allow_html=True
-)
+if page == "RMC Data":
+    st.title("RMC Data 📊")
+    st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+    st.markdown(
+        "A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituída por 20 municípios. "
+        "Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano."
+    )
+    st.markdown(
+        "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
+    )
 
-functions = {
-    "Home": pg.show_home,
-    "Install": pg.show_install,
-    "User Guide": pg.show_user_guide,
-    "API": pg.show_api,
-    "Examples": pg.show_examples,
-    "Community": pg.show_community,
-}
+    gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
+    if gdf.crs != "EPSG:4326":
+        gdf = gdf.to_crs("EPSG:4326")
+    gdf = gdf.sort_values(by="NM_MUN")
 
-go_to = functions.get(page)
-if go_to:
-    go_to()
-else:
-    st.write("Selecione uma página no menu.")
+    df = pd.read_excel("dados_rmc.xlsx")
+    df.set_index("nome", inplace=True)
+
+    features = []
+    for _, row in gdf.iterrows():
+        nome = row["NM_MUN"]
+        geom = row["geometry"].__geo_interface__
+        props = df.loc[nome].to_dict() if nome in df.index else {}
+        props["name"] = nome
+        features.append({"type": "Feature", "geometry": geom, "properties": props})
+
+    gj = {"type": "FeatureCollection", "features": features}
+    geojson_js = json.dumps(gj)
+
+    with open("grafico_rmc.html", "r", encoding="utf-8") as f:
+        html_template = f.read()
+
+    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
+    st.components.v1.html(html_code, height=600, scrolling=False)
+
+elif page == "Sobre":
+    st.title("Sobre")
+    st.write("Informações institucionais e gerais sobre o projeto.")
+
+elif page == "Economia":
+    st.title("Economia")
+    st.write("Conteúdo relacionado à economia da RMC.")
+
+elif page == "Finanças Públicas":
+    st.title("Finanças Públicas")
+    st.write("Informações sobre finanças públicas da região.")
+
+elif page == "Segurança":
+    st.title("Segurança")
+    st.write("Dados e análises sobre segurança.")
+
+elif page == "População":
+    st.title("População")
+    st.write("Indicadores populacionais da Região Metropolitana de Campinas.")
