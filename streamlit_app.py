@@ -27,7 +27,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14px !important;
+            font-size: 14.5px !important; /* Diminuído pouco */
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -41,10 +41,12 @@ st.markdown(
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
+        /* Selecionado: só negrito leve, mesma cor */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: rgba(255,255,255,0.85) !important;
         }
+        /* Remove underline animada */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
         }
@@ -72,13 +74,13 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",
+        "font-size": "14.5px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "14px",
+        "font-size": "14.5px",
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
@@ -93,7 +95,7 @@ styles = {
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    "logo_href": "#",  # link para logo (clicar não muda de página, faremos manual)
+    "logo_href": "#",  # Para poder clicar no logo e controlar manualmente
 }
 
 pages = [
@@ -106,11 +108,11 @@ pages = [
     "Contato",
 ]
 
-# Função para capturar clique no logo: forçar página "RMC Data"
-clicked_logo = st.experimental_get_query_params().get("logo_clicked", ["0"])[0]
-if clicked_logo == "1":
+# Detecta clique no logo via query param ?logo_clicked=1 para resetar aba
+query_params = st.query_params
+if query_params.get("logo_clicked") == ["1"]:
     st.session_state.page = "RMC Data"
-    st.experimental_set_query_params()  # limpa query params pra evitar loop
+    st.experimental_set_query_params()  # limpa query params para não repetir
 
 # Exibe a navbar, passando a página atual como "default"
 page = st_navbar(
