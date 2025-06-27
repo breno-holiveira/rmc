@@ -1,16 +1,12 @@
 import os
-
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
-
 import pages as pg
-
 
 st.set_page_config(page_title='RMC Data',
                    initial_sidebar_state='collapsed',
-                   page_icon='📈',
-                   layout='wide',
-)
+                   page_icon='📊',
+                   layout='wide')
 
 pages = ['Início', 'Sobre', 'Economia', 'Finanças', 'Segurança', 'GitHub']
 parent_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +32,7 @@ styles = {
     }
 }
 options = {
-    "show_menu": False,
+    "show_menu": True,
     "show_sidebar": False,
 }
 
