@@ -12,25 +12,25 @@ st.set_page_config(page_title='RMC Data',
                    layout='wide',
 )
 
-pages = ['Início', 'Sobre', 'Economia', 'Finanças Públicas', 'Segurança', 'GitHub']
+pages = ['Início', 'Sobre', 'Economia', 'Finanças', 'Segurança', 'GitHub']
 parent_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(parent_dir, 'cubes.svg')
 urls = {'GitHub': 'https://github.com/breno-holiveira/rmc'}
 styles = {
     "nav": {
-        "background-color": "royalblue",
+        "background-color": "#0B1D3A",  # Azul-marinho escuro
         "justify-content": "left",
     },
     "img": {
         "padding-right": "14px",
     },
     "span": {
-        "color": "white",
+        "color": "#E0E6F0",  # Azul claro acinzentado para texto
         "padding": "14px",
     },
     "active": {
-        "background-color": "white",
-        "color": "var(--text-color)",
+        "background-color": "#1F355A",  # Azul intermediário para aba ativa
+        "color": "#FFFFFF",
         "font-weight": "normal",
         "padding": "14px",
     }
