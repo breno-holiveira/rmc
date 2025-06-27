@@ -6,39 +6,40 @@ from streamlit_navigation_bar import st_navbar
 
 st.set_page_config(page_title="RMC Data", layout="wide", page_icon="📊")
 
-# Estilos ultrafinos, suaves e profissionais para a navbar
 styles = {
     "nav": {
         "background": "linear-gradient(90deg, #1e2a38, #273544)",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-size": "14px",
-        "padding": "0 12px",
+        "padding": "0 10px",
         "height": "38px",
         "align-items": "center",
         "box-shadow": "none",
-        "border-radius": "0 0 8px 8px",
+        "border-radius": "0",  # Remove bordas arredondadas da navbar
         "letter-spacing": "0.03em",
     },
     "span": {
         "color": "rgba(255, 255, 255, 0.85)",
-        "padding": "6px 10px",
+        "padding": "6px 18px",  # Espaçamento lateral simétrico e maior para todas as opções
         "font-weight": "400",
         "user-select": "none",
         "transition": "color 0.25s ease",
+        "margin": "0 6px",  # Margem para garantir espaçamento uniforme
     },
     "active": {
-        "background-color": "rgba(255, 255, 255, 0.95)",
-        "color": "#1e2a38",
+        "background-color": "rgba(255, 255, 255, 0.18)",  # Fundo suave e translúcido
+        "color": "#e6e6e6",  # Texto claro, mas não branco puro
         "font-weight": "600",
-        "padding": "6px 10px",
-        "border-radius": "6px",
+        "padding": "6px 18px",
+        "border-radius": "2px",  # Bordas levemente arredondadas só para suavizar
         "user-select": "none",
-        "box-shadow": "0 0 6px rgba(0,0,0,0.1)",
+        "box-shadow": "none",  # Remove sombra para menos destaque pesado
         "transition": "background-color 0.3s ease, color 0.3s ease",
+        "margin": "0 6px",  # Mesma margem para alinhamento
     },
     "img": {
-        "display": "none",  # Ocultar logo (vamos usar texto)
+        "display": "none",  # Ocultar logo, só texto
     }
 }
 
@@ -47,7 +48,6 @@ options = {
     "show_sidebar": False,
 }
 
-# Definição das páginas, trocando 'Home' por 'Inicio'
 pages = ["Inicio", "Documentation", "Examples", "Community", "About"]
 
 page = st_navbar(pages, styles=styles, options=options)
