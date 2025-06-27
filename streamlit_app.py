@@ -4,54 +4,52 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Importa fonte Inter via Google Fonts para suavidade e legibilidade
-st.markdown(
-    """
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        /* Container navbar */
-        .stHorizontalBlock {
-            background-color: #1f2937 !important;
-            padding: 0 !important;
-            height: 38px !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: left !important;
-        }
-        /* Itens da navbar - remover padding/margin padrão e aplicar espaçamento pequeno */
-        .stHorizontalBlock span {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            font-weight: 400 !important;
-            font-size: 13px !important;
-            letter-spacing: 0.02em !important;
-            padding: 6px 8px !important; /* menor padding */
-            margin: 0 4px !important;   /* margem lateral menor para reduzir espaçamento */
-            color: rgba(255,255,255,0.85) !important;
-            transition: color 0.2s ease;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-        }
-        /* Hover suave */
-        .stHorizontalBlock span:hover {
-            color: #ffa366 !important;
-        }
-        /* Item ativo - só borda inferior e cor */
-        .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: #ffffff !important;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.4) !important;
-            padding-bottom: 4px !important;
-            background-color: transparent !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# Importa a fonte Inter via Google Fonts
+st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* Ajusta o container da navbar */
+.stHorizontalBlock {
+    background-color: #1f2937 !important;
+    padding: 0 !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: left !important;
+}
+
+/* Estiliza os itens: span dentro da navbar */
+.stHorizontalBlock span {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+    color: rgba(255,255,255,0.85) !important;
+    padding: 6px 6px !important; /* padding horizontal reduzido */
+    margin: 0 2px !important;   /* margem lateral reduzida para compactar espaçamento */
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+/* Hover nos itens */
+.stHorizontalBlock span:hover {
+    color: #ffa366 !important;
+}
+
+/* Item ativo - borda inferior simples e texto destacado */
+.stHorizontalBlock [aria-selected="true"] span {
+    font-weight: 500 !important;
+    color: #ffffff !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.4) !important;
+    padding-bottom: 4px !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 styles = {
     "nav": {
@@ -60,11 +58,10 @@ styles = {
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 8px",
+        "padding": "6px 6px",
         "font-weight": "400",
         "font-size": "13px",
-        "letter-spacing": "0.02em",
-        "margin": "0 4px",
+        "margin": "0 2px",
     },
     "active": {
         "color": "#ffffff",
