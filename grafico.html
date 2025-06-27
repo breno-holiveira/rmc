@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RMC Interativo</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #1c1c1c;
+      font-family: "Segoe UI", sans-serif;
+      color: #e0e0e0;
+    }
+
+    #map {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .info-box {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(30, 30, 30, 0.85);
+      backdrop-filter: blur(10px);
+      color: #f1f1f1;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 400px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      display: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      font-size: 14px;
+      z-index: 999;
+    }
+
+    .legend {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(35, 35, 35, 0.9);
+      backdrop-filter: blur(6px);
+      padding: 12px 16px;
+      border-radius: 10px;
+      color: #ddd;
+      max-height: 70vh;
+      overflow-y: auto;
+      transition: opacity 0.3s ease;
+      font-size: 13px;
+    }
+
+    .legend.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .legend:hover {
+      opacity: 1;
+    }
+
+    .legend-item {
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+    }
+
+    .legend-color {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      border-radius: 3px;
+      border: 1px solid #444;
+    }
+
+    .highlighted {
+      stroke: #ffffff !important;
+      stroke-width: 2.5;
+    }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <div class="info-box" id="infoBox"></div>
+  <div class="legend" id="legend"></div>
+
+  <script>
+    const geojsonData = __GEOJSON_PLACEHOLDER__;
+
+    const map = L.map('map').setView([-22.9, -47.1], 9);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap',
+    }).addTo(map);
+
+    function getColor(value) {
+      return value > 100000 ? '#81a1c1' :
+             value > 50000  ? '#5e81ac' :
+             value > 20000  ? '#4c679a' :
+             value > 10000  ? '#394f7d' :
+                              '#2e3440';
+    }
+
+    function style(feature) {
+      return {
+        fillColor: getColor(feature.properties.valor),
+        weight: 1,
+        opacity: 1,
+        color: "#000",
+        fillOpacity: 0.7
+      };
+    }
+
+    function highlightFeature(e) {
+      const layer = e.target;
+      layer.setStyle({
+        weight: 2,
+        color: '#fff',
+        fillOpacity: 0.85
+      });
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+      }
+    }
+
+    function resetHighlight(e) {
+      geojson.resetStyle(e.target);
+    }
+
+    function showInfoBox(properties) {
+      const box = document.getElementById("infoBox");
+      box.innerHTML = `
+        <h3>${properties.nome}</h3>
+        <p><strong>População:</strong> ${properties.populacao.toLocaleString("pt-BR")}</p>
+        <p><strong>PIB per capita:</strong> R$ ${properties.pib_per_capita.toLocaleString("pt-BR")}</p>
+        <p><strong>PIB total:</strong> R$ ${properties.valor.toLocaleString("pt-BR")}</p>
+      `;
+      box.style.display = "block";
+    }
+
+    function hideInfoBox() {
+      document.getElementById("infoBox").style.display = "none";
+    }
+
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: () => showInfoBox(feature.properties)
+      });
+    }
+
+    const geojson = L.geoJson(geojsonData, {
+      style: style,
+      onEachFeature: onEachFeature
+    }).addTo(map);
+
+    function buildLegend() {
+      const legend = document.getElementById("legend");
+      const grades = [0, 10000, 20000, 50000, 100000];
+      for (let i = 0; i < grades.length; i++) {
+        const div = document.createElement("div");
+        div.className = "legend-item";
+        const colorBox = document.createElement("div");
+        colorBox.className = "legend-color";
+        colorBox.style.backgroundColor = getColor(grades[i] + 1);
+        const label = document.createElement("span");
+        label.innerText = `> R$ ${grades[i].toLocaleString("pt-BR")}`;
+        div.appendChild(colorBox);
+        div.appendChild(label);
+        legend.appendChild(div);
+      }
+    }
+
+    buildLegend();
+  </script>
+</body>
+</html>
