@@ -28,6 +28,10 @@ st.markdown(
             position: relative;
             transition: color 0.15s ease, background-color 0.15s ease;
         }
+        /* RMC Data sempre em negrito */
+        .stHorizontalBlock span:first-child {
+            font-weight: 600 !important;
+        }
         /* Hover suave: só muda a cor */
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
@@ -35,11 +39,7 @@ st.markdown(
         /* Destaque do item ativo para todas as abas */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
-            color: rgba(255,255,255,0.95) !important;
-            background-color: transparent !important;
-        }
-        /* Fundo branco sutil para o primeiro item ativo (RMC Data) */
-        .stHorizontalBlock [aria-selected="true"]:nth-child(1) span {
+            color: rgba(0,0,0,0.85) !important;
             background-color: rgba(255,255,255,0.12) !important;
             border-radius: 6px;
             padding-left: 12px !important;
@@ -91,9 +91,12 @@ styles = {
         "position": "relative",
     },
     "active": {
-        "color": "rgba(255,255,255,0.95)",
+        "color": "rgba(0,0,0,0.85)",
         "font-weight": "500",
-        "background-color": "transparent",
+        "background-color": "rgba(255,255,255,0.12)",
+        "border-radius": "6px",
+        "padding-left": "12px",
+        "padding-right": "12px",
     },
 }
 
@@ -113,7 +116,7 @@ pages = [
 
 page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
-# Conteúdo por página
+# *** Restante do seu código permanece exatamente igual ***
 
 if page == "RMC Data":
     st.title("RMC Data 📊")
