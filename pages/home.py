@@ -1,9 +1,8 @@
 import streamlit as st
 
-
 def show_home():
-    st.header('RMC Data')
-    st.write(
+    st.markdown('# RMC Data')
+    st.markdown(
         """
         A Região Metropolitana de Campinas (RMC) foi criada em 2000 pela Lei Complementar nº 870, do Estado de São Paulo, 
         e é composta por 20 municípios. 
