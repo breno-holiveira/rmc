@@ -4,18 +4,15 @@ def show_home():
     st.markdown('# RMC Data')
     
     st.markdown("""
-    Apesar dos avanços na disponibilização de dados públicos nos últimos anos, ainda há carência de divulgação acessível 
-    e qualificada de informações em nível regional e municipal. 
+    Apesar dos avanços na disponibilização de dados públicos nos últimos anos, o acesso a informações de qualidade em nível regional
+    e municipal ainda é limitado. O **RMC Data** foi criado com o propósito de reunir, produzir e divulgar indicadores econômicos e sociais
+    dos municípios da Região Metropolitana de Campinas (RMC), com foco na confiabilidade e qualidade das informações.
     
-    O **RMC Data** foi desenvolvido com o objetivo de reunir, elaborar e divulgar indicadores econômicos e sociais dos municípios 
-    da Região Metropolitana de Campinas (RMC), prezando pela confiabilidade e qualidade das informações.
+    O site foi desenvolvido por **Breno Oliveira** e **Bianca Lopes**, utilizando Python e a biblioteca Streamlit. Em caso de dúvidas ou sugestões, entre em contato por meio da aba **Contatos**.
     
-    Este site foi criado por **Breno Oliveira** e **Bianca Lopes**, utilizando Python e Streamlit. Em caso de dúvidas ou sugestões, 
-    entre em contato pelos canais disponíveis na aba **Contatos**.
-    
-    O conteúdo do site pode ser reproduzido parcial ou integralmente, sem a necessidade de comunicação prévia ou a citação de fontes. 
-    Todos os dados utilizados estão disponíveis para acesso e clonagem na aba **GitHub**.
+    Todo o conteúdo deste site pode ser reproduzido parcial ou integralmente, sem necessidade de autorização prévia. Os dados utilizados estão disponíveis para consulta e clonagem na aba **GitHub**.
     """)
+
         
     st.markdown
     
