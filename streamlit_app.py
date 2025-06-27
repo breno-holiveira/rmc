@@ -1,70 +1,72 @@
-import os
 import streamlit as st
 import pandas as pd
 import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg na pasta raiz
-logo_path = os.path.join(os.getcwd(), "cubes.svg")
-
-# Importar fonte Inter para suavidade e legibilidade
+# Importar fonte Inter via Google Fonts para suavidade e legibilidade
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Estilo base dos itens da navbar */
-        .stHorizontalBlock span {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            font-weight: 400 !important;
-            font-size: 15px !important;
-            letter-spacing: 0em !important;
-            padding: 6px 6px !important;
-            margin: 0 6px !important;
-            color: rgba(255,255,255,0.85) !important;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            position: relative;
-            transition: color 0.25s ease;
-        }
-        /* Hover suave: só muda a cor */
-        .stHorizontalBlock span:hover {
-            color: #ff9e3b !important;
-        }
-        /* Destaque do item ativo */
-        .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: #ff9e3b !important;
-        }
-        /* Linha animada embaixo do item ativo */
-        .stHorizontalBlock [aria-selected="true"] span::after {
-            content: '';
-            position: absolute;
-            left: 10%;
-            bottom: 0;
-            height: 3px;
-            width: 80%;
-            background-color: #ff9e3b;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            animation: underlineExpand 0.3s forwards;
-        }
-        /* Container da navbar */
+        /* Navbar container */
         .stHorizontalBlock {
-            background-color: #1f2937 !important; /* cinza escuro */
+            background-color: #1f2937 !important;  /* cinza escuro */
             padding: 0 !important;
-            height: 44px !important;
+            height: 42px !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: left !important;
-            user-select: none;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-size: 14px !important;
+            letter-spacing: 0.02em !important;
         }
-        @keyframes underlineExpand {
-            from { width: 0; }
-            to { width: 80%; }
+
+        /* Logo container */
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            margin-left: 16px;
+            margin-right: 24px;
+            cursor: pointer;
+            user-select: none;
+            text-decoration: none;
+            color: #a3bffa;
+            font-weight: 600;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        .navbar-logo:hover {
+            color: #7c90f4;
+        }
+        .navbar-logo img {
+            height: 26px;
+            width: 26px;
+            margin-right: 8px;
+        }
+
+        /* Navbar items */
+        .stHorizontalBlock span {
+            color: rgba(255,255,255,0.85) !important;
+            padding: 8px 12px !important;
+            margin: 0 6px !important;
+            font-weight: 400 !important;
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s ease, box-shadow 0.3s ease;
+        }
+        /* Hover nos itens */
+        .stHorizontalBlock span:hover {
+            color: #a3bffa !important;
+            box-shadow: inset 0 -2px 0 #a3bffa;
+        }
+        /* Item ativo */
+        .stHorizontalBlock [aria-selected="true"] span {
+            color: #7c90f4 !important;
+            font-weight: 600 !important;
+            box-shadow: inset 0 -3px 0 #7c90f4;
         }
     </style>
     """,
@@ -75,23 +77,22 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "15px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 6px",
+        "padding": "8px 12px",
         "font-weight": "400",
-        "font-size": "15px",
-        "letter-spacing": "0em",
-        "margin": "0 6px",
-        "white-space": "nowrap",
-        "position": "relative",
+        "font-size": "14px",
+        "letter-spacing": "0.02em",
+        "cursor": "pointer",
+        "user-select": "none",
+        "transition": "color 0.2s ease, box-shadow 0.3s ease",
     },
     "active": {
-        "color": "#ff9e3b",
-        "font-weight": "500",
-    },
+        "color": "#7c90f4",
+        "font-weight": "600",
+        "box-shadow": "inset 0 -3px 0 #7c90f4",
+    }
 }
 
 options = {
@@ -99,22 +100,44 @@ options = {
     "show_sidebar": False,
 }
 
-pages = [
-    "RMC Data",
-    "Sobre",
-    "Economia",
-    "Finanças Públicas",
-    "Segurança",
-    "População",
-]
+pages = ["Inicio", "Sobre", "Economia", "Finanças Públicas", "Segurança", "População"]
 
-page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
+# Definindo o logo_path e link para o GitHub
+logo_path = "git.svg"
+logo_url = "https://github.com/breno-holiveira/rmc"
 
-# Conteúdo por página
+# Exibe o navbar com logo e texto customizados
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    logo_link=logo_url,
+    logo_text="RMC Data",
+    styles=styles,
+    options=options,
+)
 
-if page == "RMC Data":
+# Inject custom HTML para o logo + texto no navbar
+# Aqui usamos um hack para forçar o clique do logo e texto abrirem link externo
+# Essa parte aparece antes da navbar e usa css para posicionar corretamente
+st.markdown(f"""
+    <style>
+    .stHorizontalBlock > div {{
+        display: flex !important;
+        align-items: center !important;
+    }}
+    </style>
+    <a href="{logo_url}" target="_blank" rel="noopener noreferrer" class="navbar-logo" style="position: absolute; left: 16px; top: 7px; z-index: 9999;">
+        <img src="{logo_path}" alt="Logo" />
+        RMC Data
+    </a>
+""", unsafe_allow_html=True)
+
+
+# Conteúdo da página conforme seleção
+if page == "Inicio":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+
     st.markdown(
         "A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituída por 20 municípios. "
         "Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano."
@@ -150,20 +173,20 @@ if page == "RMC Data":
 
 elif page == "Sobre":
     st.title("Sobre")
-    st.write("Informações institucionais e gerais sobre o projeto.")
+    st.write("Conteúdo sobre o projeto e informações institucionais.")
 
 elif page == "Economia":
     st.title("Economia")
-    st.write("Conteúdo relacionado à economia da RMC.")
+    st.write("Indicadores e análises econômicas da região.")
 
 elif page == "Finanças Públicas":
     st.title("Finanças Públicas")
-    st.write("Informações sobre finanças públicas da região.")
+    st.write("Informações e dados sobre finanças públicas locais.")
 
 elif page == "Segurança":
     st.title("Segurança")
-    st.write("Dados e análises sobre segurança.")
+    st.write("Estatísticas e análises sobre segurança pública.")
 
 elif page == "População":
     st.title("População")
-    st.write("Indicadores populacionais da Região Metropolitana de Campinas.")
+    st.write("Dados demográficos e análises populacionais.")
