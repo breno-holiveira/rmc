@@ -4,6 +4,7 @@ from streamlit_navigation_bar import st_navbar
 st.set_page_config(initial_sidebar_state="collapsed")
 
 pages = ["Home", "Library", "Tutorials", "Development", "Download"]
+
 styles = {
     "nav": {
         "background-color": "rgb(123, 209, 146)",
@@ -14,11 +15,13 @@ styles = {
     "span": {
         "border-radius": "0.5rem",
         "color": "rgb(49, 51, 63)",
-        "margin": "0 0.125rem",
-        "padding": "0.4375rem 0.625rem",
+        "margin": "0 0.25rem",
+        "padding": "0.5rem 0.75rem",
+        "transition": "background-color 0.3s ease",
     },
     "active": {
         "background-color": "rgba(255, 255, 255, 0.25)",
+        "font-weight": "bold",
     },
     "hover": {
         "background-color": "rgba(255, 255, 255, 0.35)",
