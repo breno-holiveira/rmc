@@ -5,11 +5,11 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Forçar página inicial em "RMC Data"
+# Inicializa o estado da página no session_state para controlar a aba ativa
 if "page" not in st.session_state:
     st.session_state.page = "RMC Data"
 
-# Configurar layout wide para ocupar toda a largura
+# Configurar layout da página
 st.set_page_config(
     page_title="RMC Data",
     layout="wide",
@@ -17,19 +17,17 @@ st.set_page_config(
     page_icon="📊"
 )
 
-# Caminho para o logo cubes.svg na pasta raiz (se não usar, pode remover essa variável)
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-# Importar fonte Inter para suavidade e legibilidade
+# Importar fonte Inter e CSS personalizado para navbar
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Estilo base dos itens da navbar */
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14px !important;  /* fonte levemente menor */
+            font-size: 14px !important;
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -40,22 +38,18 @@ st.markdown(
             position: relative;
             transition: color 0.25s ease;
         }
-        /* Hover suave: só muda a cor */
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Destaque do item ativo: só negrito leve, mesma cor */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: rgba(255,255,255,0.85) !important;
         }
-        /* Removendo a linha embaixo do item ativo */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
         }
-        /* Container da navbar */
         .stHorizontalBlock {
-            background-color: #1f2937 !important; /* cinza escuro */
+            background-color: #1f2937 !important;
             padding: 0 !important;
             height: 44px !important;
             box-shadow: none !important;
@@ -65,20 +59,9 @@ st.markdown(
             justify-content: left !important;
             user-select: none;
         }
-        /* Forçar body e main ocupando largura total */
-        .css-18e3th9 {  /* main container padrão do Streamlit */
-            max-width: 100% !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-        }
-        /* Ajustar container principal para ocupar largura toda */
-        .css-1d391kg {  /* container do corpo da página */
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            max-width: 100% !important;
-        }
+        /* Ajustes para largura máxima da página */
+        .css-18e3th9 { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+        .css-1d391kg { padding-left: 0 !important; padding-right: 0 !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -102,16 +85,15 @@ styles = {
         "position": "relative",
     },
     "active": {
-        "color": "rgba(255,255,255,0.85)",  # mesma cor do texto normal
-        "font-weight": "500",  # negrito leve
+        "color": "rgba(255,255,255,0.85)",
+        "font-weight": "500",
     },
 }
 
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    "default_page": st.session_state.page,  # define página inicial
-    "logo_href": "#",  # link do logo que vamos tratar abaixo
+    "logo_href": "#",  # link para logo (clicar não muda de página, faremos manual)
 }
 
 pages = [
@@ -124,19 +106,27 @@ pages = [
     "Contato",
 ]
 
-# Inicializa a navbar e captura a página selecionada
-page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
+# Função para capturar clique no logo: forçar página "RMC Data"
+clicked_logo = st.experimental_get_query_params().get("logo_clicked", ["0"])[0]
+if clicked_logo == "1":
+    st.session_state.page = "RMC Data"
+    st.experimental_set_query_params()  # limpa query params pra evitar loop
 
-# Se clicar no logo (cubo), vai pra "RMC Data"
-if st.experimental_get_query_params().get("page", [None])[0] != page:
-    # Atualiza a query string para a página selecionada
-    st.experimental_set_query_params(page=page)
+# Exibe a navbar, passando a página atual como "default"
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    styles=styles,
+    options=options,
+    default=st.session_state.page,
+)
 
-# Forçar página inicial ao abrir app
+# Atualiza a página selecionada no session_state
 if page != st.session_state.page:
     st.session_state.page = page
 
-if page == "RMC Data":
+# Conteúdo das páginas
+if st.session_state.page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
     st.markdown(
@@ -172,26 +162,26 @@ if page == "RMC Data":
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif page == "Economia":
+elif st.session_state.page == "Economia":
     st.title("Economia")
     st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
 
-elif page == "Finanças Públicas":
+elif st.session_state.page == "Finanças Públicas":
     st.title("Finanças Públicas")
     st.write("Informações sobre finanças públicas da região.")
 
-elif page == "Segurança":
+elif st.session_state.page == "Segurança":
     st.title("Segurança")
     st.write("Dados e análises sobre segurança.")
 
-elif page == "Arquivos":
+elif st.session_state.page == "Arquivos":
     st.title("Arquivos")
     st.write("Documentos e arquivos relacionados ao projeto.")
 
-elif page == "Sobre":
+elif st.session_state.page == "Sobre":
     st.title("Sobre")
     st.write("Informações institucionais e gerais sobre o projeto.")
 
-elif page == "Contato":
+elif st.session_state.page == "Contato":
     st.title("Contato")
     st.write("Informações para contato e comunicação.")
