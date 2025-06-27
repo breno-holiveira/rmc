@@ -15,18 +15,18 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Fonte DM Sans com destaque por cor suave (sem negrito)
+# Fonte Work Sans com peso leve, cor suave e destaque sem negrito nem brilho
 st.markdown(
     """
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400&display=swap" rel="stylesheet">
     <style>
         .stHorizontalBlock span {
-            font-family: 'DM Sans', sans-serif !important;
-            font-weight:  !important;
+            font-family: 'Work Sans', sans-serif !important;
+            font-weight: 300 !important;
             font-size: 15px !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
-            color: rgba(255,255,255,0.85) !important;
+            color: rgba(255,255,255,0.80) !important;
             cursor: pointer;
             user-select: none;
             white-space: nowrap;
@@ -38,7 +38,7 @@ st.markdown(
         }
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 300 !important;
-            color: #f4a259 !important; /* tom suave, sem negrito */
+            color: #e3a86a !important; /* tom suave para o item ativo */
         }
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
@@ -63,21 +63,21 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'DM Sans', sans-serif",
+        "font-family": "'Work Sans', sans-serif",
         "font-size": "15px",
     },
     "span": {
-        "color": "rgba(255,255,255,0.85)",
+        "color": "rgba(255,255,255,0.80)",
         "padding": "6px 6px",
-        "font-weight": "400",
+        "font-weight": "300",
         "font-size": "15px",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
     },
     "active": {
-        "color": "#f4a259",  # mesma cor usada no CSS
-        "font-weight": "400",
+        "color": "#e3a86a",
+        "font-weight": "300",
     },
 }
 
