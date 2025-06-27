@@ -32,16 +32,14 @@ st.markdown(
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Destaque do item ativo para todas as abas (menos RMC Data) */
-        .stHorizontalBlock [aria-selected="true"] span:not(.rmc-data) {
+        /* Destaque do item ativo para todas as abas */
+        .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: rgba(255,255,255,0.95) !important;
             background-color: transparent !important;
         }
-        /* Fundo branco sutil para RMC Data quando ativo */
-        .stHorizontalBlock [aria-selected="true"] span.rmc-data {
-            font-weight: 500 !important;
-            color: rgba(255,255,255,0.95) !important;
+        /* Fundo branco sutil para o primeiro item ativo (RMC Data) */
+        .stHorizontalBlock [aria-selected="true"]:nth-child(1) span {
             background-color: rgba(255,255,255,0.12) !important;
             border-radius: 6px;
             padding-left: 12px !important;
@@ -113,14 +111,7 @@ pages = [
     "População",
 ]
 
-page = st_navbar(
-    pages,
-    logo_path=logo_path,
-    styles=styles,
-    options=options,
-    # Adiciona a classe rmc-data só ao span do primeiro item para CSS específico
-    item_classnames=["rmc-data"] + [""] * (len(pages) - 1),
-)
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
 # Conteúdo por página
 
