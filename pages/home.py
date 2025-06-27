@@ -28,3 +28,10 @@ def show_home():
     - Em 2025, Campinas foi eleita a melhor cidade do interior do país para investimentos, de acordo com a *Oxford Economics Global Cities Index*.
         """
     )
+
+# Carrega o conteúdo do HTML
+with open("grafico.html", "r", encoding="utf-8") as f:
+    html_content = f.read()
+
+# Exibe o HTML
+st.components.v1.html(html_content, height=800, scrolling=True)
