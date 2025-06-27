@@ -5,25 +5,19 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-if "page" not in st.session_state:
-    st.session_state.page = "RMC DATA"
+# Caminho para o logo cubes.svg na pasta raiz (se não usar, pode remover essa variável)
+logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-st.set_page_config(
-    page_title="RMC Data",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-    page_icon="📊",
-)
-
-# CSS da navbar com Arial Narrow
+# CSS customizado para a navbar com fonte Segoe UI, espaçamento equilibrado e estilo moderno
 st.markdown(
     """
     <style>
         .stHorizontalBlock span {
-            font-family: 'Arial Narrow', Arial, sans-serif !important;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14.5px !important;
-            padding: 6px 6px !important;
+            font-size: 15px !important;
+            letter-spacing: 0.02em !important;
+            padding: 6px 8px !important;
             margin: 0 6px !important;
             color: rgba(255,255,255,0.85) !important;
             cursor: pointer;
@@ -62,14 +56,16 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'Arial Narrow', Arial, sans-serif",
-        "font-size": "14.5px",
+        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-size": "15px",
+        "letter-spacing": "0.02em",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 6px",
+        "padding": "6px 8px",
         "font-weight": "400",
-        "font-size": "14.5px",
+        "font-size": "15px",
+        "letter-spacing": "0.02em",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
@@ -86,7 +82,7 @@ options = {
 }
 
 pages = [
-    "RMC DATA",
+    "RMC Data",
     "Economia",
     "Finanças Públicas",
     "Segurança",
@@ -95,14 +91,31 @@ pages = [
     "Contato",
 ]
 
-clicked_page = st_navbar(pages, logo_path=None, styles=styles, options=options)
+# Define a página inicial padrão
+if "page" not in st.session_state:
+    st.session_state.page = "RMC Data"
 
-if clicked_page and clicked_page != st.session_state.page:
-    st.session_state.page = clicked_page
+# Função para definir página inicial ao clicar no logo
+def go_home():
+    st.session_state.page = "RMC Data"
 
-page = st.session_state.page
+# Exibe a navbar, define página ativa, logo clicável para home
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    styles=styles,
+    options=options,
+    default=st.session_state.page,
+    on_logo_click=go_home,
+)
 
-if page == "RMC DATA":
+# Atualiza st.session_state.page para persistir seleção
+if page and page != st.session_state.page:
+    st.session_state.page = page
+
+# Conteúdo por página
+
+if st.session_state.page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
     st.markdown(
@@ -135,31 +148,29 @@ if page == "RMC DATA":
     with open("grafico_rmc.html", "r", encoding="utf-8") as f:
         html_template = f.read()
 
-    html_code = html_template.replace(
-        "const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};"
-    )
+    html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif page == "Economia":
+elif st.session_state.page == "Economia":
     st.title("Economia")
     st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
 
-elif page == "Finanças Públicas":
+elif st.session_state.page == "Finanças Públicas":
     st.title("Finanças Públicas")
     st.write("Informações sobre finanças públicas da região.")
 
-elif page == "Segurança":
+elif st.session_state.page == "Segurança":
     st.title("Segurança")
     st.write("Dados e análises sobre segurança.")
 
-elif page == "Arquivos":
+elif st.session_state.page == "Arquivos":
     st.title("Arquivos")
     st.write("Documentos e arquivos relacionados ao projeto.")
 
-elif page == "Sobre":
+elif st.session_state.page == "Sobre":
     st.title("Sobre")
     st.write("Informações institucionais e gerais sobre o projeto.")
 
-elif page == "Contato":
+elif st.session_state.page == "Contato":
     st.title("Contato")
     st.write("Informações para contato e comunicação.")
