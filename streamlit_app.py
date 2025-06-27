@@ -5,53 +5,49 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg na pasta raiz (se não usar, pode remover essa variável)
-logo_path = os.path.join(os.getcwd(), "cubes.svg")
+# Caminho para o logo
+logo_path = os.path.join(os.getcwd(), "cubes.svg")  # Pode substituir por imagem de texto se quiser
 
-# CSS customizado para a navbar com fonte Segoe UI, espaçamento equilibrado e estilo moderno
-st.markdown(
-    """
-    <style>
-        .stHorizontalBlock span {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-            font-weight: 400 !important;
-            font-size: 15px !important;
-            letter-spacing: 0.02em !important;
-            padding: 6px 8px !important;
-            margin: 0 6px !important;
-            color: rgba(255,255,255,0.85) !important;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            position: relative;
-            transition: color 0.25s ease;
-        }
-        .stHorizontalBlock span:hover {
-            color: #ff9e3b !important;
-        }
-        .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 500 !important;
-            color: rgba(255,255,255,0.85) !important;
-        }
-        .stHorizontalBlock [aria-selected="true"] span::after {
-            content: none !important;
-        }
-        .stHorizontalBlock {
-            background-color: #1f2937 !important;
-            padding: 0 !important;
-            height: 44px !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: left !important;
-            user-select: none;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+# CSS personalizado da navbar (fonte moderna, espaçamento equilibrado, estilo refinado)
+st.markdown("""
+<style>
+.stHorizontalBlock span {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-weight: 400 !important;
+    font-size: 15px !important;
+    letter-spacing: 0.02em !important;
+    padding: 6px 8px !important;
+    margin: 0 6px !important;
+    color: rgba(255,255,255,0.85) !important;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.25s ease;
+}
+.stHorizontalBlock span:hover {
+    color: #ff9e3b !important;
+}
+.stHorizontalBlock [aria-selected="true"] span {
+    font-weight: 500 !important;
+    color: rgba(255,255,255,0.85) !important;
+}
+.stHorizontalBlock [aria-selected="true"] span::after {
+    content: none !important;
+}
+.stHorizontalBlock {
+    background-color: #1f2937 !important;
+    padding: 0 !important;
+    height: 44px !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: left !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
+# Estilo do componente
 styles = {
     "nav": {
         "background-color": "#1f2937",
@@ -76,11 +72,13 @@ styles = {
     },
 }
 
+# Opções gerais da barra
 options = {
     "show_menu": False,
     "show_sidebar": False,
 }
 
+# Lista de páginas
 pages = [
     "RMC Data",
     "Economia",
@@ -91,31 +89,17 @@ pages = [
     "Contato",
 ]
 
-# Define a página inicial padrão
-if "page" not in st.session_state:
-    st.session_state.page = "RMC Data"
-
-# Função para definir página inicial ao clicar no logo
-def go_home():
-    st.session_state.page = "RMC Data"
-
-# Exibe a navbar, define página ativa, logo clicável para home
+# Define a página padrão como "RMC Data"
 page = st_navbar(
     pages,
     logo_path=logo_path,
     styles=styles,
     options=options,
-    default=st.session_state.page,
-    on_logo_click=go_home,
+    default="RMC Data"
 )
 
-# Atualiza st.session_state.page para persistir seleção
-if page and page != st.session_state.page:
-    st.session_state.page = page
-
 # Conteúdo por página
-
-if st.session_state.page == "RMC Data":
+if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
     st.markdown(
@@ -151,26 +135,26 @@ if st.session_state.page == "RMC Data":
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif st.session_state.page == "Economia":
+elif page == "Economia":
     st.title("Economia")
     st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
 
-elif st.session_state.page == "Finanças Públicas":
+elif page == "Finanças Públicas":
     st.title("Finanças Públicas")
     st.write("Informações sobre finanças públicas da região.")
 
-elif st.session_state.page == "Segurança":
+elif page == "Segurança":
     st.title("Segurança")
     st.write("Dados e análises sobre segurança.")
 
-elif st.session_state.page == "Arquivos":
+elif page == "Arquivos":
     st.title("Arquivos")
     st.write("Documentos e arquivos relacionados ao projeto.")
 
-elif st.session_state.page == "Sobre":
+elif page == "Sobre":
     st.title("Sobre")
     st.write("Informações institucionais e gerais sobre o projeto.")
 
-elif st.session_state.page == "Contato":
+elif page == "Contato":
     st.title("Contato")
     st.write("Informações para contato e comunicação.")
