@@ -5,7 +5,7 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Estado inicial da página
+# Estado inicial
 if "page" not in st.session_state:
     st.session_state.page = "RMC Data"
 
@@ -17,37 +17,68 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Estilo baseado no exemplo fornecido, adaptado para azul-escuro (#1f2937)
+# Fonte DM Sans + CSS igual ao da OUP, mantendo azul escuro
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        .stHorizontalBlock {
+            background-color: #1f2937 !important;
+            height: 56px !important;
+            padding: 0 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: left !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .stHorizontalBlock span {
+            font-family: 'DM Sans', sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 16px !important;
+            color: rgba(255, 255, 255, 0.88) !important;
+            margin: 0 10px !important;
+            padding: 6px 12px !important;
+            border-radius: 6px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .stHorizontalBlock span:hover {
+            background-color: rgba(255,255,255,0.08);
+        }
+        .stHorizontalBlock [aria-selected="true"] span {
+            background-color: rgba(255,255,255,0.14);
+            color: #f4a259 !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Estilos do st_navbar (compatíveis com o CSS acima)
 styles = {
     "nav": {
         "background-color": "#1f2937",
-    },
-    "div": {
-        "max-width": "32rem",
+        "justify-content": "left",
+        "font-family": "'DM Sans', sans-serif",
+        "font-size": "16px",
     },
     "span": {
-        "border-radius": "0.5rem",
-        "color": "rgba(255, 255, 255, 0.9)",
-        "margin": "0 0.125rem",
-        "padding": "0.4375rem 0.625rem",
-        "font-family": "'DM Sans', sans-serif",
-        "font-size": "15px",
+        "color": "rgba(255, 255, 255, 0.88)",
+        "padding": "6px 12px",
+        "margin": "0 10px",
+        "font-weight": "400",
+        "border-radius": "6px",
     },
     "active": {
-        "background-color": "rgba(255, 255, 255, 0.2)",
-    },
-    "hover": {
-        "background-color": "rgba(255, 255, 255, 0.1)",
+        "color": "#f4a259",
+        "background-color": "rgba(255,255,255,0.14)",
     },
 }
 
-# Opções visuais
 options = {
     "show_menu": False,
     "show_sidebar": False,
 }
 
-# Páginas da barra
 pages = [
     "RMC Data",
     "Economia",
@@ -58,14 +89,14 @@ pages = [
     "Contato",
 ]
 
-# Barra de navegação
-clicked_page = st_navbar(pages, styles=styles, options=options)
+clicked_page = st_navbar(pages, logo_path=None, styles=styles, options=options)
+
 if clicked_page and clicked_page != st.session_state.page:
     st.session_state.page = clicked_page
 
 page = st.session_state.page
 
-# Conteúdo da página selecionada
+# Página: RMC Data
 if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
@@ -77,7 +108,7 @@ if page == "RMC Data":
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
 
-    # Dados do mapa
+    # Carregamento de dados
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
