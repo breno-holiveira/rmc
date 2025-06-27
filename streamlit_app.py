@@ -1,13 +1,15 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+from paginas import inicio, sobre, economia, financas, despesas, arrecadacao
+
 st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 
-# Inicia a página padrão
+# Controlador de página atual
 if "page" not in st.session_state:
     st.session_state.page = "inicio"
 
-# Controle de navegação via mensagem JS
+# JavaScript para mudar session_state.page
 components.html("""
 <script>
 function navigateTo(page) {
@@ -19,7 +21,7 @@ function navigateTo(page) {
 </script>
 """, height=0)
 
-# HTML + CSS da navbar estilizada com dropdown
+# Navbar HTML (com dropdown)
 st.markdown("""
 <style>
     .navbar {
@@ -115,27 +117,22 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Atualiza a página com base na variável
+# Roteamento para a função de cada página
+st.markdown("<br><br>", unsafe_allow_html=True)
+
 page = st.session_state.page
 
-# Conteúdo de cada "página"
 if page == "inicio":
-    st.title("Início")
-    st.write("Bem-vindo ao RMC Data.")
+    inicio.render()
 elif page == "sobre":
-    st.title("Sobre")
-    st.write("Informações sobre o projeto.")
+    sobre.render()
 elif page == "economia":
-    st.title("Economia")
-    st.write("Dados econômicos da RMC.")
+    economia.render()
 elif page == "financas":
-    st.title("Finanças")
-    st.write("Resumo financeiro.")
+    financas.render()
 elif page == "despesas":
-    st.title("Finanças > Despesas")
-    st.write("Dados sobre despesas públicas.")
+    despesas.render()
 elif page == "arrecadacao":
-    st.title("Finanças > Arrecadação")
-    st.write("Informações sobre arrecadação municipal.")
+    arrecadacao.render()
 else:
-    st.warning("Página não encontrada.")
+    st.error("Página não encontrada.")
