@@ -1,15 +1,15 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-from paginas import inicio, sobre, economia, financas, despesas, arrecadacao
+from pages import inicio, sobre, economia, financas, despesas, arrecadacao
 
 st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed")
 
-# Controlador de página atual
+# Inicializa a página padrão
 if "page" not in st.session_state:
     st.session_state.page = "inicio"
 
-# JavaScript para mudar session_state.page
+# JS para alterar a página via clique na navbar HTML
 components.html("""
 <script>
 function navigateTo(page) {
@@ -21,7 +21,7 @@ function navigateTo(page) {
 </script>
 """, height=0)
 
-# Navbar HTML (com dropdown)
+# Navbar estilizada com dropdowns e links que usam navigateTo('page')
 st.markdown("""
 <style>
     .navbar {
@@ -117,9 +117,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Roteamento para a função de cada página
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
+# Roteia para função render de cada página
 page = st.session_state.page
 
 if page == "inicio":
