@@ -5,21 +5,16 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Inicializa o estado da página no session_state para controlar a aba ativa
+# Inicializa estado da aba ativa
 if "page" not in st.session_state:
     st.session_state.page = "RMC Data"
 
-# Configurar layout da página
-st.set_page_config(
-    page_title="RMC Data",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-    page_icon="📊"
-)
+# Configuração da página
+st.set_page_config(page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed", page_icon="📊")
 
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-# Importar fonte Inter e CSS personalizado para navbar
+# CSS personalizado para navbar
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -27,7 +22,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14.5px !important; /* Diminuído pouco */
+            font-size: 14.5px !important;
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -41,12 +36,10 @@ st.markdown(
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Selecionado: só negrito leve, mesma cor */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: rgba(255,255,255,0.85) !important;
         }
-        /* Remove underline animada */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: none !important;
         }
@@ -61,7 +54,7 @@ st.markdown(
             justify-content: left !important;
             user-select: none;
         }
-        /* Ajustes para largura máxima da página */
+        /* Ajuste largura e padding da página */
         .css-18e3th9 { max-width: 100% !important; padding-left: 1rem !important; padding-right: 1rem !important; }
         .css-1d391kg { padding-left: 0 !important; padding-right: 0 !important; margin-left: 0 !important; margin-right: 0 !important; max-width: 100% !important; }
     </style>
@@ -95,7 +88,7 @@ styles = {
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    "logo_href": "#",  # Para poder clicar no logo e controlar manualmente
+    "logo_href": "#",  # Para permitir detectar clique no logo
 }
 
 pages = [
@@ -108,26 +101,25 @@ pages = [
     "Contato",
 ]
 
-# Detecta clique no logo via query param ?logo_clicked=1 para resetar aba
-query_params = st.query_params
+# Detectar clique no logo pelo parâmetro query 'logo_clicked'
+query_params = st.experimental_get_query_params()
 if query_params.get("logo_clicked") == ["1"]:
     st.session_state.page = "RMC Data"
-    st.experimental_set_query_params()  # limpa query params para não repetir
+    st.experimental_set_query_params()  # limpa query params para não ficar clicando sempre
 
-# Exibe a navbar, passando a página atual como "default"
-page = st_navbar(
+# Chama navbar, retorna a aba clicada (não passa default)
+clicked_page = st_navbar(
     pages,
     logo_path=logo_path,
     styles=styles,
     options=options,
-    default=st.session_state.page,
 )
 
-# Atualiza a página selecionada no session_state
-if page != st.session_state.page:
-    st.session_state.page = page
+# Atualiza o estado da aba só se mudou (para manter o controle da aba)
+if clicked_page != st.session_state.page and clicked_page is not None:
+    st.session_state.page = clicked_page
 
-# Conteúdo das páginas
+# Conteúdo da aba atual
 if st.session_state.page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
