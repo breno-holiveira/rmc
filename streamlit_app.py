@@ -5,11 +5,51 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Importar fonte Inter para suavidade e legibilidade e custom CSS
+# Caminho para o logo cubes.svg na pasta raiz
+logo_path = os.path.join(os.getcwd(), "cubes.svg")
+
+# Importar fonte Inter para suavidade e legibilidade
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        /* Estilo base dos itens da navbar */
+        .stHorizontalBlock span {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-weight: 400 !important;
+            font-size: 15px !important;
+            letter-spacing: 0em !important;
+            padding: 6px 6px !important;
+            margin: 0 6px !important;
+            color: rgba(255,255,255,0.85) !important;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            position: relative;
+            transition: color 0.25s ease;
+        }
+        /* Hover suave: só muda a cor */
+        .stHorizontalBlock span:hover {
+            color: #ff9e3b !important;
+        }
+        /* Destaque do item ativo - negrito menos forte */
+        .stHorizontalBlock [aria-selected="true"] span {
+            font-weight: 600 !important; /* mudado de 700 para 600 */
+            color: rgba(255,255,255,0.85) !important;
+        }
+        /* Linha animada embaixo do item ativo */
+        .stHorizontalBlock [aria-selected="true"] span::after {
+            content: '';
+            position: absolute;
+            left: 10%;
+            bottom: 0;
+            height: 3px;
+            width: 80%;
+            background-color: #ff9e3b;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            animation: underlineExpand 0.3s forwards;
+        }
         /* Container da navbar */
         .stHorizontalBlock {
             background-color: #1f2937 !important; /* cinza escuro */
@@ -21,50 +61,10 @@ st.markdown(
             align-items: center !important;
             justify-content: left !important;
             user-select: none;
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         }
-        /* Estilo base dos itens da navbar */
-        .stHorizontalBlock span {
-            font-weight: 400 !important;
-            font-size: 14px !important;
-            letter-spacing: 0em !important;
-            padding: 6px 6px !important;
-            margin: 0 6px !important;
-            color: rgba(255,255,255,0.85) !important;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            position: relative;
-            transition: color 0.25s ease;
-        }
-        /* Hover suave: muda a cor para feedback */
-        .stHorizontalBlock span:hover {
-            color: #ff9e3b !important;
-        }
-        /* Item ativo: negrito menos forte */
-        .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 600 !important; /* menos forte que 700 */
-            color: rgba(255,255,255,0.85) !important;
-        }
-        /* Remove underline embaixo do item ativo */
-        .stHorizontalBlock [aria-selected="true"] span::after {
-            content: none;
-        }
-        /* Estilo do logo-texto no início */
-        .custom-logo {
-            font-weight: 700;
-            font-size: 18px;
-            color: white;
-            padding: 0 14px;
-            cursor: pointer;
-            user-select: none;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            height: 44px;
-        }
-        .custom-logo:hover {
-            color: #ff9e3b;
+        @keyframes underlineExpand {
+            from { width: 0; }
+            to { width: 80%; }
         }
     </style>
     """,
@@ -76,13 +76,13 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",
+        "font-size": "15px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "14px",
+        "font-size": "15px",
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
@@ -109,19 +109,7 @@ pages = [
     "Contato",
 ]
 
-# Função para renderizar o logo-texto clicável no topo
-def render_logo():
-    logo_html = """
-    <div class="custom-logo" onclick="window.location.href='?page=RMC Data'">
-        RMC DATA
-    </div>
-    """
-    st.markdown(logo_html, unsafe_allow_html=True)
-
-# Renderiza o logo antes da navbar
-render_logo()
-
-page = st_navbar(pages, styles=styles, options=options)
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
 # Conteúdo por página
 
