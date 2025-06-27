@@ -14,13 +14,14 @@ st.markdown(
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
             font-size: 13px !important;
-            letter-spacing: 0.02em !important;
-            padding: 6px 10px !important;
-            margin: 0 6px !important;
+            letter-spacing: 0.0em !important;  /* Remove espaçamento entre letras */
+            padding: 6px 6px !important;      /* Padding horizontal menor */
+            margin: 0 3px !important;         /* Margem lateral reduzida */
             color: rgba(255,255,255,0.85) !important;
             transition: color 0.2s ease;
             cursor: pointer;
             user-select: none;
+            white-space: nowrap;              /* Evita quebra de linha */
         }
         /* Hover suave: muda só a cor, sem fundo */
         .stHorizontalBlock span:hover {
@@ -59,10 +60,12 @@ styles = {
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 10px",
+        "padding": "6px 6px",
         "font-weight": "400",
         "font-size": "13px",
-        "letter-spacing": "0.02em",
+        "letter-spacing": "0.0em",
+        "margin": "0 3px",
+        "white-space": "nowrap",
     },
     "active": {
         "color": "#ffffff",
