@@ -30,7 +30,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 15px !important;
+            font-size: 14px !important;   /* Fonte reduzida */
             letter-spacing: 0em !important;
             padding: 6px 8px !important;
             margin: 0 6px !important;
@@ -40,6 +40,8 @@ st.markdown(
             white-space: nowrap;
             position: relative;
             transition: color 0.15s ease, background-color 0.15s ease;
+            display: inline-flex !important;
+            align-items: center !important;
         }
         /* Hover suave para itens */
         .stHorizontalBlock span:hover {
@@ -50,18 +52,18 @@ st.markdown(
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: rgba(255,255,255,0.95) !important;
-            background-color: rgba(255, 255, 255, 0.12) !important;
-            border-radius: 6px;
-            padding-left: 12px !important;
-            padding-right: 12px !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;  /* Fundo branco mais sutil */
+            border-radius: 5px;
+            padding-left: 10px !important;   /* Leve redução do padding para ficar mais compacto */
+            padding-right: 10px !important;
         }
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: '';
             position: absolute;
-            left: 10%;
-            bottom: 0;
+            left: 12%;
+            bottom: 2px;
             height: 2px;
-            width: 80%;
+            width: 76%;
             background-color: #ff9e3b;
             border-radius: 3px;
         }
@@ -71,54 +73,48 @@ st.markdown(
         .stHorizontalBlock span:has-text("RMC Data") {
             font-weight: 700 !important;
             color: white !important;
-            padding-left: 12px !important;
-            padding-right: 12px !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
         }
 
-        /* Quando RMC Data estiver selecionado, só adiciona fundo branco sutil e linha */
+        /* Quando RMC Data estiver selecionado, só adiciona fundo branco sutil */
         .stHorizontalBlock [aria-selected="true"] span:has-text("RMC Data") {
             background-color: rgba(255, 255, 255, 0.15) !important;
             color: white !important;
             font-weight: 700 !important;
         }
-        /* Esconder o underline padrão para RMC Data */
+        /* Remover underline para RMC Data */
         .stHorizontalBlock [aria-selected="true"] span:has-text("RMC Data")::after {
             background-color: transparent !important;
         }
 
-        /* Logo cubes.svg inline no menu (com margem direita) */
-        .stHorizontalBlock span:has-text("RMC Data") {
-            display: flex !important;
-            align-items: center;
-        }
-        .stHorizontalBlock span:has-text("RMC Data") img {
-            height: 22px;
-            margin-right: 8px;
+        /* Ajustar tamanho do logo inline SVG e margem para alinhamento */
+        .stHorizontalBlock span:has-text("RMC Data") svg {
+            height: 20px !important;
+            margin-right: 6px !important;
         }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-# Para logo inline SVG no menu
-# Leitura do svg para inserir inline no menu
+# Lê e prepara o SVG para inline no menu
 with open(logo_path, "r", encoding="utf-8") as f:
     svg_logo = f.read()
-# Remover quebras e aspas para inline funcionar dentro do span
-svg_logo_inline = svg_logo.replace('\n', '').replace('"', "'").replace('<svg ', '<svg style="height:22px; margin-right:8px;" ')
+svg_logo_inline = svg_logo.replace('\n', '').replace('"', "'").replace('<svg ', '<svg style="height:20px; margin-right:6px;" ')
 
 styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "15px",
+        "font-size": "14px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 8px",
         "font-weight": "400",
-        "font-size": "15px",
+        "font-size": "14px",
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
@@ -129,10 +125,10 @@ styles = {
     "active": {
         "color": "rgba(255,255,255,0.95)",
         "font-weight": "500",
-        "background-color": "rgba(255,255,255,0.12)",
-        "border-radius": "6px",
-        "padding-left": "12px",
-        "padding-right": "12px",
+        "background-color": "rgba(255,255,255,0.1)",
+        "border-radius": "5px",
+        "padding-left": "10px",
+        "padding-right": "10px",
     },
 }
 
@@ -150,19 +146,9 @@ pages = [
     "População",
 ]
 
-# Substituir o texto RMC Data pelo texto + SVG logo no menu (via hack no nome)
-# A streamlit_navigation_bar não tem API para inserir logo do lado do texto, então vamos substituir o texto "RMC Data" pelo SVG + texto com HTML no CSS
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
-# Como a navbar apenas recebe texto simples, vamos aproveitar um truque: setar o texto do botão como um caractere especial invisível + o texto real que será substituído via CSS
-# Para facilitar, vamos usar um caractere invisível no nome e usar CSS para mostrar o SVG + texto real
-
-# Porém, para simplicidade aqui, vamos usar um patch simples: depois que a navbar renderizar, substituir via JS
-
-# Vamos montar o menu normalmente e injetar um script para substituir o texto do primeiro item ("RMC Data") pelo SVG inline + texto
-
-page = st_navbar(pages, styles=styles, options=options)
-
-# Inject JS para alterar texto do primeiro item da navbar e adicionar SVG
+# Inject JS para substituir o texto do primeiro item da navbar por SVG + texto
 js_code = f"""
 <script>
     const navItems = document.querySelectorAll('.stHorizontalBlock span');
