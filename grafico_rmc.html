@@ -9,8 +9,8 @@
       margin: 0;
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(120deg, #f4f7fa, #e9eef4); /* fundo claro suave */
-      color: #2c3e70; /* texto escuro azul */
+      background: linear-gradient(120deg, #f4f7fa, #e9eef4);
+      color: #2c3e70;
       overflow: hidden;
     }
 
@@ -27,28 +27,28 @@
       display: block;
     }
 
-    /* Barra superior fixa */
+    /* Seletor fixo no canto superior esquerdo */
     #top-bar {
       position: fixed;
       top: 16px;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 10px 18px;
-      background: rgba(255, 255, 255, 0.85); /* branco translúcido */
+      background: rgba(245, 248, 252, 0.9); /* branco suave */
       backdrop-filter: saturate(180%) blur(6px);
       border-radius: 12px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 8px rgba(70, 90, 120, 0.12);
       z-index: 1000;
       white-space: nowrap;
       user-select: none;
-      max-width: 400px;
+      max-width: 350px;
       width: 90vw;
       color: #2c3e70;
       font-weight: 600;
       font-size: 15px;
+      border: 1.2px solid #7a8ba3; /* borda cinza azulado */
     }
 
     #top-bar label {
@@ -58,8 +58,8 @@
     #municipio-select {
       padding: 7px 14px;
       border-radius: 8px;
-      border: 1.5px solid #7a8ba3; /* cinza-azulado suave */
-      background: #f9fafb; /* quase branco */
+      border: 1.5px solid #64748b; /* azul acinzentado */
+      background: #f9fafb;
       color: #2c3e70;
       min-width: 200px;
       font-size: 15px;
@@ -68,7 +68,7 @@
     }
 
     #municipio-select:hover, #municipio-select:focus {
-      border-color: #4c6ef5; /* azul mais vivo suave */
+      border-color: #475569; /* azul acinzentado mais escuro */
       outline: none;
       background: #ffffff;
       color: #1e293b;
@@ -76,22 +76,23 @@
 
     /* Áreas do mapa */
     .area {
-      fill: rgba(44, 62, 112, 0.1); /* azul escuro bem clarinho */
-      stroke: rgba(44, 62, 112, 0.3); /* contorno azul claro e ultrafino */
+      fill: rgba(44, 62, 112, 0.1);
+      stroke: rgba(100, 115, 140, 0.35); /* contorno azul acinzentado */
       stroke-width: 0.8;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .area:hover {
-      fill: rgba(44, 62, 112, 0.2);
-      stroke-width: 1.2;
+      fill: rgba(44, 62, 112, 0.22);
+      stroke-width: 1.1;
+      stroke: rgba(70, 90, 120, 0.6);
     }
 
     .area.selected {
-      fill: rgba(44, 62, 112, 0.35);
-      stroke: rgba(44, 62, 112, 0.6);
-      stroke-width: 1.5;
+      fill: rgba(44, 62, 112, 0.38);
+      stroke: rgba(55, 75, 105, 0.75);
+      stroke-width: 1.4;
     }
 
     /* Tooltip */
@@ -111,25 +112,25 @@
       box-shadow: 0 0 8px rgba(44,62,112,0.5);
     }
 
-    /* Caixa flutuante informações - esquerda */
+    /* Caixa flutuante informações - lado direito fixo */
     #floatingInfo {
       position: fixed;
       top: 70px;
-      left: 20px;
-      width: 300px;
+      right: 20px;
+      width: 320px;
       max-height: calc(100vh - 90px);
-      background: rgba(255,255,255,0.95);
+      background: rgba(245, 248, 252, 0.95);
       backdrop-filter: saturate(180%) blur(8px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 20px rgba(70, 90, 120, 0.15);
       border-radius: 14px;
-      padding: 22px 18px;
+      padding: 24px 20px;
       font-size: 14px;
       color: #2c3e70;
       overflow-y: auto;
       z-index: 1100;
 
       opacity: 0;
-      transform: translateX(-15px);
+      transform: translateX(15px);
       pointer-events: none;
       transition: opacity 0.3s ease, transform 0.3s ease;
       user-select: text;
@@ -158,7 +159,7 @@
 
     .label {
       font-weight: 600;
-      color: #4b5563;
+      color: #475569;
       user-select: text;
     }
 
@@ -171,7 +172,7 @@
     .fonte {
       font-size: 11px;
       margin-top: 18px;
-      color: #6b7280;
+      color: #64748b;
       text-align: center;
       font-style: italic;
       user-select: none;
@@ -181,28 +182,28 @@
       position: absolute;
       top: 14px;
       right: 14px;
-      background: rgba(44,62,112,0.1);
+      background: rgba(70, 90, 120, 0.15);
       border: none;
       border-radius: 50%;
-      width: 26px;
-      height: 26px;
+      width: 28px;
+      height: 28px;
       cursor: pointer;
       font-size: 16px;
       font-weight: bold;
-      color: #374151;
+      color: #2c3e70;
       transition: background-color 0.25s ease;
       user-select: none;
     }
 
     #closeFloatingBtn:hover {
-      background: rgba(44,62,112,0.3);
-      color: #111827;
+      background: rgba(70, 90, 120, 0.35);
+      color: #1e293b;
     }
   </style>
 </head>
 <body>
 
-  <div id="map">
+  <div id="map" role="main">
     <div id="top-bar" role="region" aria-label="Seleção de município">
       <label for="municipio-select">Selecione um município ou clique no mapa:</label>
       <select id="municipio-select" aria-describedby="top-bar">
