@@ -87,7 +87,7 @@ options = {
 }
 
 pages = [
-    "RMC DATA",
+    "RMC Data",
     "Economia",
     "Finanças Públicas",
     "Segurança",
@@ -103,7 +103,7 @@ if clicked_page and clicked_page != st.session_state.page:
 
 page = st.session_state.page
 
-if page == "RMC DATA":
+if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
     st.markdown(
