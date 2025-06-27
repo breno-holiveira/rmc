@@ -5,7 +5,15 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg na pasta raiz
+# Configurar layout wide para ocupar toda a largura
+st.set_page_config(
+    page_title="RMC Data",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    page_icon="📊"
+)
+
+# Caminho para o logo cubes.svg na pasta raiz (se não usar, pode remover essa variável)
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
 # Importar fonte Inter para suavidade e legibilidade
@@ -17,7 +25,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 15px !important;
+            font-size: 14px !important;  /* diminuiu de 15px para 14px */
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -62,6 +70,20 @@ st.markdown(
             justify-content: left !important;
             user-select: none;
         }
+        /* Forçar body e main ocupando largura total */
+        .css-18e3th9 {  /* main container padrão do Streamlit */
+            max-width: 100% !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+        /* Ajustar container principal para ocupar largura toda */
+        .css-1d391kg {  /* container do corpo da página */
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            max-width: 100% !important;
+        }
         @keyframes underlineExpand {
             from { width: 0; }
             to { width: 80%; }
@@ -76,13 +98,13 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "15px",
+        "font-size": "14px",  # diminuiu de 15px para 14px
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "15px",
+        "font-size": "14px",  # diminuiu de 15px para 14px
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
@@ -101,11 +123,12 @@ options = {
 
 pages = [
     "RMC Data",
-    "Sobre",
     "Economia",
     "Finanças Públicas",
     "Segurança",
-    "População",
+    "Arquivos",
+    "Sobre",
+    "Contato",
 ]
 
 page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
@@ -148,13 +171,9 @@ if page == "RMC Data":
     html_code = html_template.replace("const geo = __GEOJSON_PLACEHOLDER__;", f"const geo = {geojson_js};")
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif page == "Sobre":
-    st.title("Sobre")
-    st.write("Informações institucionais e gerais sobre o projeto.")
-
 elif page == "Economia":
     st.title("Economia")
-    st.write("Conteúdo relacionado à economia da RMC.")
+    st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
 
 elif page == "Finanças Públicas":
     st.title("Finanças Públicas")
@@ -164,6 +183,14 @@ elif page == "Segurança":
     st.title("Segurança")
     st.write("Dados e análises sobre segurança.")
 
-elif page == "População":
-    st.title("População")
-    st.write("Indicadores populacionais da Região Metropolitana de Campinas.")
+elif page == "Arquivos":
+    st.title("Arquivos")
+    st.write("Documentos e arquivos relacionados ao projeto.")
+
+elif page == "Sobre":
+    st.title("Sobre")
+    st.write("Informações institucionais e gerais sobre o projeto.")
+
+elif page == "Contato":
+    st.title("Contato")
+    st.write("Informações para contato e comunicação.")
