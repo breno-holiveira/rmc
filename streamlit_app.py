@@ -94,7 +94,7 @@ options = {
 }
 
 pages = [
-    "RMC Data",
+    "📊 RMC Data",
     "Sobre",
     "Economia",
     "Finanças Públicas",
