@@ -84,7 +84,7 @@ styles = {
 
 options = {
     "show_menu": False,
-    "show_sidebar": True,
+    "show_sidebar": False,
 }
 
 # Menu sem os sub-itens "Example 1", "Example 2", "Example 3"
