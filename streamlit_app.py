@@ -1,37 +1,57 @@
+import os
+
 import streamlit as st
 from streamlit_navigation_bar import st_navbar
 
-st.set_page_config(page_title='RMC Data',
-                   initial_sidebar_state='collapsed',
-                   page_icon='📈',
-                   layout='wide')
+import pages as pg
 
-pages = ['Início', 'Sobre', 'Economia', 'Finanças Públicas', 'Segurança']
+
+st.set_page_config(initial_sidebar_state="collapsed")
+
+pages = ["Install", "User Guide", "API", "Examples", "Community", "GitHub"]
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(parent_dir, "cubes.svg")
+urls = {"GitHub": "https://github.com/gabrieltempass/streamlit-navigation-bar"}
 styles = {
     "nav": {
-        "background-color": "#0B1D3A",
+        "background-color": "royalblue",
+        "justify-content": "left",
     },
-    "div": {
-        "max-width": "32rem",
+    "img": {
+        "padding-right": "14px",
     },
     "span": {
-        "border-radius": "0.5rem",
-        "color": "#E0E6F0",
-        "margin": "0 0.125rem",
-        "padding": "0.4375rem 0.625rem",
+        "color": "white",
+        "padding": "14px",
     },
     "active": {
-        "background-color": "#2E4A7D",
-        "color": "#FFFFFF",
-    },
-    "hover": {
-        "background-color": "#1F355A",
-        "color": "#FFFFFF",
-    },
+        "background-color": "white",
+        "color": "var(--text-color)",
+        "font-weight": "normal",
+        "padding": "14px",
+    }
+}
+options = {
+    "show_menu": False,
+    "show_sidebar": False,
 }
 
-page = st_navbar(pages, styles=styles)
-st.write(page)
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    urls=urls,
+    styles=styles,
+    options=options,
+)
 
-with st.sidebar:
-    st.write("Sidebar")
+functions = {
+    "Home": pg.show_home,
+    "Install": pg.show_install,
+    "User Guide": pg.show_user_guide,
+    "API": pg.show_api,
+    "Examples": pg.show_examples,
+    "Community": pg.show_community,
+}
+go_to = functions.get(page)
+if go_to:
+    go_to()
