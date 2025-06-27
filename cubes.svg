@@ -1,16 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="220" height="48" viewBox="0 0 220 48" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="48" viewBox="0 0 200 48" fill="none">
   <!-- Fundo transparente -->
 
-  <!-- Barras com cantos arredondados -->
-  <rect x="14" y="24" width="8" height="14" fill="#FFFFFF" rx="3"></rect>
-  <rect x="30" y="18" width="8" height="20" fill="#FFFFFF" rx="3"></rect>
-  <rect x="46" y="12" width="8" height="26" fill="#FFFFFF" rx="3"></rect>
+  <!-- Ícone gráfico de barras minimalista -->
+  <rect x="14" y="22" width="7" height="14" fill="#FFFFFF" rx="2"></rect>
+  <rect x="29" y="17" width="7" height="19" fill="#FFFFFF" rx="2"></rect>
+  <rect x="44" y="10" width="7" height="26" fill="#FFFFFF" rx="2"></rect>
 
-  <!-- Curva crescente conectando os topos -->
-  <path d="M18 24 Q38 10 54 12" stroke="#D87F3A" stroke-width="4" fill="none" stroke-linejoin="round" stroke-linecap="round"></path>
+  <!-- Linha conectando os topos das barras com stroke mais fino -->
+  <polyline points="17,22 32,17 47,10" stroke="#7FB3FF" stroke-width="1.5" fill="none" stroke-linejoin="round"></polyline>
 
-  <!-- Texto destacado -->
-  <text x="70" y="36" fill="#FFFFFF" font-family="'Segoe UI', sans-serif" font-size="26" font-weight="900" letter-spacing="0.01em" style="text-transform: uppercase;">
+  <!-- Texto moderno e profissional -->
+  <text x="65" y="34" fill="#FFFFFF" font-family="'Montserrat', sans-serif" font-size="20" font-weight="700" letter-spacing="0.06em" style="text-transform: uppercase;">
     RMC DATA
   </text>
 </svg>
