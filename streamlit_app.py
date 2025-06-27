@@ -4,49 +4,59 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Importa a fonte Inter via Google Fonts
+# Injeta CSS poderoso para reduzir espaçamento na navbar do st_navbar
 st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
-
 <style>
-/* Ajusta o container da navbar */
-.stHorizontalBlock {
+/* Container da navbar */
+[data-testid="stHorizontalBlock"] > div:first-child {
     background-color: #1f2937 !important;
     padding: 0 !important;
-    height: 40px !important;
+    height: 38px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: left !important;
 }
 
-/* Estiliza os itens: span dentro da navbar */
-.stHorizontalBlock span {
+/* Itens da navbar: botões e tabs */
+[data-testid="stHorizontalBlock"] button,
+[data-testid="stHorizontalBlock"] div[role="tab"] {
     font-family: 'Inter', sans-serif !important;
     font-weight: 400 !important;
     font-size: 13px !important;
     color: rgba(255,255,255,0.85) !important;
-    padding: 6px 6px !important; /* padding horizontal reduzido */
-    margin: 0 2px !important;   /* margem lateral reduzida para compactar espaçamento */
+    padding: 4px 6px !important;       /* padding menor */
+    margin: 0 4px !important;          /* margem lateral reduzida */
+    border-radius: 0 !important;       /* borda reta */
+    background-color: transparent !important;
+    border: none !important;
+    transition: color 0.2s ease, background-color 0.2s ease;
     cursor: pointer;
-    user-select: none;
     white-space: nowrap;
-    transition: color 0.2s ease;
 }
 
-/* Hover nos itens */
-.stHorizontalBlock span:hover {
+/* Hover suave */
+[data-testid="stHorizontalBlock"] button:hover,
+[data-testid="stHorizontalBlock"] div[role="tab"]:hover {
     color: #ffa366 !important;
+    background-color: transparent !important;
 }
 
-/* Item ativo - borda inferior simples e texto destacado */
-.stHorizontalBlock [aria-selected="true"] span {
-    font-weight: 500 !important;
+/* Item ativo: borda inferior fina */
+[data-testid="stHorizontalBlock"] button[aria-selected="true"],
+[data-testid="stHorizontalBlock"] div[role="tab"][aria-selected="true"] {
     color: #ffffff !important;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.4) !important;
-    padding-bottom: 4px !important;
+    font-weight: 500 !important;
     background-color: transparent !important;
     box-shadow: none !important;
-    border-radius: 0 !important;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.4) !important;
+    padding-bottom: 4px !important;
+    margin-bottom: 0 !important;
+}
+
+/* Remove outline ao focar */
+[data-testid="stHorizontalBlock"] button:focus,
+[data-testid="stHorizontalBlock"] div[role="tab"]:focus {
+    outline: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -55,13 +65,14 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
+        # fonte e tamanho já ajustados via CSS injetado
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 6px",
+        "padding": "4px 6px",
         "font-weight": "400",
         "font-size": "13px",
-        "margin": "0 2px",
+        "margin": "0 4px",
     },
     "active": {
         "color": "#ffffff",
