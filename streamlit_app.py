@@ -5,39 +5,28 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo cubes.svg (deve estar na raiz do projeto)
-logo_path = os.path.join(os.getcwd(), "cubes.svg")
-
-# Fonte moderna e compacta (DM Sans)
+# ======== CONFIGURAÇÃO DA FONTE E CSS ========
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Fonte geral da navbar */
         .stHorizontalBlock span {
-            font-family: 'DM Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-family: 'DM Sans', sans-serif !important;
             font-weight: 400 !important;
             font-size: 14.5px !important;
-            letter-spacing: 0em !important;
-            padding: 6px 6px !important;
-            margin: 0 6px !important;
             color: rgba(255,255,255,0.85) !important;
-            cursor: pointer;
-            user-select: none;
+            margin: 0 6px !important;
             white-space: nowrap;
             position: relative;
             transition: color 0.25s ease;
         }
-        /* Hover */
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Item ativo */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
             color: #ff9e3b !important;
         }
-        /* Linha animada */
         .stHorizontalBlock [aria-selected="true"] span::after {
             content: '';
             position: absolute;
@@ -47,19 +36,14 @@ st.markdown(
             width: 80%;
             background-color: #ff9e3b;
             border-radius: 4px;
-            transition: width 0.3s ease;
             animation: underlineExpand 0.3s forwards;
         }
-        /* Container da navbar */
         .stHorizontalBlock {
             background-color: #1f2937 !important;
-            padding: 0 !important;
             height: 44px !important;
-            border-radius: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: left !important;
-            user-select: none;
         }
         @keyframes underlineExpand {
             from { width: 0; }
@@ -70,22 +54,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Definições da navbar
+# ======== DEFINIÇÃO DOS PARÂMETROS ========
 styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'DM Sans', 'Segoe UI', sans-serif",
+        "font-family": "'DM Sans', sans-serif",
         "font-size": "14.5px",
+    },
+    "logo": {
+        "padding-right": "16px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
-        "padding": "6px 6px",
         "font-weight": "400",
         "font-size": "14.5px",
-        "margin": "0 6px",
-        "white-space": "nowrap",
-        "position": "relative",
     },
     "active": {
         "color": "#ff9e3b",
@@ -98,6 +81,9 @@ options = {
     "show_sidebar": False,
 }
 
+# Substituindo o logo por texto clicável
+logo_html = '<a href="/?page=RMC%20Data" style="text-decoration: none; font-family: DM Sans, sans-serif; font-weight: 600; font-size: 15px; color: white;">RMC DATA</a>'
+
 pages = [
     "RMC Data",
     "Economia",
@@ -108,20 +94,15 @@ pages = [
     "Contato",
 ]
 
-# Função para reiniciar na página RMC Data
-def go_home():
-    st.experimental_set_query_params(page="RMC Data")
-
-# Barra de navegação
+# ========== NAVEGAÇÃO ==========
 page = st_navbar(
     pages,
-    logo_path=logo_path,
+    logo_path=logo_html,
     styles=styles,
-    options=options,
-    on_logo_click=go_home,  # Clique no logo leva à página inicial
+    options=options
 )
 
-# ------------------ CONTEÚDO DE CADA PÁGINA ------------------
+# ========== CONTEÚDO DE CADA PÁGINA ==========
 
 if page == "RMC Data":
     st.title("RMC Data 📊")
@@ -134,7 +115,6 @@ if page == "RMC Data":
         "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
     )
 
-    # Carregamento de dados
     gdf = gpd.read_file("./shapefile_rmc/RMC_municipios.shp")
     if gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
