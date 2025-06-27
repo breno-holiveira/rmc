@@ -7,7 +7,7 @@ st.set_page_config(
     layout='wide'
 )
 
-# CSS e HTML personalizado simplificado
+# CSS e HTML personalizado
 nav_html = """
 <style>
     /* Estilos básicos */
