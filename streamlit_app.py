@@ -5,17 +5,18 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Caminho para o logo
-logo_path = os.path.join(os.getcwd(), "cubes.svg")  # Pode substituir por imagem de texto se quiser
+# Caminho para o logo (cubes.svg)
+logo_path = os.path.join(os.getcwd(), "cubes.svg")
 
-# CSS personalizado da navbar (fonte moderna, espaçamento equilibrado, estilo refinado)
+# Fonte moderna e equilibrada
 st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500&display=swap" rel="stylesheet">
 <style>
 .stHorizontalBlock span {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    font-family: 'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     font-weight: 400 !important;
     font-size: 15px !important;
-    letter-spacing: 0.02em !important;
+    letter-spacing: 0.01em !important;
     padding: 6px 8px !important;
     margin: 0 6px !important;
     color: rgba(255,255,255,0.85) !important;
@@ -47,21 +48,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Estilo do componente
+# Estilo da navbar
 styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-family": "'Manrope', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
         "font-size": "15px",
-        "letter-spacing": "0.02em",
+        "letter-spacing": "0.01em",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 8px",
         "font-weight": "400",
         "font-size": "15px",
-        "letter-spacing": "0.02em",
+        "letter-spacing": "0.01em",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
@@ -72,13 +73,11 @@ styles = {
     },
 }
 
-# Opções gerais da barra
 options = {
     "show_menu": False,
     "show_sidebar": False,
 }
 
-# Lista de páginas
 pages = [
     "RMC Data",
     "Economia",
@@ -89,16 +88,9 @@ pages = [
     "Contato",
 ]
 
-# Define a página padrão como "RMC Data"
-page = st_navbar(
-    pages,
-    logo_path=logo_path,
-    styles=styles,
-    options=options,
-    default="RMC Data"
-)
+page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options, default="RMC Data")
 
-# Conteúdo por página
+# Conteúdo das páginas
 if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
