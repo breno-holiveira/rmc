@@ -5,6 +5,10 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
+# Forçar página inicial em "RMC Data"
+if "page" not in st.session_state:
+    st.session_state.page = "RMC Data"
+
 # Configurar layout wide para ocupar toda a largura
 st.set_page_config(
     page_title="RMC Data",
@@ -25,7 +29,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14px !important;  /* diminuiu de 15px para 14px */
+            font-size: 14px !important;  /* fonte levemente menor */
             letter-spacing: 0em !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -40,23 +44,14 @@ st.markdown(
         .stHorizontalBlock span:hover {
             color: #ff9e3b !important;
         }
-        /* Destaque do item ativo */
+        /* Destaque do item ativo: só negrito leve, mesma cor */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
-            color: #ff9e3b !important;
+            color: rgba(255,255,255,0.85) !important;
         }
-        /* Linha animada embaixo do item ativo */
+        /* Removendo a linha embaixo do item ativo */
         .stHorizontalBlock [aria-selected="true"] span::after {
-            content: '';
-            position: absolute;
-            left: 10%;
-            bottom: 0;
-            height: 3px;
-            width: 80%;
-            background-color: #ff9e3b;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-            animation: underlineExpand 0.3s forwards;
+            content: none !important;
         }
         /* Container da navbar */
         .stHorizontalBlock {
@@ -84,10 +79,6 @@ st.markdown(
             margin-right: 0 !important;
             max-width: 100% !important;
         }
-        @keyframes underlineExpand {
-            from { width: 0; }
-            to { width: 80%; }
-        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -98,27 +89,29 @@ styles = {
         "background-color": "#1f2937",
         "justify-content": "left",
         "font-family": "'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-        "font-size": "14px",  # diminuiu de 15px para 14px
+        "font-size": "14px",
     },
     "span": {
         "color": "rgba(255,255,255,0.85)",
         "padding": "6px 6px",
         "font-weight": "400",
-        "font-size": "14px",  # diminuiu de 15px para 14px
+        "font-size": "14px",
         "letter-spacing": "0em",
         "margin": "0 6px",
         "white-space": "nowrap",
         "position": "relative",
     },
     "active": {
-        "color": "#ff9e3b",
-        "font-weight": "500",
+        "color": "rgba(255,255,255,0.85)",  # mesma cor do texto normal
+        "font-weight": "500",  # negrito leve
     },
 }
 
 options = {
     "show_menu": False,
     "show_sidebar": False,
+    "default_page": st.session_state.page,  # define página inicial
+    "logo_href": "#",  # link do logo que vamos tratar abaixo
 }
 
 pages = [
@@ -131,9 +124,17 @@ pages = [
     "Contato",
 ]
 
+# Inicializa a navbar e captura a página selecionada
 page = st_navbar(pages, logo_path=logo_path, styles=styles, options=options)
 
-# Conteúdo por página
+# Se clicar no logo (cubo), vai pra "RMC Data"
+if st.experimental_get_query_params().get("page", [None])[0] != page:
+    # Atualiza a query string para a página selecionada
+    st.experimental_set_query_params(page=page)
+
+# Forçar página inicial ao abrir app
+if page != st.session_state.page:
+    st.session_state.page = page
 
 if page == "RMC Data":
     st.title("RMC Data 📊")
