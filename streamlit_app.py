@@ -2,18 +2,19 @@ import streamlit as st
 from streamlit_navigation_bar import st_navbar
 
 st.set_page_config(
-    page_title="Exemplo com Navbar Verde",
+    page_title="RMC Data",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
+    page_icon="📊",
 )
 
-# Lista de páginas
-pages = ["Home", "Library", "Tutorials", "Development", "Download"]
+# Páginas da navbar
+pages = ["RMC Data", "Economia", "Finanças Públicas", "Segurança", "Arquivos", "Sobre", "Contato"]
 
-# Estilo verde claro
+# Estilos EXATAMENTE iguais ao seu exemplo, só trocando o fundo por azul escuro
 styles = {
     "nav": {
-        "background-color": "rgb(123, 209, 146)",
+        "background-color": "#1f2937",
     },
     "div": {
         "max-width": "32rem",
@@ -32,30 +33,45 @@ styles = {
     },
 }
 
-# Mostra a navbar e guarda a aba atual
+# Renderiza a navbar
 page = st_navbar(pages, styles=styles)
 
-# Conteúdo por página
-if page == "Home":
-    st.title("Home")
-    st.write("Bem-vindo à página inicial.")
+# Conteúdo para cada aba
+if page == "RMC Data":
+    st.title("RMC Data 📊")
+    st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
+    st.markdown(
+        "A Região Metropolitana de Campinas foi criada em 2000, através da Lei Complementar nº 870, do estado de São Paulo e é constituída por 20 municípios. "
+        "Em 2021, a RMC apresentou um PIB de 266,8 bilhões de reais, o equivalente a 3,07% do Produto Interno Bruto brasileiro no mesmo ano."
+    )
+    st.markdown(
+        "Em 2020, o Instituto Brasileiro de Geografia e Estatística (IBGE) classificou a cidade de Campinas como uma das 15 metrópoles brasileiras."
+    )
 
-elif page == "Library":
-    st.title("Library")
-    st.write("Catálogo e repositórios de dados.")
+elif page == "Economia":
+    st.title("Economia")
+    st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
 
-elif page == "Tutorials":
-    st.title("Tutorials")
-    st.write("Guias de uso e demonstrações práticas.")
+elif page == "Finanças Públicas":
+    st.title("Finanças Públicas")
+    st.write("Informações sobre finanças públicas da região.")
 
-elif page == "Development":
-    st.title("Development")
-    st.write("Notas sobre desenvolvimento e roadmap.")
+elif page == "Segurança":
+    st.title("Segurança")
+    st.write("Dados e análises sobre segurança.")
 
-elif page == "Download":
-    st.title("Download")
-    st.write("Arquivos disponíveis para baixar.")
+elif page == "Arquivos":
+    st.title("Arquivos")
+    st.write("Documentos e arquivos relacionados ao projeto.")
 
-# Sidebar opcional
+elif page == "Sobre":
+    st.title("Sobre")
+    st.write("Informações institucionais e gerais sobre o projeto.")
+
+elif page == "Contato":
+    st.title("Contato")
+    st.write("Informações para contato e comunicação.")
+
+# Exemplo de conteúdo na barra lateral (opcional)
 with st.sidebar:
     st.write("Sidebar")
