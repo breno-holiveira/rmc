@@ -4,40 +4,38 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Import Google Fonts Inter para garantir a fonte suave
+# Importar fonte Inter via Google Fonts
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* Aplicar Inter na navbar */
+        /* Fonte e estilo base dos itens da navbar */
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
             font-size: 14px !important;
             letter-spacing: 0.04em !important;
-        }
-        /* Estilo para item ativo */
-        .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 600 !important;
-            background-color: rgba(255,255,255,0.1) !important;
-            border-radius: 2px !important;
             padding: 6px 16px !important;
-            color: #fff !important;
-            border: 1px solid rgba(255,255,255,0.2) !important;
-        }
-        /* Espaçamento uniforme para todos os itens */
-        .stHorizontalBlock span {
-            padding: 6px 16px !important;
-            margin: 0 6px !important;
+            margin: 0 8px !important;
             color: rgba(255,255,255,0.85) !important;
-            transition: color 0.3s ease;
+            transition: color 0.3s ease, border-bottom 0.3s ease;
+            cursor: pointer;
         }
         /* Hover suave */
         .stHorizontalBlock span:hover {
             color: #ff7f50 !important;
-            cursor: pointer;
         }
-        /* Navbar background */
+        /* Destaque do item ativo: só underline branco translúcido */
+        .stHorizontalBlock [aria-selected="true"] span {
+            font-weight: 600 !important;
+            color: #ffffff !important;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.6) !important;
+            padding-bottom: 4px !important;
+            background-color: transparent !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        /* Container da navbar */
         .stHorizontalBlock {
             background-color: #1f2937 !important;  /* cinza escuro */
             padding: 0 !important;
@@ -53,9 +51,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Styles permitidos pela lib (mais simples, só o básico)
 styles = {
     "nav": {
-        "background-color": "#1f2937",  # Cinza escuro (funcional, mas o css acima faz o principal)
+        "background-color": "#1f2937",
         "justify-content": "left",
     },
     "span": {
@@ -64,12 +63,9 @@ styles = {
         "font-weight": "400",
     },
     "active": {
-        "background-color": "rgba(255,255,255,0.1)",
         "color": "#ffffff",
         "font-weight": "600",
-        "padding": "6px 16px",
-        "border-radius": "2px",
-        "border": "1px solid rgba(255,255,255,0.2)",
+        # Sem fundo, borda ou sombra no styles para não conflitar com o CSS
     }
 }
 
@@ -79,7 +75,6 @@ options = {
 }
 
 pages = ["Inicio", "Documentation", "Examples", "Community", "About"]
-
 page = st_navbar(pages, styles=styles, options=options)
 
 if page == "Inicio":
