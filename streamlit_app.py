@@ -30,7 +30,7 @@ st.markdown(
         .stHorizontalBlock span {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
             font-weight: 400 !important;
-            font-size: 14px !important;   /* Fonte reduzida */
+            font-size: 14px !important;
             letter-spacing: 0em !important;
             padding: 6px 8px !important;
             margin: 0 6px !important;
@@ -45,27 +45,21 @@ st.markdown(
         }
         /* Hover suave para itens */
         .stHorizontalBlock span:hover {
-            color: #ff9e3b !important;
+            color: #7dd3fc !important;  /* Azul claro ao passar o mouse */
         }
 
-        /* Destaque do item ativo: fundo branco sutil e linha laranja */
+        /* Destaque do item ativo: fundo colorido moderno */
         .stHorizontalBlock [aria-selected="true"] span {
             font-weight: 500 !important;
-            color: rgba(255,255,255,0.95) !important;
-            background-color: rgba(255, 255, 255, 0.1) !important;  /* Fundo branco mais sutil */
+            color: white !important;
+            background-color: #2563eb !important; /* Azul sutil moderno */
             border-radius: 5px;
-            padding-left: 10px !important;   /* Leve redução do padding para ficar mais compacto */
+            padding-left: 10px !important;
             padding-right: 10px !important;
         }
+        /* Remover linha de underline */
         .stHorizontalBlock [aria-selected="true"] span::after {
-            content: '';
-            position: absolute;
-            left: 12%;
-            bottom: 2px;
-            height: 2px;
-            width: 76%;
-            background-color: #ff9e3b;
-            border-radius: 3px;
+            content: none !important;
         }
 
         /* Estilo fixo para RMC Data: negrito e sempre cor branca */
@@ -77,15 +71,11 @@ st.markdown(
             padding-right: 10px !important;
         }
 
-        /* Quando RMC Data estiver selecionado, só adiciona fundo branco sutil */
+        /* Quando RMC Data estiver selecionado, só adiciona fundo mais escuro */
         .stHorizontalBlock [aria-selected="true"] span:has-text("RMC Data") {
-            background-color: rgba(255, 255, 255, 0.15) !important;
+            background-color: #1e40af !important; /* Azul mais escuro */
             color: white !important;
             font-weight: 700 !important;
-        }
-        /* Remover underline para RMC Data */
-        .stHorizontalBlock [aria-selected="true"] span:has-text("RMC Data")::after {
-            background-color: transparent !important;
         }
 
         /* Ajustar tamanho do logo inline SVG e margem para alinhamento */
@@ -123,9 +113,9 @@ styles = {
         "align-items": "center",
     },
     "active": {
-        "color": "rgba(255,255,255,0.95)",
+        "color": "white",
         "font-weight": "500",
-        "background-color": "rgba(255,255,255,0.1)",
+        "background-color": "#2563eb",
         "border-radius": "5px",
         "padding-left": "10px",
         "padding-right": "10px",
