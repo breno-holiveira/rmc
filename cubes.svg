@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="80" viewBox="0 0 240 60" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="72" viewBox="0 0 240 60" fill="none">
   <defs>
     <!-- Gradientes suaves nas barras -->
     <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#DDE3ED"/>
+      <stop offset="0%" stop-color="#E0E6F0"/>
       <stop offset="100%" stop-color="#A9B8C9"/>
     </linearGradient>
     <linearGradient id="bar2" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#BFD6F2"/>
-      <stop offset="100%" stop-color="#6FA8E8"/>
+      <stop offset="100%" stop-color="#7FB3FF"/>
     </linearGradient>
     <linearGradient id="bar3" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#96B3D5"/>
@@ -16,8 +16,8 @@
 
     <!-- Gradiente do texto -->
     <linearGradient id="textGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#E2E8F0"/>
-      <stop offset="100%" stop-color="#BCC8D6"/>
+      <stop offset="0%" stop-color="#E0E6F0"/>
+      <stop offset="100%" stop-color="#C4CCD6"/>
     </linearGradient>
 
     <!-- Sombra leve -->
@@ -27,12 +27,12 @@
   </defs>
 
   <!-- Gráfico de barras -->
-  <rect x="20" y="28" width="8" height="20" rx="2" fill="url(#bar1)" filter="url(#sombra)"/>
-  <rect x="36" y="20" width="8" height="28" rx="2" fill="url(#bar2)" filter="url(#sombra)"/>
-  <rect x="52" y="10" width="8" height="38" rx="2" fill="url(#bar3)" filter="url(#sombra)"/>
+  <rect x="20" y="28" width="8" height="20" rx="2" fill="url(#bar1)" filter="url(#sombra)" />
+  <rect x="36" y="20" width="8" height="28" rx="2" fill="url(#bar2)" filter="url(#sombra)" />
+  <rect x="52" y="10" width="8" height="38" rx="2" fill="url(#bar3)" filter="url(#sombra)" />
 
-  <!-- Texto RMC DATA -->
-  <text x="80" y="42" fill="url(#textGrad)" font-family="'Poppins', sans-serif" font-size="24" font-weight="600" letter-spacing="0.09em" style="text-transform: uppercase;">
+  <!-- Texto com gradiente -->
+  <text x="80" y="42" fill="url(#textGrad)" font-family="'Poppins', sans-serif" font-size="26" font-weight="700" letter-spacing="0.09em" style="text-transform: uppercase;">
     RMC DATA
   </text>
 </svg>
