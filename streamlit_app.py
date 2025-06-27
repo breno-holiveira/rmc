@@ -15,13 +15,12 @@ st.set_page_config(
     page_icon="📊",
 )
 
-# Remove importação do Inter, pois não vamos usar mais
-# Estilo CSS do navbar atualizado para usar Segoe UI e sem Inter
+# CSS da navbar com Arial Narrow
 st.markdown(
     """
     <style>
         .stHorizontalBlock span {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+            font-family: 'Arial Narrow', Arial, sans-serif !important;
             font-weight: 400 !important;
             font-size: 14.5px !important;
             padding: 6px 6px !important;
@@ -63,7 +62,7 @@ styles = {
     "nav": {
         "background-color": "#1f2937",
         "justify-content": "left",
-        "font-family": "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+        "font-family": "'Arial Narrow', Arial, sans-serif",
         "font-size": "14.5px",
     },
     "span": {
