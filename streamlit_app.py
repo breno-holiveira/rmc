@@ -22,7 +22,7 @@ st.markdown(
     <style>
         .stHorizontalBlock span {
             font-family: 'DM Sans', sans-serif !important;
-            font-weight: 400 !important;
+            font-weight:  !important;
             font-size: 15px !important;
             padding: 6px 6px !important;
             margin: 0 6px !important;
@@ -37,7 +37,7 @@ st.markdown(
             color: #ff9e3b !important;
         }
         .stHorizontalBlock [aria-selected="true"] span {
-            font-weight: 400 !important;
+            font-weight: 300 !important;
             color: #f4a259 !important; /* tom suave, sem negrito */
         }
         .stHorizontalBlock [aria-selected="true"] span::after {
