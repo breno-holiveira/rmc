@@ -2,9 +2,20 @@ import streamlit as st
 
 def show_home():
     st.markdown('# RMC Data')
-    O RMC Data é um site criado com o intuito de divulgar dados e indicadores dos municípios da Região Metropolitana de Campinas, com
-    confiabilidade e qualidade. Apesar do notável avanço da disponibilização de informações nos últimos anos, o acesso a dados de nível 
-    regional e municipal ainda carecem de ampla divulgação e qualidade. 
+    
+    st.markdown("""
+    Apesar dos avanços na disponibilização de dados públicos nos últimos anos, ainda há carência de divulgação acessível 
+    e qualificada de informações em nível regional e municipal. 
+    
+    O **RMC Data** foi desenvolvido com o objetivo de reunir, elaborar e divulgar indicadores econômicos e sociais dos municípios 
+    da Região Metropolitana de Campinas (RMC), prezando pela confiabilidade e qualidade das informações.
+    
+    Este site foi criado por **Breno Oliveira** e **Bianca Lopes**, utilizando Python e Streamlit. Em caso de dúvidas ou sugestões, 
+    entre em contato pelos canais disponíveis na aba **Contatos**.
+    
+    O conteúdo do site pode ser reproduzido parcial ou integralmente, sem a necessidade de comunicação prévia ou a citação de fontes. 
+    Todos os dados utilizados estão disponíveis para acesso e clonagem na aba **GitHub**.
+    """)
         
     st.markdown
     
