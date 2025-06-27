@@ -36,7 +36,7 @@ styles = {
     }
 }
 options = {
-    "show_menu": True,
+    "show_menu": False,
     "show_sidebar": False,
 }
 
