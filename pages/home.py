@@ -2,6 +2,13 @@ import streamlit as st
 
 def show_home():
     st.markdown('# RMC Data')
+    O RMC Data é um site criado com o intuito de divulgar dados e indicadores dos municípios da Região Metropolitana de Campinas, com
+    confiabilidade e qualidade. Apesar do notável avanço da disponibilização de informações nos últimos anos, o acesso a dados de nível 
+    regional e municipal ainda carecem de ampla divulgação e qualidade. 
+        
+    st.markdown
+    
+    st.markdown('# RMC Data')
     st.markdown(
         """
         A Região Metropolitana de Campinas (RMC) foi criada em 2000 pela Lei Complementar nº 870, do Estado de São Paulo, 
