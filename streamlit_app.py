@@ -16,7 +16,7 @@ st.markdown(
             font-size: 13px !important;
             letter-spacing: 0.02em !important;
             padding: 6px 10px !important;
-            margin: 0 6px !important;
+            margin: 0 3px !important;  /* Reduzido aqui */
             color: rgba(255,255,255,0.85) !important;
             transition: color 0.2s ease;
             cursor: pointer;
@@ -63,6 +63,7 @@ styles = {
         "font-weight": "400",
         "font-size": "13px",
         "letter-spacing": "0.02em",
+        "margin": "0 3px",  # Também ajustado aqui para coerência
     },
     "active": {
         "color": "#ffffff",
