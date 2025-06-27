@@ -5,13 +5,16 @@ import geopandas as gpd
 import json
 from streamlit_navigation_bar import st_navbar
 
-# Inicializa a página padrão no estado da sessão
+# Inicializa página padrão para "RMC Data"
 if "page" not in st.session_state:
     st.session_state.page = "RMC Data"
 
 # Configuração da página
 st.set_page_config(
-    page_title="RMC Data", layout="wide", initial_sidebar_state="collapsed", page_icon="📊"
+    page_title="RMC Data",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+    page_icon="📊"
 )
 
 logo_path = os.path.join(os.getcwd(), "cubes.svg")
@@ -87,7 +90,6 @@ styles = {
 options = {
     "show_menu": False,
     "show_sidebar": False,
-    # NÃO passe parâmetro 'logo_href' ou 'default' para evitar erro!
 }
 
 pages = [
@@ -100,13 +102,7 @@ pages = [
     "Contato",
 ]
 
-# Usar st.query_params para detectar clique no logo (se quiser fazer isso)
-query_params = st.query_params
-if query_params.get("logo_clicked") == ["1"]:
-    st.session_state.page = "RMC Data"
-    st.experimental_set_query_params()  # Limpa a query para evitar loop
-
-# Chamar a navbar (SEM passar default)
+# Chamada do navbar SEM default
 clicked_page = st_navbar(
     pages,
     logo_path=logo_path,
@@ -114,12 +110,14 @@ clicked_page = st_navbar(
     options=options,
 )
 
-# Atualizar o estado se mudou de página
+# Atualiza o estado da página somente se o usuário clicou numa aba diferente
 if clicked_page and clicked_page != st.session_state.page:
     st.session_state.page = clicked_page
 
-# Conteúdo da página ativa
-if st.session_state.page == "RMC Data":
+# Conteúdo baseado no estado da sessão
+page = st.session_state.page
+
+if page == "RMC Data":
     st.title("RMC Data 📊")
     st.markdown("## Dados e indicadores da Região Metropolitana de Campinas")
     st.markdown(
@@ -157,26 +155,26 @@ if st.session_state.page == "RMC Data":
     )
     st.components.v1.html(html_code, height=600, scrolling=False)
 
-elif st.session_state.page == "Economia":
+elif page == "Economia":
     st.title("Economia")
     st.write("Conteúdo relacionado à economia da Região Metropolitana de Campinas.")
 
-elif st.session_state.page == "Finanças Públicas":
+elif page == "Finanças Públicas":
     st.title("Finanças Públicas")
     st.write("Informações sobre finanças públicas da região.")
 
-elif st.session_state.page == "Segurança":
+elif page == "Segurança":
     st.title("Segurança")
     st.write("Dados e análises sobre segurança.")
 
-elif st.session_state.page == "Arquivos":
+elif page == "Arquivos":
     st.title("Arquivos")
     st.write("Documentos e arquivos relacionados ao projeto.")
 
-elif st.session_state.page == "Sobre":
+elif page == "Sobre":
     st.title("Sobre")
     st.write("Informações institucionais e gerais sobre o projeto.")
 
-elif st.session_state.page == "Contato":
+elif page == "Contato":
     st.title("Contato")
     st.write("Informações para contato e comunicação.")
