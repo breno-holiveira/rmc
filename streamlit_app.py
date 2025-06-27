@@ -1,37 +1,58 @@
+import os
 import streamlit as st
+from streamlit_navigation_bar import st_navbar
+import pages as pg
 
-# Configurações da página
-st.set_page_config(page_title='RMC Data', page_icon='icon.svg', layout='wide')
+st.set_page_config(page_title='RMC Data',
+                   initial_sidebar_state='collapsed',
+                   page_icon='icon.svg',
+                   layout='wide')
 
-# Função para criar a barra de navegação
-def navbar():
-    st.sidebar.title("Navegação")
-    pages = ['Início', 'Sobre', 'Economia', 'Finanças', 'Segurança', 'GitHub']
-    selection = st.sidebar.radio("Ir para", pages)
+pages = ['Início', 'Sobre', 'Economia', 'Finanças', 'Segurança', 'GitHub']
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(parent_dir, 'cubes.svg')
+urls = {'GitHub': 'https://github.com/breno-holiveira/rmc'}
+styles = {
+    "nav": {
+        "background-color": "#0B1D3A",
+        "justify-content": "left",
+    },
+    "img": {
+        "padding-right": "14px",
+    },
+    "span": {
+        "color": "#E0E6F0",
+        "padding": "14px",
+    },
+    "active": {
+        "background-color": "#1F355A",
+        "color": "#FFFFFF",
+        "font-weight": "normal",
+        "padding": "14px",
+    }
+}
+options = {
+    "show_menu": True,
+    "show_sidebar": False,
+}
 
-    return selection
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    urls=urls,
+    styles=styles,
+    options=options,
+)
 
-# Chama a função de navegação
-page = navbar()
-
-# Conteúdo das páginas
-if page == 'Início':
-    st.title("Bem-vindo ao RMC Data")
-    st.write("Conteúdo da página Início.")
-elif page == 'Sobre':
-    st.title("Sobre")
-    st.write("Conteúdo da página Sobre.")
-elif page == 'Economia':
-    st.title("Economia")
-    st.write("Conteúdo da página Economia.")
-elif page == 'Finanças':
-    st.title("Finanças")
-    st.write("Conteúdo da página Finanças.")
-elif page == 'Segurança':
-    st.title("Segurança")
-    st.write("Conteúdo da página Segurança.")
-elif page == 'GitHub':
-    st.title("GitHub")
-    st.write("Visite nosso repositório no GitHub.")
-    st.markdown("[GitHub Repository](https://github.com/breno-holiveira/rmc)")
-
+functions = {
+    "Home": pg.show_home,
+    "Install": pg.show_install,
+    "User Guide": pg.show_user_guide,
+    "API": pg.show_api,
+    "Examples": pg.show_examples,
+    "Community": pg.show_community,
+    "Início": pg.show_home,
+}
+go_to = functions.get(page)
+if go_to:
+    go_to()
