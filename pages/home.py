@@ -12,11 +12,9 @@ def show_home():
     
     Todo o conteúdo deste site pode ser reproduzido parcial ou integralmente, sem necessidade de autorização prévia. Os dados utilizados estão disponíveis para consulta e clonagem na aba **GitHub**.
     """)
-
-        
-    st.markdown
     
-    st.markdown('# RMC Data')
+    st.markdown('# Região Metropolitana de Campinas')
+    
     st.markdown(
         """
         A Região Metropolitana de Campinas (RMC) foi criada em 2000 pela Lei Complementar nº 870, do Estado de São Paulo, 
