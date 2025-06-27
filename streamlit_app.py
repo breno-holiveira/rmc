@@ -135,5 +135,5 @@ nav_html = """
 st.markdown(nav_html, unsafe_allow_html=True)
 
 # Conteúdo principal
-st.title("Sistejma RMC Data")
+st.title("Sistema RMC Data")
 st.write("Selecione uma opção no menu superior para navegar.")
