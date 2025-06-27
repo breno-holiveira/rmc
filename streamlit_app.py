@@ -5,7 +5,7 @@ import pages as pg
 
 st.set_page_config(page_title='RMC Data',
                    initial_sidebar_state='collapsed',
-                   page_icon='📊',
+                   page_icon='icon.svg',
                    layout='wide')
 
 pages = ['Início', 'Sobre', 'Economia', 'Finanças', 'Segurança', 'GitHub']
