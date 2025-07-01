@@ -1,108 +1,185 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RMC Data</title>
-    <link rel="icon" href="icon.svg" type="image/svg+xml">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f7fc;
-        }
+import streamlit as st
 
-        /* Navbar */
-        nav {
-            background-color: #0B1D3A;
-            display: flex;
-            justify-content: flex-start;
-            padding: 10px;
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-        }
+import pages.inicio as inicio
+import pages.pib as pib
+import pages.pib_per_capita as pib_per_capita
+import pages.vab as vab
+import pages.orcamento as orcamento
+import pages.tributos as tributos
+import pages.cameras as cameras
+import pages.alertas as alertas
+import pages.contato as contato
 
-        .logo {
-            height: 40px;
-            margin-right: 15px;
-        }
+st.set_page_config(
+    page_title="RMC Data",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-        .navbar-item {
-            color: #E0E6F0;
-            padding: 14px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
+params = st.query_params
+pagina = params.get("page", "inicio")
 
-        .navbar-item:hover {
-            background-color: #1F355A;
-            color: #FFFFFF;
-        }
+st.markdown("""
+<style>
+#MainMenu, footer, header, [data-testid="stSidebar"], [data-testid="collapsedControl"] {
+    display: none !important;
+}
 
-        .navbar-item.active {
-            background-color: #1F355A;
-            color: #FFFFFF;
-        }
+.block-container {
+    padding-top: 60px !important;
+    font-family: Georgia, serif;
+}
 
-        .main-content {
-            margin-top: 60px; /* Adjusted for fixed navbar */
-            padding: 20px;
-            background-color: #ffffff;
-            min-height: 500px;
-        }
-        
-        .hidden {
-            display: none;
-        }
+.navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 50px;
+    background: #fff;
+    border-bottom: 1px solid #eaeaea;
+    display: flex;
+    align-items: center;
+    padding: 0 30px;
+    gap: 30px;
+    font-family: Georgia, serif;
+    z-index: 9999;
+}
 
-    </style>
-</head>
-<body>
+.logo-container {
+    font-weight: 700;
+    font-size: 24px;
+    color: #222;
+    user-select: none;
+    cursor: default;
+    display: flex;
+    align-items: center;
+}
+.logo-container .data {
+    font-weight: 400;
+    font-size: 18px;
+    color: #555;
+    margin-left: 2px;
+}
 
-    <nav>
-        <img src="cubes.svg" alt="Logo" class="logo">
-        <a href="#" class="navbar-item active" onclick="changeContent('home')">Início</a>
-        <a href="#" class="navbar-item" onclick="changeContent('sobre')">Sobre</a>
-        <a href="#" class="navbar-item" onclick="changeContent('economia')">Economia</a>
-        <a href="#" class="navbar-item" onclick="changeContent('financas')">Finanças</a>
-        <a href="#" class="navbar-item" onclick="changeContent('seguranca')">Segurança</a>
-        <a href="https://github.com/breno-holiveira/rmc" class="navbar-item">GitHub</a>
-    </nav>
+.nav-item {
+    position: relative;
+    cursor: pointer;
+}
 
-    <div class="main-content">
-        <div id="home" class="content-section">Bem-vindo à página inicial do RMC Data.</div>
-        <div id="sobre" class="content-section hidden">Aqui você pode aprender mais sobre o projeto.</div>
-        <div id="economia" class="content-section hidden">Esta seção aborda a economia.</div>
-        <div id="financas" class="content-section hidden">Aqui discutimos sobre finanças.</div>
-        <div id="seguranca" class="content-section hidden">A seção de segurança contém as melhores práticas.</div>
+.nav-link {
+    color: #444;
+    font-size: 16px;
+    padding: 15px 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+.nav-link:hover {
+    color: #0056b3;
+}
+
+/* Triângulo para baixo normal */
+.dropdown-arrow {
+    margin-left: 5px;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid #444;
+    transition: border-top-color 0.2s ease;
+    display: inline-block;
+    vertical-align: middle;
+}
+.nav-link:hover .dropdown-arrow {
+    border-top-color: #0056b3;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    background: #fff;
+    min-width: 160px;
+    border-top: 2px solid #0056b3;
+    padding: 6px 0;
+    display: none;
+    font-family: Georgia, serif;
+    border-radius: 0 0 4px 4px;
+    z-index: 99999;
+    box-shadow: none;
+}
+
+.nav-item:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    color: #444;
+    padding: 9px 16px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s ease;
+}
+
+.dropdown-content a:hover {
+    color: #0056b3;
+    background: transparent;
+    font-weight: normal;
+}
+</style>
+
+<div class="navbar">
+    <div class="logo-container">RMC<span class="data">Data</span></div>
+    <div class="nav-item">
+        <a href="/?page=inicio" class="nav-link" target="_self">Início</a>
     </div>
+    <div class="nav-item">
+        <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
+        <div class="dropdown-content">
+            <a href="/?page=pib" target="_self">PIB</a>
+            <a href="/?page=pib_per_capita" target="_self">PIB per capita</a>
+            <a href="/?page=vab" target="_self">VAB</a>
+        </div>
+    </div>
+    <div class="nav-item">
+        <span class="nav-link">Finanças <span class="dropdown-arrow"></span></span>
+        <div class="dropdown-content">
+            <a href="/?page=orcamento" target="_self">Orçamento</a>
+            <a href="/?page=tributos" target="_self">Tributos</a>
+        </div>
+    </div>
+    <div class="nav-item">
+        <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
+        <div class="dropdown-content">
+            <a href="/?page=cameras" target="_self">Câmeras</a>
+            <a href="/?page=alertas" target="_self">Alertas</a>
+        </div>
+    </div>
+    <div class="nav-item">
+        <a href="/?page=contato" class="nav-link" target="_self">Contato</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
-    <script>
-        function changeContent(page) {
-            // Esconde todas as seções
-            let sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.classList.add('hidden'));
-            
-            // Mostra a seção correspondente
-            let activeSection = document.getElementById(page);
-            if (activeSection) {
-                activeSection.classList.remove('hidden');
-            }
-
-            // Atualiza a navegação ativa
-            let navItems = document.querySelectorAll('.navbar-item');
-            navItems.forEach(item => item.classList.remove('active'));
-            document.querySelector(`[onclick="changeContent('${page}')"]`).classList.add('active');
-        }
-
-        // Inicializa a página com a seção "Início"
-        changeContent('home');
-    </script>
-
-</body>
-</html>
+match pagina:
+    case "inicio":
+        inicio.show()
+    case "pib":
+        pib.show()
+    case "pib_per_capita":
+        pib_per_capita.show()
+    case "vab":
+        vab.show()
+    case "orcamento":
+        orcamento.show()
+    case "tributos":
+        tributos.show()
+    case "cameras":
+        cameras.show()
+    case "alertas":
+        alertas.show()
+    case "contato":
+        contato.show()
+    case _:
+        st.warning("Página não encontrada.")
