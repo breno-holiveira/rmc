@@ -7,167 +7,174 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Barra de navegação premium acadêmica
+# CSS para esconder elementos não necessários
 st.markdown("""
 <style>
 #MainMenu, footer, header, [data-testid="stSidebar"], [data-testid="collapsedControl"] {
     display: none !important;
 }
-
 .block-container {
-    padding-top: 56px !important;
-    font-family: 'Georgia', serif;
+    padding-top: 64px !important;
 }
+</style>
+""", unsafe_allow_html=True)
 
-.navbar {
+# Barra de navegação premium internacional com HTML
+st.markdown("""
+<style>
+.navbar-container {
+    font-family: 'Georgia', serif;
     position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 56px;
-    background: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #eaeaea;
+    z-index: 1000;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     padding: 0 40px;
-    gap: 30px;
-    font-family: 'Georgia', serif;
-    z-index: 9999;
 }
 
-.logo-container {
-    font-weight: 700;
+.logo {
     font-size: 22px;
-    color: #2a2a2a;
-    user-select: none;
-    cursor: default;
-    display: flex;
-    align-items: center;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    color: #333;
 }
-.logo-container .data {
+.logo .sub {
     font-weight: 400;
     font-size: 18px;
-    color: #5a5a5a;
-    margin-left: 4px;
+    color: #666;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    height: 100%;
 }
 
 .nav-item {
     position: relative;
-    cursor: pointer;
+    height: 100%;
+    display: flex;
+    align-items: center;
 }
 
 .nav-link {
-    color: #4a4a4a;
-    font-size: 16px;
-    padding: 16px 12px;
+    color: #444;
+    font-size: 15px;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    transition: color 0.2s ease;
+    padding: 20px 12px;
+    transition: color 0.2s;
     font-weight: 450;
+    letter-spacing: 0.3px;
 }
 
 .nav-link:hover {
-    color: #0077cc;
+    color: #0056b3;
 }
 
-/* Triângulo para baixo */
 .dropdown-arrow {
-    margin-left: 5px;
-    width: 0;
-    height: 0;
+    margin-left: 6px;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 4px solid #5a5a5a;
-    transition: border-top-color 0.2s ease;
+    border-top: 4px solid #666;
+    transition: all 0.2s;
     display: inline-block;
-    vertical-align: middle;
-}
-.nav-link:hover .dropdown-arrow {
-    border-top-color: #0077cc;
 }
 
-.dropdown-content {
+.nav-item:hover .dropdown-arrow {
+    border-top-color: #0056b3;
+}
+
+.dropdown-menu {
     position: absolute;
-    top: 56px;
+    top: 100%;
     left: 0;
-    background: #ffffff;
-    min-width: 180px;
-    padding: 8px 0;
-    display: none;
-    font-family: 'Georgia', serif;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e0e0e0;
-    border-radius: 2px;
-    z-index: 99999;
+    background: white;
+    min-width: 200px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    border: 1px solid #eaeaea;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+    z-index: 1001;
 }
 
-.nav-item:hover .dropdown-content {
-    display: block;
+.nav-item:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
 }
 
-.dropdown-content a {
-    color: #4a4a4a;
-    padding: 10px 16px;
-    font-size: 15px;
+.dropdown-item {
+    padding: 12px 16px;
+    color: #444;
+    font-size: 14px;
     text-decoration: none;
     display: block;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s;
 }
 
-.dropdown-content a:hover {
-    background-color: #f7f7f7;
-    color: #0077cc;
+.dropdown-item:hover {
+    background: #f8f9fa;
+    color: #0056b3;
 }
 
-.nav-divider {
-    height: 22px;
-    border-left: 1px solid #e0e0e0;
+.divider {
+    width: 1px;
+    height: 24px;
+    background: #eaeaea;
     margin: 0 10px;
 }
-
 </style>
 
-<div class="navbar">
-    <div class="logo-container">RMC<span class="data">Data</span></div>
+<div class="navbar-container">
+    <div class="logo">RMC<span class="sub">Data</span></div>
     
-    <div class="nav-divider"></div>
-    
-    <div class="nav-item">
-        <a href="#" class="nav-link" target="_self">Início</a>
-    </div>
-    
-    <div class="nav-item">
-        <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">PIB</a>
-            <a href="#" target="_self">PIB per capita</a>
-            <a href="#" target="_self">VAB</a>
+    <div class="nav-links">
+        <div class="nav-item">
+            <a href="#" class="nav-link">Home</a>
         </div>
-    </div>
-    
-    <div class="nav-item">
-        <span class="nav-link">Finanças <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">Orçamento</a>
-            <a href="#" target="_self">Tributos</a>
+        
+        <div class="divider"></div>
+        
+        <div class="nav-item">
+            <a href="#" class="nav-link">Economy <span class="dropdown-arrow"></span></a>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item">GDP</a>
+                <a href="#" class="dropdown-item">GDP per capita</a>
+                <a href="#" class="dropdown-item">VAB</a>
+            </div>
         </div>
-    </div>
-    
-    <div class="nav-item">
-        <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">Câmeras</a>
-            <a href="#" target="_self">Alertas</a>
+        
+        <div class="nav-item">
+            <a href="#" class="nav-link">Finance <span class="dropdown-arrow"></span></a>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item">Budget</a>
+                <a href="#" class="dropdown-item">Taxes</a>
+            </div>
         </div>
-    </div>
-    
-    <div class="nav-divider"></div>
-    
-    <div class="nav-item">
-        <a href="#" class="nav-link" target="_self">Contato</a>
+        
+        <div class="nav-item">
+            <a href="#" class="nav-link">Security <span class="dropdown-arrow"></span></a>
+            <div class="dropdown-menu">
+                <a href="#" class="dropdown-item">Cameras</a>
+                <a href="#" class="dropdown-item">Alerts</a>
+            </div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="nav-item">
+            <a href="#" class="nav-link">Contact</a>
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Conteúdo de exemplo
-st.write("Bem-vindo ao RMC Data! Selecione uma opção na barra de navegação acima para explorar os dados.")
+# Conteúdo principal
+st.markdown("<div style='margin-top: 80px;'></div>", unsafe_allow_html=True)
+st.write("Welcome to RMC Data. Select an option from the navigation bar above.")
