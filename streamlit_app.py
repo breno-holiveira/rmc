@@ -7,150 +7,162 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Barra de navegação
+# Captura da página via URL
+params = st.query_params
+page = params.get("page", "inicio")
+
+# Estilo visual institucional refinado
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap');
+
+body {
+    font-family: 'Playfair Display', serif;
+}
+
 #MainMenu, footer, header, [data-testid="stSidebar"], [data-testid="collapsedControl"] {
     display: none !important;
 }
 
 .block-container {
-    padding-top: 60px !important;
-    font-family: 'Georgia', serif;
+    padding-top: 72px !important;
 }
 
+/* NAVBAR */
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 70px;
-    background: #f8f9fa;
+    height: 72px;
+    background: #ffffff;
     border-bottom: 1px solid #dee2e6;
     display: flex;
     align-items: center;
-    padding: 0 40px;
+    padding: 0 50px;
     gap: 40px;
+    font-family: 'Playfair Display', serif;
     z-index: 9999;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.logo-container {
+/* LOGO */
+.logo {
+    font-size: 26px;
     font-weight: 700;
-    font-size: 28px;
-    color: #343a40;
-    user-select: none;
-    cursor: default;
-    display: flex;
-    align-items: center;
-}
-.logo-container .data {
-    font-weight: 400;
-    font-size: 20px;
-    color: #6c757d;
-    margin-left: 5px;
+    color: #1a2d40;
+    margin-right: auto;
 }
 
+/* ITEM MENU */
 .nav-item {
     position: relative;
-    cursor: pointer;
 }
-
 .nav-link {
-    color: #495057;
+    color: #1a2d40;
     font-size: 18px;
-    padding: 15px 12px;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    transition: color 0.3s ease, background 0.3s ease;
-    border-radius: 4px;
+    padding: 8px 10px;
+    display: inline-block;
+    transition: 0.2s;
 }
 .nav-link:hover {
-    color: #ffffff;
-    background: #007bff;
+    color: #0a58ca;
 }
 
-/* Triângulo para baixo normal */
-.dropdown-arrow {
-    margin-left: 5px;
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 6px solid #495057;
-    transition: border-top-color 0.3s ease;
-    display: inline-block;
-    vertical-align: middle;
-}
-.nav-link:hover .dropdown-arrow {
-    border-top-color: #ffffff;
-}
-
+/* DROPDOWN */
 .dropdown-content {
-    position: absolute;
-    top: 70px; /* Ajustado para a altura da barra de navegação */
-    left: 0;
-    background: #ffffff;
-    min-width: 180px;
-    border-top: 2px solid #007bff;
-    padding: 8px 0;
     display: none;
-    font-family: 'Georgia', serif;
-    border-radius: 0 0 4px 4px;
-    z-index: 99999;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    background-color: #ffffff;
+    top: 48px;
+    min-width: 200px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    z-index: 9999;
+    border-top: 3px solid #0a58ca;
 }
-
 .nav-item:hover .dropdown-content {
     display: block;
 }
-
 .dropdown-content a {
-    color: #495057;
-    padding: 10px 16px;
-    font-size: 16px;
-    text-decoration: none;
+    color: #1a2d40;
+    padding: 10px 20px;
     display: block;
-    transition: color 0.3s ease, background 0.3s ease;
+    text-decoration: none;
+    font-size: 16px;
 }
 .dropdown-content a:hover {
-    color: #ffffff;
-    background: #007bff;
-    font-weight: normal;
+    background-color: #f1f1f1;
+    color: #0a58ca;
 }
 </style>
 
+<!-- HTML da Navbar -->
 <div class="navbar">
-    <div class="logo-container">RMC<span class="data">Data</span></div>
-    <div class="nav-item">
-        <a href="#" class="nav-link" target="_self">Início</a>
+  <div class="logo">RMC Data</div>
+
+  <div class="nav-item">
+    <a class="nav-link" href="/?page=inicio">Início</a>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-link">Economia ▼</span>
+    <div class="dropdown-content">
+      <a href="/?page=pib">PIB Municipal</a>
+      <a href="/?page=pib_per_capita">PIB per capita</a>
+      <a href="/?page=vab">Valor Adicionado Bruto</a>
     </div>
-    <div class="nav-item">
-        <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">PIB</a>
-            <a href="#" target="_self">PIB per capita</a>
-            <a href="#" target="_self">VAB</a>
-        </div>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-link">Finanças ▼</span>
+    <div class="dropdown-content">
+      <a href="/?page=orcamento">Orçamento</a>
+      <a href="/?page=tributos">Tributos</a>
+      <a href="/?page=despesas">Despesas</a>
     </div>
-    <div class="nav-item">
-        <span class="nav-link">Finanças <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">Orçamento</a>
-            <a href="#" target="_self">Tributos</a>
-        </div>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-link">Segurança ▼</span>
+    <div class="dropdown-content">
+      <a href="/?page=seguranca">Indicadores</a>
+      <a href="/?page=mapa">Mapa de Ocorrências</a>
+      <a href="/?page=comparativos">Comparativos</a>
     </div>
-    <div class="nav-item">
-        <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">Câmeras</a>
-            <a href="#" target="_self">Alertas</a>
-        </div>
-    </div>
-    <div class="nav-item">
-        <a href="#" class="nav-link" target="_self">Contato</a>
-    </div>
+  </div>
+
+  <div class="nav-item">
+    <a class="nav-link" href="/?page=contato">Contato</a>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Conteúdo de exemplo
-st.write("Bem-vindo ao RMC Data! Selecione uma opção na barra de navegação acima para explorar os dados.")
+# Conteúdo baseado na navegação
+match page:
+    case "inicio":
+        st.title("Bem-vindo ao RMC Data")
+        st.write("Este é o portal de dados científicos da Região Metropolitana de Campinas.")
+    case "pib":
+        st.title("PIB Municipal")
+        st.write("Página com dados de Produto Interno Bruto dos municípios.")
+    case "pib_per_capita":
+        st.title("PIB per capita")
+    case "vab":
+        st.title("Valor Adicionado Bruto")
+    case "orcamento":
+        st.title("Orçamento Público")
+    case "tributos":
+        st.title("Tributos Municipais")
+    case "despesas":
+        st.title("Despesas por Setor")
+    case "seguranca":
+        st.title("Indicadores de Segurança")
+    case "mapa":
+        st.title("Mapa de Ocorrências")
+    case "comparativos":
+        st.title("Dados Comparativos")
+    case "contato":
+        st.title("Fale Conosco")
+        st.write("Entre em contato com a equipe do RMC Data.")
+    case _:
+        st.title("Página não encontrada")
