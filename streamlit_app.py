@@ -15,21 +15,20 @@ st.markdown("""
 }
 
 .block-container {
-    padding-top: 60px !important;
+    padding-top: 80px !important;
     font-family: 'Georgia', serif;
 }
 
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 60px;
-    background: #f8f9fa;
+    height: 70px;
+    background: #ffffff;
     border-bottom: 1px solid #dee2e6;
     display: flex;
     align-items: center;
     padding: 0 40px;
     gap: 40px;
-    font-family: 'Georgia', serif;
     z-index: 9999;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -37,7 +36,7 @@ st.markdown("""
 .logo-container {
     font-weight: 700;
     font-size: 28px;
-    color: #343a40;
+    color: #003366; /* Azul escuro */
     user-select: none;
     cursor: default;
     display: flex;
@@ -46,7 +45,7 @@ st.markdown("""
 .logo-container .data {
     font-weight: 400;
     font-size: 20px;
-    color: #6c757d;
+    color: #6c757d; /* Cinza */
     margin-left: 5px;
 }
 
@@ -56,7 +55,7 @@ st.markdown("""
 }
 
 .nav-link {
-    color: #495057;
+    color: #495057; /* Cinza escuro */
     font-size: 18px;
     padding: 15px 12px;
     text-decoration: none;
@@ -67,7 +66,7 @@ st.markdown("""
 }
 .nav-link:hover {
     color: #ffffff;
-    background: #007bff;
+    background: #007bff; /* Azul */
 }
 
 /* Triângulo para baixo normal */
@@ -77,7 +76,7 @@ st.markdown("""
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 6px solid #495057;
+    border-top: 6px solid #495057; /* Cinza escuro */
     transition: border-top-color 0.3s ease;
     display: inline-block;
     vertical-align: middle;
@@ -88,11 +87,11 @@ st.markdown("""
 
 .dropdown-content {
     position: absolute;
-    top: 60px;
+    top: 70px; /* Ajustado para a altura da barra de navegação */
     left: 0;
     background: #ffffff;
     min-width: 180px;
-    border-top: 2px solid #007bff;
+    border-top: 2px solid #007bff; /* Azul */
     padding: 8px 0;
     display: none;
     font-family: 'Georgia', serif;
@@ -106,7 +105,7 @@ st.markdown("""
 }
 
 .dropdown-content a {
-    color: #495057;
+    color: #495057; /* Cinza escuro */
     padding: 10px 16px;
     font-size: 16px;
     text-decoration: none;
@@ -115,7 +114,7 @@ st.markdown("""
 }
 .dropdown-content a:hover {
     color: #ffffff;
-    background: #007bff;
+    background: #007bff; /* Azul */
     font-weight: normal;
 }
 </style>
