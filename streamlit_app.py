@@ -1,24 +1,12 @@
 import streamlit as st
 
-import pages.inicio as inicio
-import pages.pib as pib
-import pages.pib_per_capita as pib_per_capita
-import pages.vab as vab
-import pages.orcamento as orcamento
-import pages.tributos as tributos
-import pages.cameras as cameras
-import pages.alertas as alertas
-import pages.contato as contato
-
 st.set_page_config(
     page_title="RMC Data",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-params = st.query_params
-pagina = params.get("page", "inicio")
-
+# Barra de navegação
 st.markdown("""
 <style>
 #MainMenu, footer, header, [data-testid="stSidebar"], [data-testid="collapsedControl"] {
@@ -134,54 +122,35 @@ st.markdown("""
 <div class="navbar">
     <div class="logo-container">RMC<span class="data">Data</span></div>
     <div class="nav-item">
-        <a href="/?page=inicio" class="nav-link" target="_self">Início</a>
+        <a href="#" class="nav-link" target="_self">Início</a>
     </div>
     <div class="nav-item">
         <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
         <div class="dropdown-content">
-            <a href="/?page=pib" target="_self">PIB</a>
-            <a href="/?page=pib_per_capita" target="_self">PIB per capita</a>
-            <a href="/?page=vab" target="_self">VAB</a>
+            <a href="#" target="_self">PIB</a>
+            <a href="#" target="_self">PIB per capita</a>
+            <a href="#" target="_self">VAB</a>
         </div>
     </div>
     <div class="nav-item">
         <span class="nav-link">Finanças <span class="dropdown-arrow"></span></span>
         <div class="dropdown-content">
-            <a href="/?page=orcamento" target="_self">Orçamento</a>
-            <a href="/?page=tributos" target="_self">Tributos</a>
+            <a href="#" target="_self">Orçamento</a>
+            <a href="#" target="_self">Tributos</a>
         </div>
     </div>
     <div class="nav-item">
         <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
         <div class="dropdown-content">
-            <a href="/?page=cameras" target="_self">Câmeras</a>
-            <a href="/?page=alertas" target="_self">Alertas</a>
+            <a href="#" target="_self">Câmeras</a>
+            <a href="#" target="_self">Alertas</a>
         </div>
     </div>
     <div class="nav-item">
-        <a href="/?page=contato" class="nav-link" target="_self">Contato</a>
+        <a href="#" class="nav-link" target="_self">Contato</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-match pagina:
-    case "inicio":
-        inicio.show()
-    case "pib":
-        pib.show()
-    case "pib_per_capita":
-        pib_per_capita.show()
-    case "vab":
-        vab.show()
-    case "orcamento":
-        orcamento.show()
-    case "tributos":
-        tributos.show()
-    case "cameras":
-        cameras.show()
-    case "alertas":
-        alertas.show()
-    case "contato":
-        contato.show()
-    case _:
-        st.warning("Página não encontrada.")
+# Conteúdo de exemplo
+st.write("Bem-vindo ao RMC Data! Selecione uma opção na barra de navegação acima para explorar os dados.")
