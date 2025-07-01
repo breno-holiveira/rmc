@@ -1,1 +1,10 @@
-
+from .inicio import show
+from .sobre import show
+from .pib import show
+from .pib_per_capita import show
+from .vab import show
+from .orcamento import show
+from .tributos import show
+from .cameras import show
+from .alertas import show
+from .contato import show
