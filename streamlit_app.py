@@ -1,6 +1,5 @@
 import streamlit as st
 
-# Configuração da página
 st.set_page_config(
     page_title="RMC Data",
     layout="wide",
@@ -8,11 +7,10 @@ st.set_page_config(
     page_icon="📊"
 )
 
-# --- Lê a página atual a partir dos parâmetros da URL ---
-query_params = st.query_params
-pagina = query_params.get("page", ["inicio"])[0]
+# Página atual via query param
+pagina = st.query_params.get("page", ["inicio"])[0]
 
-# --- CSS e HTML da navbar ---
+# HTML e CSS da barra
 st.markdown(f"""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Raleway:wght@300;400;500&display=swap');
@@ -34,7 +32,6 @@ st.markdown(f"""
 .block-container {{
     padding-top: 70px !important;
     font-family: 'Raleway', sans-serif;
-    color: var(--text-dark);
 }}
 
 .navbar {{
@@ -199,72 +196,4 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# --- Conteúdo dinâmico por página ---
-if pagina == "inicio":
-    st.markdown("""
-    <div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
-        <h1 style="font-family: 'Playfair Display', serif; color: #003366; border-bottom: 2px solid #bc4639; padding-bottom: 10px; margin-top: 40px;">
-            Sistema de Dados Regionais - RMC
-        </h1>
-        
-        <p style="font-size: 18px; margin-top: 30px;">
-            Bem-vindo ao portal de dados científicos da Região Metropolitana de Campinas. 
-            Esta plataforma oferece acesso a indicadores econômicos, financeiros e de 
-            segurança pública, consolidando informações de 20 municípios da região.
-        </p>
-        
-        <div style="margin-top: 50px; background: #f8f9fa; padding: 30px; border-left: 4px solid #4a6fa5;">
-            <h3 style="color: #5c2018; margin-top: 0;">Sobre o Projeto</h3>
-            <p>
-                Desenvolvido em parceria com instituições de pesquisa, o RMC Data tem como 
-                objetivo democratizar o acesso a dados regionais, fornecendo análises 
-                precisas e visualizações interativas para pesquisadores, gestores públicos 
-                e cidadãos.
-            </p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-elif pagina == "pib":
-    st.title("PIB Municipal")
-    st.write("Conteúdo sobre o Produto Interno Bruto dos municípios da RMC.")
-
-elif pagina == "pib_per_capita":
-    st.title("PIB per capita")
-    st.write("Conteúdo sobre o PIB per capita dos municípios da RMC.")
-
-elif pagina == "vab":
-    st.title("Valor Adicionado Bruto")
-    st.write("Conteúdo sobre o VAB da RMC.")
-
-elif pagina == "orcamento":
-    st.title("Orçamento Público")
-    st.write("Visualização e análise do orçamento público municipal.")
-
-elif pagina == "tributos":
-    st.title("Tributos Municipais")
-    st.write("Análise de receitas tributárias nos municípios.")
-
-elif pagina == "despesas":
-    st.title("Despesas por Setor")
-    st.write("Comparativo setorial dos gastos municipais.")
-
-elif pagina == "seguranca":
-    st.title("Indicadores de Segurança")
-    st.write("Dados de criminalidade, policiamento e sensação de segurança.")
-
-elif pagina == "mapa_ocorrencias":
-    st.title("Mapa de Ocorrências")
-    st.write("Visualização geográfica de ocorrências policiais.")
-
-elif pagina == "comparativos":
-    st.title("Dados Comparativos")
-    st.write("Série histórica e análise entre os municípios.")
-
-elif pagina == "publicacoes":
-    st.title("Publicações")
-    st.write("Artigos, relatórios e painéis publicados pela equipe.")
-
-elif pagina == "contato":
-    st.title("Contato")
-    st.write("Informações para contato, equipe técnica e canais institucionais.")
+# Nenhum conteúdo é exibido. Apenas navegação.
