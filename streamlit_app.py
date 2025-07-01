@@ -7,161 +7,162 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Barra de navegação científica e institucional
+# Captura da página via URL
+params = st.query_params
+page = params.get("page", "inicio")
+
+# Estilo visual institucional refinado
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap');
+
+body {
+    font-family: 'Playfair Display', serif;
+}
 
 #MainMenu, footer, header, [data-testid="stSidebar"], [data-testid="collapsedControl"] {
     display: none !important;
 }
 
 .block-container {
-    padding-top: 64px !important;
-    font-family: 'Merriweather', serif;
-    background-color: #f9fafc;
-    color: #2c2f36;
+    padding-top: 72px !important;
 }
 
-/* Barra superior */
+/* NAVBAR */
 .navbar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 64px;
+    height: 72px;
     background: #ffffff;
     border-bottom: 1px solid #dee2e6;
     display: flex;
     align-items: center;
-    padding: 0 48px;
-    gap: 36px;
-    font-family: 'Merriweather', serif;
-    z-index: 10000;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 0 50px;
+    gap: 40px;
+    font-family: 'Playfair Display', serif;
+    z-index: 9999;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Logotipo */
-.logo-container {
-    font-weight: 700;
+/* LOGO */
+.logo {
     font-size: 26px;
-    color: #1c2e45;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-}
-.logo-container .sub {
-    font-weight: 400;
-    font-size: 16px;
-    color: #6c757d;
-    margin-left: 6px;
+    font-weight: 700;
+    color: #1a2d40;
+    margin-right: auto;
 }
 
-/* Menu principal */
+/* ITEM MENU */
 .nav-item {
     position: relative;
 }
-
 .nav-link {
-    color: #344054;
-    font-size: 17px;
-    padding: 10px 14px;
+    color: #1a2d40;
+    font-size: 18px;
     text-decoration: none;
+    padding: 8px 10px;
     display: inline-block;
-    border-radius: 4px;
-    transition: background 0.3s ease, color 0.3s ease;
-    cursor: pointer;
+    transition: 0.2s;
 }
 .nav-link:hover {
-    background: #1c2e45;
-    color: #ffffff;
+    color: #0a58ca;
 }
 
-/* Setinha de dropdown */
-.dropdown-arrow {
-    margin-left: 6px;
-    width: 0; height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 6px solid #344054;
-    display: inline-block;
-    vertical-align: middle;
-    transition: border-top-color 0.3s ease;
-}
-.nav-link:hover .dropdown-arrow {
-    border-top-color: #ffffff;
-}
-
-/* Dropdown */
+/* DROPDOWN */
 .dropdown-content {
-    position: absolute;
-    top: 64px;
-    left: 0;
-    background: #ffffff;
-    min-width: 180px;
-    border: 1px solid #dee2e6;
-    border-top: 3px solid #1c2e45;
-    padding: 6px 0;
     display: none;
-    font-family: 'Merriweather', serif;
-    border-radius: 0 0 6px 6px;
-    z-index: 10001;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+    position: absolute;
+    background-color: #ffffff;
+    top: 48px;
+    min-width: 200px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    z-index: 9999;
+    border-top: 3px solid #0a58ca;
 }
-
 .nav-item:hover .dropdown-content {
     display: block;
 }
-
 .dropdown-content a {
-    color: #343a40;
+    color: #1a2d40;
     padding: 10px 20px;
-    font-size: 15px;
-    text-decoration: none;
     display: block;
-    transition: background 0.2s ease, padding-left 0.2s;
+    text-decoration: none;
+    font-size: 16px;
 }
 .dropdown-content a:hover {
-    background: #e9ecef;
-    padding-left: 26px;
+    background-color: #f1f1f1;
+    color: #0a58ca;
 }
 </style>
 
-<!-- HTML da Barra de Navegação -->
+<!-- HTML da Navbar -->
 <div class="navbar">
-    <div class="logo-container">
-        RMC<span class="sub">Data</span>
+  <div class="logo">RMC Data</div>
+
+  <div class="nav-item">
+    <a class="nav-link" href="/?page=inicio">Início</a>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-link">Economia ▼</span>
+    <div class="dropdown-content">
+      <a href="/?page=pib">PIB Municipal</a>
+      <a href="/?page=pib_per_capita">PIB per capita</a>
+      <a href="/?page=vab">Valor Adicionado Bruto</a>
     </div>
-    <div class="nav-item">
-        <a href="#" class="nav-link" target="_self">Início</a>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-link">Finanças ▼</span>
+    <div class="dropdown-content">
+      <a href="/?page=orcamento">Orçamento</a>
+      <a href="/?page=tributos">Tributos</a>
+      <a href="/?page=despesas">Despesas</a>
     </div>
-    <div class="nav-item">
-        <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">PIB</a>
-            <a href="#" target="_self">PIB per capita</a>
-            <a href="#" target="_self">Valor Adicionado Bruto</a>
-        </div>
+  </div>
+
+  <div class="nav-item">
+    <span class="nav-link">Segurança ▼</span>
+    <div class="dropdown-content">
+      <a href="/?page=seguranca">Indicadores</a>
+      <a href="/?page=mapa">Mapa de Ocorrências</a>
+      <a href="/?page=comparativos">Comparativos</a>
     </div>
-    <div class="nav-item">
-        <span class="nav-link">Finanças <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">Orçamento</a>
-            <a href="#" target="_self">Tributos</a>
-            <a href="#" target="_self">Despesas</a>
-        </div>
-    </div>
-    <div class="nav-item">
-        <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
-        <div class="dropdown-content">
-            <a href="#" target="_self">Câmeras</a>
-            <a href="#" target="_self">Alertas</a>
-            <a href="#" target="_self">Comparativos</a>
-        </div>
-    </div>
-    <div class="nav-item">
-        <a href="#" class="nav-link" target="_self">Contato</a>
-    </div>
+  </div>
+
+  <div class="nav-item">
+    <a class="nav-link" href="/?page=contato">Contato</a>
+  </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Conteúdo
-st.write("Bem-vindo ao **RMC Data**! Utilize o menu superior para navegar pelos indicadores.")
+# Conteúdo baseado na navegação
+match page:
+    case "inicio":
+        st.title("Bem-vindo ao RMC Data")
+        st.write("Este é o portal de dados científicos da Região Metropolitana de Campinas.")
+    case "pib":
+        st.title("PIB Municipal")
+        st.write("Página com dados de Produto Interno Bruto dos municípios.")
+    case "pib_per_capita":
+        st.title("PIB per capita")
+    case "vab":
+        st.title("Valor Adicionado Bruto")
+    case "orcamento":
+        st.title("Orçamento Público")
+    case "tributos":
+        st.title("Tributos Municipais")
+    case "despesas":
+        st.title("Despesas por Setor")
+    case "seguranca":
+        st.title("Indicadores de Segurança")
+    case "mapa":
+        st.title("Mapa de Ocorrências")
+    case "comparativos":
+        st.title("Dados Comparativos")
+    case "contato":
+        st.title("Fale Conosco")
+        st.write("Entre em contato com a equipe do RMC Data.")
+    case _:
+        st.title("Página não encontrada")
