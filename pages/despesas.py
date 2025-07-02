@@ -1,6 +1,10 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import locale
+
+# Define localidade brasileira para formatação
+locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
 @st.cache_data
 def load_data():
@@ -23,6 +27,17 @@ def load_data():
 
     return df
 
+def format_brl(x):
+    return f"R$ {locale.format_string('%.2f', x, grouping=True)}"
+
+def top_n_outros(df, grupo, valor, n=7):
+    df_agg = df.groupby(grupo)[valor].sum().sort_values(ascending=False)
+    top_n = df_agg.head(n)
+    outros = df_agg[n:].sum()
+    if outros > 0:
+        top_n["Outros"] = outros
+    return top_n.reset_index()
+
 def show():
     st.title("Análise de Despesas em C&T (2016–2021)")
 
@@ -33,7 +48,7 @@ def show():
     keywords = [
         "pesquisa", "científica", "cientifica", "ciencia", "inovacao", "desenvolvimento",
         "P&D", "tecnologia", "laboratório", "laboratorio", "inovação", "técnico", "tecnico", "ciência",
-        "tecnológico", "tecnologico", "formação", "formacao"
+        "tecnológico", "tecnologico", "formação", "formacao", "universidade", "ensino", "acadêmica"
     ]
 
     mask_func = df["Função"].astype(str).str.strip() == "19"
@@ -50,12 +65,11 @@ def show():
 
     df = df[mask_func | mask_subfunc | mask_keywords]
 
-    # --- Exclusão de termos irrelevantes ---
     excluir = ["inativos", "pensionistas", "juros", "amortização", "assistencia hospitalar"]
     mask_excluir = df["Despesa"].astype(str).str.lower().str.contains('|'.join(excluir), na=False)
     df = df[~mask_excluir]
 
-    # --- Filtro interativo por município ---
+    # --- Filtro por município ---
     municipios = sorted(df["Município"].dropna().unique())
     municipio_sel = st.selectbox(
         "Selecione o município",
@@ -66,101 +80,67 @@ def show():
 
     st.markdown(f"**Total de registros encontrados:** `{len(df)}`")
 
-    # --- Gráfico 1: Evolução anual ---
-    graf = df.groupby("Ano")["Liquidado"].sum().reset_index()
-    fig = px.bar(
-        graf,
-        x="Ano",
-        y="Liquidado",
-        text_auto=".2s",
+    # --- Gráfico 1: Total por ano ---
+    dados_ano = df.groupby("Ano")["Liquidado"].sum().reset_index()
+    fig1 = px.bar(
+        dados_ano, x="Ano", y="Liquidado", text_auto=".2s",
+        title=f"Total de Despesas em C&T – {municipio_sel}",
         labels={"Liquidado": "Valor Liquidado (R$)"},
-        title=f"Total Anual – {municipio_sel}",
     )
-    fig.update_layout(
+    fig1.update_layout(
         yaxis_tickprefix="R$ ",
-        yaxis_tickformat=",",
         xaxis_title="Ano",
         yaxis_title="Total Liquidado",
-        title_x=0.02
+        title_x=0.05
     )
-    st.plotly_chart(fig, use_container_width=True)
+    fig1.update_traces(texttemplate='%{text:.2s}', hovertemplate='Ano: %{x}<br>R$ %{y:,.2f}<extra></extra>')
+    st.plotly_chart(fig1, use_container_width=True)
 
     # --- Gráfico 2: Por Programa ---
-    graf2 = df.groupby(["Ano", "Programa"])["Liquidado"].sum().reset_index()
+    top_programas = top_n_outros(df, "Programa", "Liquidado")
     fig2 = px.bar(
-        graf2,
-        x="Ano",
-        y="Liquidado",
-        color="Programa",
+        top_programas, x="Programa", y="Liquidado",
+        title=f"Top 7 Programas de C&T – {municipio_sel}",
         labels={"Liquidado": "Valor Liquidado (R$)"},
-        title=f"Programas de C&T – {municipio_sel}",
     )
-    fig2.update_layout(
-        yaxis_tickprefix="R$ ",
-        yaxis_tickformat=",",
-        xaxis_title="Ano",
-        yaxis_title="Total por Programa",
-        title_x=0.02
-    )
+    fig2.update_layout(xaxis_title="Programa", yaxis_tickprefix="R$ ", title_x=0.05)
+    fig2.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
     st.plotly_chart(fig2, use_container_width=True)
 
     # --- Gráfico 3: Por Órgão ---
-    graf3 = df.groupby("Órgão")["Liquidado"].sum().reset_index().sort_values("Liquidado", ascending=False)
+    top_orgaos = top_n_outros(df, "Órgão", "Liquidado")
     fig3 = px.bar(
-        graf3,
-        x="Liquidado",
-        y="Órgão",
-        orientation="h",
-        labels={"Liquidado": "Valor Liquidado (R$)", "Órgão": "Órgão"},
-        title="Distribuição por Órgão"
+        top_orgaos, x="Órgão", y="Liquidado",
+        title=f"Top 7 Órgãos em C&T – {municipio_sel}",
+        labels={"Liquidado": "Valor Liquidado (R$)"},
     )
-    fig3.update_layout(
-        xaxis_tickprefix="R$ ",
-        xaxis_tickformat=",",
-        yaxis_title="",
-        xaxis_title="Total Liquidado",
-        title_x=0.02
-    )
+    fig3.update_layout(xaxis_title="Órgão", yaxis_tickprefix="R$ ", title_x=0.05)
+    fig3.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
     st.plotly_chart(fig3, use_container_width=True)
 
-    # --- Gráfico 4: Por UO ---
-    graf4 = df.groupby("UO")["Liquidado"].sum().reset_index().sort_values("Liquidado", ascending=False)
+    # --- Gráfico 4: Por Unidade Orçamentária (UO) ---
+    top_uo = top_n_outros(df, "UO", "Liquidado")
     fig4 = px.bar(
-        graf4,
-        x="Liquidado",
-        y="UO",
-        orientation="h",
-        labels={"Liquidado": "Valor Liquidado (R$)", "UO": "Unidade Orçamentária"},
-        title="Distribuição por UO"
+        top_uo, x="UO", y="Liquidado",
+        title=f"Top 7 UOs em C&T – {municipio_sel}",
+        labels={"Liquidado": "Valor Liquidado (R$)"},
     )
-    fig4.update_layout(
-        xaxis_tickprefix="R$ ",
-        xaxis_tickformat=",",
-        yaxis_title="",
-        xaxis_title="Total Liquidado",
-        title_x=0.02
-    )
+    fig4.update_layout(xaxis_title="Unidade Orçamentária", yaxis_tickprefix="R$ ", title_x=0.05)
+    fig4.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
     st.plotly_chart(fig4, use_container_width=True)
 
     # --- Gráfico 5: Por Unidade Gestora ---
-    graf5 = df.groupby("Unidade Gestora")["Liquidado"].sum().reset_index().sort_values("Liquidado", ascending=False)
+    top_gestora = top_n_outros(df, "Unidade Gestora", "Liquidado")
     fig5 = px.bar(
-        graf5,
-        x="Liquidado",
-        y="Unidade Gestora",
-        orientation="h",
-        labels={"Liquidado": "Valor Liquidado (R$)", "Unidade Gestora": "Unidade Gestora"},
-        title="Distribuição por Unidade Gestora"
+        top_gestora, x="Unidade Gestora", y="Liquidado",
+        title=f"Top 7 Unidades Gestoras – {municipio_sel}",
+        labels={"Liquidado": "Valor Liquidado (R$)"},
     )
-    fig5.update_layout(
-        xaxis_tickprefix="R$ ",
-        xaxis_tickformat=",",
-        yaxis_title="",
-        xaxis_title="Total Liquidado",
-        title_x=0.02
-    )
+    fig5.update_layout(xaxis_title="Unidade Gestora", yaxis_tickprefix="R$ ", title_x=0.05)
+    fig5.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
     st.plotly_chart(fig5, use_container_width=True)
 
-    # --- Tabela com dados filtrados ---
+    # --- Tabela final com valor formatado ---
+    df["Liquidado (R$)"] = df["Liquidado"].apply(format_brl)
     with st.expander("Ver dados brutos filtrados"):
-        st.dataframe(df.reset_index(drop=True), use_container_width=True)
+        st.dataframe(df[["Ano", "Município", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado (R$)"]], use_container_width=True)
