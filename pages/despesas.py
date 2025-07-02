@@ -4,7 +4,7 @@ import plotly.express as px
 
 @st.cache_data
 def load_data():
-    df = pd.read_excel("dados/despesas_sp.xlsx", sheet_name="despesas_sp")
+    df = pd.read_excel("despesas_sp.xlsx", sheet_name="despesas_sp")
 
     # Corrigir nomes de colunas, se necessário
     df.columns = df.columns.str.strip()
