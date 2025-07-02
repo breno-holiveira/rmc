@@ -53,7 +53,7 @@ def show():
     df = df[mask_func | mask_subfunc | mask_keywords]
 
     # --- Exclusão de termos que não têm relação com C&T ---
-    excluir = ["inativos", "pensionistas", "previdência", "juros", "amortização"]
+    excluir = ["inativos", "pensionistas", "juros", "amortização"]
     mask_excluir = df["Despesa"].astype(str).str.lower().str.contains('|'.join(excluir), na=False)
     df = df[~mask_excluir]
 
