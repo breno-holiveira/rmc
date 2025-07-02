@@ -1,67 +1,98 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 
 @st.cache_data
 def load_data():
-    df = pd.read_excel("despesas_sp.xlsx", dtype=str)
+    df = pd.read_excel("dados/despesas_sp.xlsx", sheet_name="despesas_sp")
 
-    # Corrige nomes das colunas
+    # Corrigir nomes de colunas, se necessário
     df.columns = df.columns.str.strip()
 
-    # Conversão da coluna "Ano" para inteiro
-    df["Ano"] = pd.to_datetime(df["Ano"], errors="coerce").dt.year
+    # Garantir que o ano seja inteiro
+    df["Ano"] = df["Ano"].astype(str).str.extract(r"(\d{4})").astype(int)
 
-    # Limpa e converte valores da coluna "Liquidado"
+    # Corrigir valor da coluna "Liquidado" (de string para float)
     df["Liquidado"] = (
         df["Liquidado"]
-        .str.replace("R$", "", regex=False)
+        .astype(str)
         .str.replace(".", "", regex=False)
         .str.replace(",", ".", regex=False)
-        .str.strip()
         .astype(float)
     )
 
     return df
 
 def show():
-    st.markdown("## Análise de Despesas em C&T (h2016–2021)")
+    st.title("Análise de Despesas em C&T (2016–2021)")
 
     df = load_data()
 
-    # Filtro por anos válidos
-    df = df[df["Ano"].between(2016, 2021)]
+    # Filtro de ano
+    df = df[(df["Ano"] >= 2016) & (df["Ano"] <= 2021)]
 
-    # Filtra Função 19 - Ciência e Tecnologia
-    funcao_ct = df[df["Função"].str.startswith("19")]
+    # Códigos das Subfunções relacionadas a C&T segundo o RIECTI
+    subfun_ct = ["571", "572", "573", "606", "664", "665"]
+    func_ct = ["19"]  # Função Ciência e Tecnologia
 
-    # Subfunções reconhecidas como C&T
-    subfuncoes_ct = ["571", "572", "573", "606", "664", "665"]
-    subfuncao_ct = df[df["Subfunção"].str.strip().str[:3].isin(subfuncoes_ct)]
+    # Filtros por função e subfunção
+    mask_func = df["Função"].astype(str).str.startswith(tuple(func_ct))
+    mask_subfunc = df["Subfunção"].astype(str).isin(subfun_ct)
+    df = df[mask_func | mask_subfunc]
 
-    # Palavras-chave associadas à C&T
-    palavras_ct = ["ciência", "cient", "tecnologia", "tecnológ", "inovação", "pesquisa", "C&T"]
-    padrao = "|".join(palavras_ct)
-
-    # Busca por palavras-chave nas colunas relacionadas
-    por_palavras = df[
-        df["Programa"].str.lower().str.contains(padrao, na=False)
-        | df["Ação"].str.lower().str.contains(padrao, na=False)
-        | df["Funcional Programática"].str.lower().str.contains(padrao, na=False)
+    # Dicionário de palavras-chave relacionadas à C&T
+    keywords = [
+        "pesquisa", "científica", "cientifico", "desenvolvimento",
+        "tecnologia", "laboratório", "inovação", "ciência", "técnico",
+        "tecnológico", "formação", "universidade", "ensino", "acadêmica"
     ]
 
-    # Concatena todos os resultados de C&T
-    df_ct = pd.concat([funcao_ct, subfuncao_ct, por_palavras], ignore_index=True)
+    # Filtros por palavras-chave
+    def keyword_mask(col):
+        return col.astype(str).str.lower().str.contains('|'.join(keywords), na=False)
 
-    # Remove duplicatas para evitar dupla contagem
-    df_ct = df_ct.drop_duplicates()
+    df = df[keyword_mask(df["Programa"]) | keyword_mask(df["Ação"]) | keyword_mask(df["Despesa"])]
 
-    # Agregação por ano
-    resumo = df_ct.groupby("Ano")["Liquidado"].sum().reset_index()
+    # Excluir termos explícitos que não representam C&T
+    excluir = ["inativos", "pensionistas", "previdência", "juros", "amortização"]
+    mask_excluir = df["Despesa"].astype(str).str.lower().str.contains('|'.join(excluir), na=False)
+    df = df[~mask_excluir]
 
-    # Gráfico de barras com totais por ano
-    st.bar_chart(resumo.set_index("Ano"))
+    # Filtro interativo por município
+    municipios = sorted(df["Município"].dropna().unique())
+    municipio_sel = st.selectbox("Selecione o município", municipios, index=municipios.index("CAMPINAS") if "CAMPINAS" in municipios else 0)
+    df = df[df["Município"] == municipio_sel]
 
-    # Exibição dos dados filtrados (opcional)
-    with st.expander("Ver dados detalhados"):
-        st.dataframe(df_ct)
+    st.markdown(f"**Total de registros:** {len(df)}")
 
+    # Gráfico interativo: evolução anual dos gastos
+    graf = df.groupby("Ano")["Liquidado"].sum().reset_index()
+
+    fig = px.bar(
+        graf,
+        x="Ano",
+        y="Liquidado",
+        text_auto=".2s",
+        labels={"Liquidado": "Valor Liquidado (R$)"},
+        title=f"Dispêndios Públicos em C&T – {municipio_sel} (2016–2021)",
+    )
+    fig.update_layout(yaxis_tickprefix="R$ ", xaxis_title="Ano", yaxis_title="Total Liquidado")
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Detalhamento por Programa
+    graf2 = df.groupby(["Ano", "Programa"])["Liquidado"].sum().reset_index()
+
+    fig2 = px.bar(
+        graf2,
+        x="Ano",
+        y="Liquidado",
+        color="Programa",
+        labels={"Liquidado": "Valor Liquidado (R$)"},
+        title=f"Programas de C&T em {municipio_sel}",
+    )
+    fig2.update_layout(yaxis_tickprefix="R$ ", xaxis_title="Ano", yaxis_title="Total por Programa")
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # Tabela com os dados filtrados
+    with st.expander("Ver dados brutos filtrados"):
+        st.dataframe(df.reset_index(drop=True), use_container_width=True)
