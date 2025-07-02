@@ -24,7 +24,7 @@ def load_data():
     return df
 
 def show():
-    st.markdown("## Análise de Despesas em C&T (2016–2021)")
+    st.markdown("## Análise de Despesas em C&T (h2016–2021)")
 
     df = load_data()
 
