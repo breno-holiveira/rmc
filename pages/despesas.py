@@ -31,9 +31,9 @@ def show():
     # --- Critérios de inclusão (OU) ---
     subfun_ct = ["571", "572", "573", "606", "664", "665"]
     keywords = [
-        "pesquisa", "científica", "cientifico", "desenvolvimento",
-        "tecnologia", "laboratório", "inovação", "ciência", "técnico",
-        "tecnológico", "formação", "universidade", "ensino", "acadêmica"
+        "pesquisa", "científica", "cientifica", "ciencia", "inovacao", "desenvolvimento",
+        "P&D", "tecnologia", "laboratório", "laboratorio", "inovação", "técnico", "tecnico", "ciência"
+        "tecnológico", "tecnologico", "formação", "formacao"
     ]
 
     # Máscaras individuais
