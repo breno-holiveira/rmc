@@ -6,13 +6,13 @@ import plotly.express as px
 def load_data():
     df = pd.read_excel("despesas_sp.xlsx", sheet_name="despesas_sp")
 
-    # Corrigir nomes de colunas, se necessário
+    # Corrigir nomes de colunas
     df.columns = df.columns.str.strip()
 
-    # Garantir que o ano seja inteiro
+    # Extrair ano como inteiro
     df["Ano"] = df["Ano"].astype(str).str.extract(r"(\d{4})").astype(int)
 
-    # Corrigir valor da coluna "Liquidado" (de string para float)
+    # Converter "Liquidado" para float
     df["Liquidado"] = (
         df["Liquidado"]
         .astype(str)
@@ -28,31 +28,31 @@ def show():
 
     df = load_data()
 
-    # --- Filtro por função/subfunção C&T ---
+    # --- Critérios de inclusão (OU) ---
     subfun_ct = ["571", "572", "573", "606", "664", "665"]
-    func_ct = ["19"]  # Função Ciência e Tecnologia
-
-    mask_func = df["Função"].astype(str).str.startswith(tuple(func_ct))
-    mask_subfunc = df["Subfunção"].astype(str).isin(subfun_ct)
-    df = df[mask_func | mask_subfunc]
-
-    # --- Filtro por palavras-chave relacionadas à C&T ---
     keywords = [
         "pesquisa", "científica", "cientifico", "desenvolvimento",
         "tecnologia", "laboratório", "inovação", "ciência", "técnico",
         "tecnológico", "formação", "universidade", "ensino", "acadêmica"
     ]
 
+    # Máscaras individuais
+    mask_func = df["Função"].astype(str).str.strip() == "19"
+    mask_subfunc = df["Subfunção"].astype(str).isin(subfun_ct)
+
     def keyword_mask(col):
         return col.astype(str).str.lower().str.contains('|'.join(keywords), na=False)
 
-    df = df[
+    mask_keywords = (
         keyword_mask(df["Programa"]) |
         keyword_mask(df["Ação"]) |
         keyword_mask(df["Despesa"])
-    ]
+    )
 
-    # --- Exclusão de termos irrelevantes ---
+    # Combina os três com OU
+    df = df[mask_func | mask_subfunc | mask_keywords]
+
+    # --- Exclusão de termos que não têm relação com C&T ---
     excluir = ["inativos", "pensionistas", "previdência", "juros", "amortização"]
     mask_excluir = df["Despesa"].astype(str).str.lower().str.contains('|'.join(excluir), na=False)
     df = df[~mask_excluir]
@@ -68,7 +68,7 @@ def show():
 
     st.markdown(f"**Total de registros encontrados:** `{len(df)}`")
 
-    # --- Gráfico 1: Evolução anual dos gastos ---
+    # --- Gráfico 1: Evolução anual ---
     graf = df.groupby("Ano")["Liquidado"].sum().reset_index()
 
     fig = px.bar(
@@ -87,7 +87,7 @@ def show():
     )
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- Gráfico 2: Detalhamento por Programa ---
+    # --- Gráfico 2: Programas ---
     graf2 = df.groupby(["Ano", "Programa"])["Liquidado"].sum().reset_index()
 
     fig2 = px.bar(
@@ -106,6 +106,6 @@ def show():
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-    # --- Tabela com os dados brutos filtrados ---
+    # --- Tabela de dados filtrados ---
     with st.expander("Ver dados brutos filtrados"):
         st.dataframe(df.reset_index(drop=True), use_container_width=True)
