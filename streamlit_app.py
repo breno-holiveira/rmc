@@ -1,218 +1,215 @@
 import streamlit as st
 
-def academic_navigation_bar():
-    st.markdown("""
-    <style>
-    /* Reset Streamlit defaults */
+import pages.inicio as inicio
+import pages.despesas as despesas
+import pages.receitas as receitas
+import pages.emprego_renda as emprego_renda
+import pages.precos as precos
+import pages.producao as producao
+import pages.balanca_comercial as balanca_comercial
+import pages.acidentes_transito as acidentes_transito
+import pages.taxa_homicidios as taxa_homicidios
+import pages.alertas as alertas
+import pages.contato as contato
+
+st.set_page_config(
+    page_title="RMC Data",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+params = st.query_params
+pagina = params.get("page", "inicio")
+
+st.markdown("""
+<style>
+    /* Fonte padrão global: Times New Roman */
+    * {
+        font-family: 'Times New Roman', serif !important;
+    }
+
+    /* Oculta elementos do Streamlit */
     #MainMenu, footer, header, [data-testid="stSidebar"], [data-testid="collapsedControl"] {
         display: none !important;
     }
-    
-    /* Main container padding adjustment */
+
     .block-container {
-        padding-top: 70px !important;
+        padding-top: 60px !important;
     }
-    
-    /* Navigation bar */
-    .academic-navbar {
+
+    /* Navbar */
+    .navbar {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 70px;
-        background-color: #fff;
-        border-bottom: 1px solid #e0e0e0;
-        z-index: 1000;
+        right: 0;
+        height: 54px;
+        background: #ffffff;
+        border-bottom: 1px solid #cccccc;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 0 2rem;
-        font-family: 'Georgia', 'Times New Roman', serif;
+        padding: 0 32px;
+        gap: 32px;
+        z-index: 9999;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
-    
-    /* Logo section */
-    .nav-logo {
+
+    /* Logo maior, refinada e centralizada verticalmente */
+    .logo-container {
         display: flex;
-        align-items: baseline;
-        cursor: default;
-    }
-    .nav-logo-main {
-        font-size: 1.5rem;
+        align-items: center;
+        font-family: 'Times', serif;
+        font-size: 32px;
         font-weight: 700;
-        color: #2c3e50;
+        color: #1a1a1a;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        margin-right: auto;
+        user-select: none;
+        position: relative;
+        padding-bottom: 0;
     }
-    .nav-logo-sub {
-        font-size: 1.1rem;
-        font-weight: 400;
-        color: #7f8c8d;
-        margin-left: 0.3rem;
+
+    .logo-container .highlight {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2f5e88;
+        margin-left: 8px;
+        font-variant: small-caps;
+        letter-spacing: 0.02em;
+        text-transform: none;
+        line-height: 1;
     }
-    
-    /* Navigation links container */
-    .nav-links {
-        display: flex;
-        height: 100%;
-    }
-    
-    /* Navigation items */
+
     .nav-item {
         position: relative;
-        height: 100%;
-        display: flex;
-        align-items: center;
+        cursor: pointer;
     }
-    
-    /* Links styling */
-    .nav-link {
-        color: #34495e;
-        font-size: 0.95rem;
-        padding: 0 1.2rem;
-        height: 100%;
-        display: flex;
-        align-items: center;
+
+    .nav-link, a.nav-link {
+        color: #222;
+        font-size: 17px;
+        padding: 14px 10px;
         text-decoration: none;
-        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        transition: color 0.3s ease;
+        border-radius: 4px;
+        font-weight: 500;
     }
-    .nav-link:hover {
-        color: #2980b9;
+
+    .nav-link:hover, a.nav-link:hover,
+    .nav-item:hover > .nav-link {
+        color: #1a3e66;
     }
-    
-    /* Dropdown arrow */
+
     .dropdown-arrow {
-        margin-left: 0.4rem;
-        transition: transform 0.2s;
+        margin-left: 6px;
+        border: solid #444;
+        border-width: 0 2px 2px 0;
+        display: inline-block;
+        padding: 3px;
+        transform: rotate(45deg);
+        transition: transform 0.25s ease, border-color 0.25s ease;
     }
-    
-    /* Dropdown menu */
-    .dropdown-menu {
+
+    .nav-item:hover .dropdown-arrow {
+        transform: rotate(225deg);
+        border-color: #1a3e66;
+    }
+
+    .dropdown-content {
         position: absolute;
-        top: 100%;
+        top: 54px;
         left: 0;
-        background: #fff;
-        min-width: 200px;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        border: 1px solid #e0e0e0;
-        border-top: none;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.2s;
-        z-index: 1001;
+        background: #ffffff;
+        min-width: 190px;
+        border-top: 3px solid #2f5e88;
+        padding: 8px 0;
+        display: none;
+        border-radius: 0 0 8px 8px;
+        z-index: 99999;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
     }
-    
-    /* Dropdown items */
-    .dropdown-item {
-        padding: 0.7rem 1.2rem;
-        color: #34495e;
+
+    .nav-item:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-content a {
+        color: #222;
+        padding: 10px 22px;
+        font-size: 16px;
         text-decoration: none;
         display: block;
-        font-size: 0.9rem;
-        transition: all 0.2s;
+        transition: all 0.3s ease;
+        font-weight: 500;
     }
-    .dropdown-item:hover {
-        background: #f8f9fa;
-        color: #2980b9;
-    }
-    
-    /* Hover states */
-    .nav-item:hover .nav-link {
-        color: #2980b9;
-    }
-    .nav-item:hover .dropdown-arrow {
-        transform: rotate(180deg);
-    }
-    .nav-item:hover .dropdown-menu {
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    /* Vertical divider */
-    .nav-divider {
-        width: 1px;
-        height: 30px;
-        background: #e0e0e0;
-        margin: 0 0.5rem;
-    }
-    </style>
-    
-    <!-- Navigation Bar HTML -->
-    <nav class="academic-navbar">
-        <div class="nav-logo">
-            <span class="nav-logo-main">RMC</span>
-            <span class="nav-logo-sub">Data</span>
-        </div>
-        
-        <div class="nav-links">
-            <div class="nav-item">
-                <a href="#" class="nav-link">Home</a>
-            </div>
-            
-            <div class="nav-divider"></div>
-            
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    Economy 
-                    <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1L5 5L9 1" stroke="#34495e" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </a>
-                <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">GDP Analysis</a>
-                    <a href="#" class="dropdown-item">Regional Economies</a>
-                    <a href="#" class="dropdown-item">Sectorial Data</a>
-                </div>
-            </div>
-            
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    Finance 
-                    <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1L5 5L9 1" stroke="#34495e" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </a>
-                <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">Public Budget</a>
-                    <a href="#" class="dropdown-item">Tax Revenue</a>
-                    <a href="#" class="dropdown-item">Fiscal Reports</a>
-                </div>
-            </div>
-            
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    Security 
-                    <svg class="dropdown-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1L5 5L9 1" stroke="#34495e" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </a>
-                <div class="dropdown-menu">
-                    <a href="#" class="dropdown-item">Crime Statistics</a>
-                    <a href="#" class="dropdown-item">Public Safety</a>
-                    <a href="#" class="dropdown-item">Surveillance</a>
-                </div>
-            </div>
-            
-            <div class="nav-divider"></div>
-            
-            <div class="nav-item">
-                <a href="#" class="nav-link">Contact</a>
-            </div>
-        </div>
-    </nav>
-    """, unsafe_allow_html=True)
 
-# Initialize the app
-def main():
-    st.set_page_config(
-        page_title="Academic Data Portal",
-        page_icon="📊",
-        layout="wide"
-    )
-    
-    academic_navigation_bar()
-    
-    # Main content
-    st.markdown("<div style='height: 20px'></div>", unsafe_allow_html=True)
-    st.title("Academic Data Portal")
-    st.write("Welcome to the regional metropolitan data analysis platform.")
-    
-if __name__ == "__main__":
-    main()
+    .dropdown-content a:hover {
+        color: #1a3e66;
+        padding-left: 28px;
+    }
+</style>
+
+<!-- HTML da BARRA DE NAVEGAÇÃO -->
+<div class="navbar">
+    <div class="logo-container">RMC<span class="highlight">Data</span></div>
+    <div class="nav-item">
+        <a href="/?page=inicio" class="nav-link" target="_self">Início</a>
+    </div>
+    <div class="nav-item">
+        <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
+        <div class="dropdown-content">
+            <a href="/?page=emprego_renda" target="_self">Emprego e renda</a>
+            <a href="/?page=precos" target="_self">Preços</a>
+            <a href="/?page=producao" target="_self">Produção</a>
+        </div>
+    </div>
+    <div class="nav-item">
+        <span class="nav-link">Finanças<span class="dropdown-arrow"></span></span>
+        <div class="dropdown-content">
+            <a href="/?page=balanca_comercial" target="_self">Balança comercial</a>
+            <a href="/?page=despesas" target="_self">Despesas</a>
+            <a href="/?page=receitas" target="_self">Receitas</a>
+        </div>
+    </div>
+    <div class="nav-item">
+        <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
+        <div class="dropdown-content">
+            <a href="/?page=taxa_homicidios" target="_self">Taxa de homicídios</a>
+            <a href="/?page=acidentes_transito" target="_self">Acidentes de trânsito</a>
+        </div>
+    </div>
+    <div class="nav-item">
+        <a href="/?page=contato" class="nav-link" target="_self">Contato</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Roteamento
+match pagina:
+    case "inicio":
+        inicio.show()
+    case "despesas":
+        despesas.show()
+    case "receitas":
+        receitas.show()
+    case "emprego_renda":
+        emprego_renda.show()
+    case "precos":
+        precos.show()
+    case "balanca_comercial":
+        balanca_comercial.show()
+    case "acidentes_transito":
+        acidentes_transito.show()
+    case "taxa_homicidios":
+        taxa_homicidios.show()
+    case "alertas":
+        alertas.show()
+    case "producao":
+        producao.show()
+    case "contato":
+        contato.show()
+    case _:
+        st.warning("Página não encontrada.")
