@@ -1,5 +1,3 @@
-# pages/despesas.py
-
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -15,7 +13,7 @@ def load_data(path="despesas_sp.xlsx"):
     for col in df.select_dtypes("object"):
         df[col] = df[col].str.strip()
 
-    # Função auxiliar para converter moeda em float
+    # Função auxiliar para converter moeda em float com coerção de erros
     def clean_money(col_series):
         s = (
             col_series.astype(str)
@@ -25,13 +23,14 @@ def load_data(path="despesas_sp.xlsx"):
         )
         return pd.to_numeric(s, errors="coerce")
 
-    # Aplica limpeza
+    # Aplica limpeza com coerção
     df["Despesa"]   = clean_money(df["Despesa"])
     df["Liquidado"] = clean_money(df["Liquidado"])
 
     # Descarta linhas sem valor numérico em 'Despesa'
     df = df.dropna(subset=["Despesa"])
     return df
+
 
 def show():
     st.markdown("## Análise de Despesas em C&T (2016–2021)")
