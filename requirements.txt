@@ -1,4 +1,7 @@
 streamlit==1.33.0
-streamlit-navigation-bar==3.3.0
-import geopandas as gpd
-
+pandas==2.3.0
+geopandas==0.14.3
+pyproj==3.6.1
+fiona==1.9.6
+shapely==2.0.3
+numpy==1.26.4
