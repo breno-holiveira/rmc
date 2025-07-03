@@ -24,7 +24,7 @@ pagina = params.get("page", "inicio")
 st.markdown("""
 <style>
     * {
-        font-family: Arial, Helvetica, sans-serif !important;
+        font-family: 'Segoe UI', Tahoma, sans-serif !important;
     }
 
     /* Oculta elementos do Streamlit */
@@ -33,121 +33,108 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 60px !important;
+        padding-top: 64px !important;
     }
 
-    /* Navbar */
+    /* Barra superior */
     .navbar {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        height: 54px;
-        background: #ffffff;
-        border-bottom: 1px solid #cccccc;
+        height: 56px;
+        background: #fdfdfd;
+        border-bottom: 1px solid #e0e0e0;
         display: flex;
         align-items: center;
-        padding: 0 32px;
-        gap: 32px;
+        padding: 0 36px;
+        gap: 28px;
         z-index: 9999;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        box-shadow: 0 1px 6px rgba(0,0,0,0.03);
     }
 
-    /* NOVA LOGO REFINADA */
+    /* LOGO refinada */
     .logo-container {
         display: flex;
-        align-items: center;
-        margin-right: auto;
-        font-family: 'Merriweather', serif;
+        align-items: baseline;
+        font-family: 'Georgia', serif;
         font-size: 30px;
-        font-weight: 400;
-        color: #1f1f1f;
-        letter-spacing: 0.5px;
-        text-transform: none;
-        user-select: none;
-        position: relative;
-        line-height: 1;
-        padding-bottom: 2px;
-        gap: 6px;
-    }
-
-    .logo-rmc {
-        font-weight: 700;
-        color: #202020;
-        letter-spacing: 0.03em;
+        font-weight: 600;
+        color: #242424;
+        letter-spacing: 0.02em;
         text-transform: uppercase;
-        font-size: 32px;
+        margin-right: auto;
+        user-select: none;
     }
 
-    .logo-divider {
+    .logo-separator {
+        display: inline-block;
         width: 6px;
         height: 6px;
-        background-color: #1f4e79;
+        background: #264a73;
         border-radius: 50%;
-        margin: 0 4px;
-        position: relative;
-        top: -1px;
+        margin: 0 8px;
+        transform: translateY(-2px);
     }
 
-    .logo-data {
-        font-weight: 400;
-        color: #1f4e79;
+    .logo-highlight {
         font-size: 24px;
+        font-weight: 400;
+        color: #264a73;
+        font-variant: small-caps;
         font-style: italic;
+        opacity: 0.9;
         letter-spacing: 0.03em;
-        text-transform: capitalize;
-        opacity: 0.95;
     }
 
+    /* Navegação */
     .nav-item {
         position: relative;
         cursor: pointer;
     }
 
     .nav-link, a.nav-link {
-        color: #222;
-        font-size: 17px;
-        padding: 14px 10px;
+        color: #333;
+        font-size: 16px;
+        padding: 12px 10px;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
-        transition: color 0.3s ease;
-        border-radius: 4px;
+        transition: all 0.3s ease;
         font-weight: 500;
     }
 
-    .nav-link:hover, a.nav-link:hover,
+    .nav-link:hover,
+    a.nav-link:hover,
     .nav-item:hover > .nav-link {
-        color: #1a3e66;
+        color: #1e3f66;
     }
 
     .dropdown-arrow {
         margin-left: 6px;
-        border: solid #444;
+        border: solid #555;
         border-width: 0 2px 2px 0;
-        display: inline-block;
         padding: 3px;
         transform: rotate(45deg);
-        transition: transform 0.25s ease, border-color 0.25s ease;
+        transition: transform 0.3s ease;
     }
 
     .nav-item:hover .dropdown-arrow {
         transform: rotate(225deg);
-        border-color: #1a3e66;
     }
 
     .dropdown-content {
         position: absolute;
-        top: 54px;
+        top: 56px;
         left: 0;
         background: #ffffff;
-        min-width: 190px;
-        border-top: 3px solid #2f5e88;
-        padding: 8px 0;
+        min-width: 180px;
+        border-top: 3px solid #264a73;
+        padding: 6px 0;
         display: none;
         border-radius: 0 0 8px 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
         z-index: 99999;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
     }
 
     .nav-item:hover .dropdown-content {
@@ -155,9 +142,9 @@ st.markdown("""
     }
 
     .dropdown-content a {
-        color: #222;
-        padding: 10px 22px;
-        font-size: 17px;
+        color: #333;
+        padding: 10px 20px;
+        font-size: 15.5px;
         text-decoration: none;
         display: block;
         transition: all 0.3s ease;
@@ -165,21 +152,22 @@ st.markdown("""
     }
 
     .dropdown-content a:hover {
-        color: #1a3e66;
+        background-color: #f5f5f5;
+        color: #1e3f66;
         padding-left: 28px;
     }
 </style>
 
-<!-- HTML da BARRA DE NAVEGAÇÃO -->
+<!-- HTML da barra -->
 <div class="navbar">
     <div class="logo-container">
-        <span class="logo-rmc">RMC</span>
-        <div class="logo-divider"></div>
-        <span class="logo-data">Data</span>
+        RMC<span class="logo-separator"></span><span class="logo-highlight">Data</span>
     </div>
+
     <div class="nav-item">
         <a href="/?page=inicio" class="nav-link" target="_self">Início</a>
     </div>
+
     <div class="nav-item">
         <span class="nav-link">Economia <span class="dropdown-arrow"></span></span>
         <div class="dropdown-content">
@@ -188,14 +176,16 @@ st.markdown("""
             <a href="/?page=producao" target="_self">Produção</a>
         </div>
     </div>
+
     <div class="nav-item">
-        <span class="nav-link">Finanças<span class="dropdown-arrow"></span></span>
+        <span class="nav-link">Finanças <span class="dropdown-arrow"></span></span>
         <div class="dropdown-content">
             <a href="/?page=balanca_comercial" target="_self">Balança comercial</a>
             <a href="/?page=despesas" target="_self">Despesas</a>
             <a href="/?page=receitas" target="_self">Receitas</a>
         </div>
     </div>
+
     <div class="nav-item">
         <span class="nav-link">Segurança <span class="dropdown-arrow"></span></span>
         <div class="dropdown-content">
@@ -203,6 +193,7 @@ st.markdown("""
             <a href="/?page=acidentes_transito" target="_self">Acidentes de trânsito</a>
         </div>
     </div>
+
     <div class="nav-item">
         <a href="/?page=contato" class="nav-link" target="_self">Contato</a>
     </div>
