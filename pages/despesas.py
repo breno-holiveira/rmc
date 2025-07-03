@@ -97,10 +97,24 @@ def show():
         x="Ano",
         y="Liquidado",
         labels={"Ano": "Ano", "Liquidado": "R$"},
-        text_auto=".2f",
+        text=None,  # Remove os rótulos de valor
         color_discrete_sequence=["#4472c4"]
     )
-    fig_ano.update_layout(yaxis_title="Valor (R$)", xaxis_title="Ano", title="Total Liquidado por Ano", title_x=0.5)
+    fig_ano.update_layout(
+        yaxis_title="Valor (R$)", 
+        xaxis_title="Ano", 
+        title="Total Liquidado por Ano", 
+        title_x=0.5,
+        hovermode="x unified",
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=12,
+            font_family="Arial"
+        )
+    )
+    fig_ano.update_traces(
+        hovertemplate="<b>Ano:</b> %{x}<br><b>Valor:</b> R$ %{y:,.2f}<extra></extra>"
+    )
     st.plotly_chart(fig_ano, use_container_width=True)
 
     # === Gráfico 2: Unidades Gestoras ===
@@ -122,10 +136,24 @@ def show():
         y="Unidade Gestora",
         orientation="h",
         labels={"Liquidado": "R$", "Unidade Gestora": "UG"},
-        text_auto=".2f",
+        text=None,  # Remove os rótulos de valor
         color_discrete_sequence=["#70ad47"]
     )
-    fig_uo.update_layout(xaxis_title="Valor (R$)", yaxis_title="Unidade Gestora", title="Top 10 Unidades Gestoras", title_x=0.5)
+    fig_uo.update_layout(
+        xaxis_title="Valor (R$)", 
+        yaxis_title="Unidade Gestora", 
+        title="Top 10 Unidades Gestoras", 
+        title_x=0.5,
+        hovermode="y unified",
+        hoverlabel=dict(
+            bgcolor="white",
+            font_size=12,
+            font_family="Arial"
+        )
+    )
+    fig_uo.update_traces(
+        hovertemplate="<b>Unidade Gestora:</b> %{y}<br><b>Valor:</b> R$ %{x:,.2f}<extra></extra>"
+    )
     st.plotly_chart(fig_uo, use_container_width=True)
 
     # === Tabela com dados ===
