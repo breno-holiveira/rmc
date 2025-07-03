@@ -73,7 +73,7 @@ st.markdown("""
 
     .logo-rmc {
         font-weight: 600;
-        color: #202020;
+        color: #403f3f;
         letter-spacing: 0.03em;
         text-transform: uppercase;
         font-size: 32px;
