@@ -66,7 +66,6 @@ def show():
     mask_keywords = (
         contem_keywords(df["Ação_norm"]) |
         contem_keywords(df["Funcional_norm"]) |
-        contem_keywords(df["Credor_norm"]) |
         contem_keywords(df["Despesa_norm"])
     )
 
