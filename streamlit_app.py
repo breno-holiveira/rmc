@@ -13,7 +13,7 @@ import pages.alertas as alertas
 import pages.contato as contato
 
 st.set_page_config(
-    page_title="RMmC Data",
+    page_title="RMC Data",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -58,8 +58,8 @@ st.markdown("""
         display: flex;
         align-items: center;
         font-family: 'Times', serif;
-        font-size: 32px;
-        font-weight: 700;
+        font-size: 36px;
+        font-weight: 600;
         color: #1a1a1a;
         letter-spacing: 0.02em;
         text-transform: uppercase;
@@ -70,7 +70,7 @@ st.markdown("""
     }
 
     .logo-container .highlight {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: 600;
         color: #2f5e88;
         margin-left: 8px;
