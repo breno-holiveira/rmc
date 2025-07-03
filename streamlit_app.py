@@ -13,7 +13,7 @@ import pages.alertas as alertas
 import pages.contato as contato
 
 st.set_page_config(
-    page_title="RMC Data",
+    page_title="RMmC Data",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
