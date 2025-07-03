@@ -29,7 +29,7 @@ def normalizar(texto):
 
 # === App principal ===
 def show():
-    st.markdown("## Dispêndios públicos em C&T liquidados no município de Campinas")
+    st.markdown("## Dispêndios públicos em C&T (2016 - 2024) | Campinas")
 
     opcao = st.selectbox("Selecione o tipo de despesa", ["Despesas estaduais em C&T", "Despesas municipais em C&T"], key="tipo_despesa")
 
