@@ -138,7 +138,7 @@ st.markdown("""
     .dropdown-content a {
         color: #222;
         padding: 10px 22px;
-        font-size: 16px;
+        font-size: 17px;
         text-decoration: none;
         display: block;
         transition: all 0.3s ease;
