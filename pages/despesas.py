@@ -88,7 +88,6 @@ def show():
     st.markdown('***')
 
     # === Gráfico 1: Total por Ano ===
-
     dados_ano = df_filtrado.groupby("Ano")["Liquidado"].sum().reset_index()
 
     fig_ano = px.bar(
@@ -96,7 +95,7 @@ def show():
         x="Ano",
         y="Liquidado",
         labels={"Ano": "Ano", "Liquidado": "R$"},
-        text=None,  # Remove os rótulos de valor
+        text=None,
         color_discrete_sequence=["#4472c4"]
     )
     fig_ano.update_layout(
@@ -117,7 +116,6 @@ def show():
     st.plotly_chart(fig_ano, use_container_width=True)
 
     # === Gráfico 2: Unidades Gestoras ===
-    
     anos_disponiveis = ["Todos"] + sorted(df_filtrado["Ano"].unique())
     ano_sel = st.selectbox("Filtrar por ano:", anos_disponiveis, key="ano_selecionado")
 
@@ -126,14 +124,14 @@ def show():
     else:
         df_uo = df_filtrado.copy()
 
-dados_uo = (
-    df_uo.groupby("Unidade Gestora")["Liquidado"]
-    .sum()
-    .sort_values(ascending=False)
-    .head(10)
-    .iloc[::-1]  # ← inverte para que o maior fique no topo do gráfico horizontal
-    .reset_index()
-)
+    dados_uo = (
+        df_uo.groupby("Unidade Gestora")["Liquidado"]
+        .sum()
+        .sort_values(ascending=False)
+        .head(10)
+        .iloc[::-1]
+        .reset_index()
+    )
 
     fig_uo = px.bar(
         dados_uo,
@@ -141,7 +139,7 @@ dados_uo = (
         y="Unidade Gestora",
         orientation="h",
         labels={"Liquidado": "R$", "Unidade Gestora": "UG"},
-        text=None,  # Remove os rótulos de valor
+        text=None,
         color_discrete_sequence=["#70ad47"]
     )
     fig_uo.update_layout(
