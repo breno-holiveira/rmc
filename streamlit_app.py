@@ -23,9 +23,8 @@ pagina = params.get("page", "inicio")
 
 st.markdown("""
 <style>
-    /* Fonte padrão global: Times New Roman */
     * {
-        font-family: 'Times New Roman', serif !important;
+        font-family: Arial, Helvetica, sans-serif !important;
     }
 
     /* Oculta elementos do Streamlit */
