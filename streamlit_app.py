@@ -56,30 +56,32 @@ st.markdown("""
     /* Logo maior, refinada e centralizada verticalmente */
 .logo-container {
     display: flex;
-    align-items: flex-end; /* Alinha verticalmente pela base */
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 36px;
-    font-weight: 500; /* menos pesado que 600 */
-    color: #2f2f2f;  /* cinza escuro elegante */
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    align-items: baseline; /* alinhamento refinado com base */
+    font-family: 'Georgia', serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: #2c2c2c;  /* cinza sofisticado */
+    letter-spacing: 0.01em;
+    text-transform: none;
     margin-right: auto;
     user-select: none;
     position: relative;
-    line-height: 1;
+    line-height: 1.1;
 }
 
 .logo-container .highlight {
-    font-size: 30px;
-    font-weight: 400;  /* mais leve que RMC para hierarquia sutil */
-    color: #2f5e88;    /* azul institucional */
-    margin-left: 6px;
+    font-size: 26px;
+    font-weight: 400;
+    color: #1f4e79;  /* azul escuro sóbrio */
+    margin-left: 10px;
     font-variant: small-caps;
-    letter-spacing: 0.01em;
-    text-transform: none;
-    font-style: italic; /* opcional: toque de elegância */
+    font-style: italic;
+    letter-spacing: 0.02em;
     opacity: 0.95;
+    position: relative;
+    top: 2px;
 }
+
 
     .nav-item {
         position: relative;
