@@ -29,12 +29,12 @@ def normalizar(texto):
 
 # === App principal ===
 def show():
-    st.title("Análise de Despesas em C&T – Campinas/SP")
+    st.markdown("## Dispêndios públicos em C&T liquidados no município de Campinas")
 
     opcao = st.selectbox("Selecione o tipo de despesa", ["Despesas estaduais em C&T", "Despesas municipais em C&T"], key="tipo_despesa")
 
     if opcao == "Despesas municipais em C&T":
-        st.info("Em breve: módulo de despesas municipais.")
+        st.info("Despesas municipais a serem inseridas...")
         return
 
     df = load_data()
@@ -88,7 +88,7 @@ def show():
     st.markdown(f"**Registros encontrados:** {len(df_filtrado)}")
 
     # === Gráfico 1: Total por Ano ===
-    st.subheader("💰 Total Liquidado por Ano (R$)")
+    st.subheader("Valor total (R$)")
 
     dados_ano = df_filtrado.groupby("Ano")["Liquidado"].sum().reset_index()
 
@@ -103,12 +103,12 @@ def show():
     fig_ano.update_layout(
         yaxis_title="Valor (R$)", 
         xaxis_title="Ano", 
-        title="Total Liquidado por Ano", 
+        title="Valor total liquidado por ano (R$)", 
         title_x=0.5,
         hovermode="x unified",
         hoverlabel=dict(
             bgcolor="white",
-            font_size=12,
+            font_size=14,
             font_family="Arial"
         )
     )
@@ -118,7 +118,7 @@ def show():
     st.plotly_chart(fig_ano, use_container_width=True)
 
     # === Gráfico 2: Unidades Gestoras ===
-    st.subheader("🏛️ Top 10 Unidades Gestoras por Ano")
+    st.subheader("Valor liquidado por unidade gestora")
 
     anos_disponiveis = ["Todos"] + sorted(df_filtrado["Ano"].unique())
     ano_sel = st.selectbox("Filtrar por ano:", anos_disponiveis, key="ano_selecionado")
@@ -142,7 +142,7 @@ def show():
     fig_uo.update_layout(
         xaxis_title="Valor (R$)", 
         yaxis_title="Unidade Gestora", 
-        title="Top 10 Unidades Gestoras", 
+        title="Valor por unidade gestora (R$)", 
         title_x=0.5,
         hovermode="y unified",
         hoverlabel=dict(
@@ -157,9 +157,9 @@ def show():
     st.plotly_chart(fig_uo, use_container_width=True)
 
     # === Tabela com dados ===
-    with st.expander("📄 Ver dados filtrados"):
+    with st.expander("📄 Visualizar os dados filtrados"):
         st.dataframe(df_filtrado[[
-            "Ano", "Programa", "Órgão", "UO", "Unidade Gestora", "Despesa", "Liquidado"
+            "Ano", "Função", "Subfunção", "Ação", "Funcional Programática", "Credor", "Despesa", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado"
         ]], use_container_width=True)
 
 if __name__ == "__main__":
