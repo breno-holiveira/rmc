@@ -59,8 +59,8 @@ st.markdown("""
         align-items: center;
         font-family: 'Times', serif;
         font-size: 36px;
-        font-weight: 500;
-        color: #1a1a1a;
+        font-weight: 600;
+        color: #1f1e1e;
         letter-spacing: 0.02em;
         text-transform: uppercase;
         margin-right: auto;
@@ -71,7 +71,7 @@ st.markdown("""
 
     .logo-container .highlight {
         font-size: 32px;
-        font-weight: 500;
+        font-weight: 600;
         color: #2f5e88;
         margin-left: 8px;
         font-variant: small-caps;
