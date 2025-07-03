@@ -13,7 +13,7 @@ import pages.alertas as alertas
 import pages.contato as contato
 
 st.set_page_config(
-    page_title="RMC Data",
+    page_title="RMmC Data",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -53,49 +53,31 @@ st.markdown("""
         box-shadow: 0 1px 4px rgba(0,0,0,0.04);
     }
 
-    /* NOVA LOGO REFINADA */
+    /* Logo maior, refinada e centralizada verticalmente */
     .logo-container {
         display: flex;
         align-items: center;
+        font-family: 'Times', serif;
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
         margin-right: auto;
-        font-family: 'Merriweather', serif;
-        font-size: 30px;
-        font-weight: 400;
-        color: #1f1f1f;
-        letter-spacing: 0.5px;
-        text-transform: none;
         user-select: none;
         position: relative;
+        padding-bottom: 0;
+    }
+
+    .logo-container .highlight {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2f5e88;
+        margin-left: 8px;
+        font-variant: small-caps;
+        letter-spacing: 0.02em;
+        text-transform: none;
         line-height: 1;
-        padding-bottom: 2px;
-        gap: 6px;
-    }
-
-    .logo-rmc {
-        font-weight: 700;
-        color: #202020;
-        letter-spacing: 0.03em;
-        text-transform: uppercase;
-        font-size: 32px;
-    }
-
-    .logo-divider {
-        width: 6px;
-        height: 6px;
-        background-color: #1f4e79;
-        border-radius: 50%;
-        margin: 0 4px;
-        position: relative;
-        top: -1px;
-    }
-
-    .logo-data {
-        font-weight: 400;
-        color: #1f4e79;
-        font-size: 24px;
-        letter-spacing: 0.03em;
-        text-transform: capitalize;
-        opacity: 0.95;
     }
 
     .nav-item {
@@ -171,11 +153,7 @@ st.markdown("""
 
 <!-- HTML da BARRA DE NAVEGAÇÃO -->
 <div class="navbar">
-    <div class="logo-container">
-        <span class="logo-rmc">RMC</span>
-        <div class="logo-divider"></div>
-        <span class="logo-data">Data</span>
-    </div>
+    <div class="logo-container">RMC<span class="highlight">Data</span></div>
     <div class="nav-item">
         <a href="/?page=inicio" class="nav-link" target="_self">Início</a>
     </div>
