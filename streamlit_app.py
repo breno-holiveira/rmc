@@ -54,31 +54,32 @@ st.markdown("""
     }
 
     /* Logo maior, refinada e centralizada verticalmente */
-    .logo-container {
-        display: flex;
-        align-items: center;
-        font-family: 'Times', serif;
-        font-size: 34px;
-        font-weight: 600;
-        color: #3a3a3a;
-        letter-spacing: 0.02em;
-        text-transform: uppercase;
-        margin-right: auto;
-        user-select: none;
-        position: relative;
-        padding-bottom: 0;
-    }
+.logo-container {
+    display: flex;
+    align-items: flex-end; /* Alinha verticalmente pela base */
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 36px;
+    font-weight: 500; /* menos pesado que 600 */
+    color: #2f2f2f;  /* cinza escuro elegante */
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-right: auto;
+    user-select: none;
+    position: relative;
+    line-height: 1;
+}
 
-    .logo-container .highlight {
-        font-size: 28px;
-        font-weight: 600;
-        color: #2f5e88;
-        margin-left: 8px;
-        font-variant: small-caps;
-        letter-spacing: 0.02em;
-        text-transform: none;
-        line-height: 1;
-    }
+.logo-container .highlight {
+    font-size: 30px;
+    font-weight: 400;  /* mais leve que RMC para hierarquia sutil */
+    color: #2f5e88;    /* azul institucional */
+    margin-left: 6px;
+    font-variant: small-caps;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    font-style: italic; /* opcional: toque de elegância */
+    opacity: 0.95;
+}
 
     .nav-item {
         position: relative;
