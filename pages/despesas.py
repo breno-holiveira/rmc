@@ -1,146 +1,96 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
-from babel.numbers import format_currency
+import unicodedata
 
 @st.cache_data
 def load_data():
     df = pd.read_excel("despesas_sp.xlsx", sheet_name="despesas_sp")
-
-    # Corrigir nomes de colunas
     df.columns = df.columns.str.strip()
 
-    # Extrair ano como inteiro
-    df["Ano"] = df["Ano"].astype(str).str.extract(r"(\d{4})").astype(int)
-
-    # Converter "Liquidado" para float
-    df["Liquidado"] = (
-        df["Liquidado"]
-        .astype(str)
-        .str.replace(".", "", regex=False)
-        .str.replace(",", ".", regex=False)
-        .astype(float)
-    )
+    # Corrigir valores da coluna 'Liquidado'
+    # Se os valores estiverem como: 383267,93 (vírgula decimal, sem milhar), apenas troca vírgula por ponto
+    df["Liquidado"] = df["Liquidado"].astype(str).str.replace(",", ".", regex=False)
+    df["Liquidado"] = pd.to_numeric(df["Liquidado"], errors='coerce')
 
     return df
 
-def format_brl(x):
-    return format_currency(x, 'BRL', locale='pt_BR')
-
-def top_n_outros(df, grupo, valor, n=7):
-    df_agg = df.groupby(grupo)[valor].sum().sort_values(ascending=False)
-    top_n = df_agg.head(n)
-    outros = df_agg[n:].sum()
-    if outros > 0:
-        top_n["Outros"] = outros
-    return top_n.reset_index()
+# Remove acentos e converte para minúsculas
+def normalizar(texto):
+    if pd.isna(texto):
+        return ""
+    return unicodedata.normalize("NFKD", str(texto)).encode("ASCII", "ignore").decode("utf-8").lower()
 
 def show():
-    st.title("Análise de Despesas em C&T (2016–2021)")
+    st.title("Filtro: Função 19, Subfunções específicas OU Palavras-chave em colunas (excluindo termos específicos)")
 
     df = load_data()
 
-    # --- Critérios de inclusão (OU) ---
-    subfun_ct = ["571", "572", "573", "606", "664", "665"]
-    keywords = [
-        "pesquisa", "científica", "cientifica", "ciencia", "inovacao", "desenvolvimento",
-        "P&D", "tecnologia", "laboratório", "laboratorio", "inovação", "técnico", "tecnico", "ciência",
-        "tecnológico", "tecnologico", "formação", "formacao", "universidade", "ensino", "acadêmica"
+    # --- Normalizar colunas-alvo ---
+    df["Ação_norm"] = df["Ação"].apply(normalizar)
+    df["Funcional_norm"] = df["Funcional Programática"].apply(normalizar)
+    df["Credor_norm"] = df["Credor"].apply(normalizar)
+    df["Despesa_norm"] = df["Despesa"].apply(normalizar)
+
+    # --- Excluir linhas com palavras proibidas na coluna Despesa ---
+    palavras_excluir = [
+        "obras", "instalacoes", "mobiliario", "recreativo", "conservacao",
+        "reformas", "reposicao", "despesas miudas", "auxilio", "seguro",
+        "indenizacoes", "indenizacao", "ajuda de custo"
     ]
-
-    mask_func = df["Função"].astype(str).str.strip() == "19"
-    mask_subfunc = df["Subfunção"].astype(str).isin(subfun_ct)
-
-    def keyword_mask(col):
-        return col.astype(str).str.lower().str.contains('|'.join(keywords), na=False)
-
-    mask_keywords = (
-        keyword_mask(df["Programa"]) |
-        keyword_mask(df["Ação"]) |
-        keyword_mask(df["Despesa"])
-    )
-
-    df = df[mask_func | mask_subfunc | mask_keywords]
-
-    # --- Exclusões ---
-    excluir = ["inativos", "pensionistas", "juros", "amortização", "assistencia hospitalar"]
-    mask_excluir = df["Despesa"].astype(str).str.lower().str.contains('|'.join(excluir), na=False)
+    mask_excluir = df["Despesa_norm"].str.contains("|".join(palavras_excluir), na=False)
     df = df[~mask_excluir]
 
-    # --- Filtro por município ---
-    municipios = sorted(df["Município"].dropna().unique())
-    municipio_sel = st.selectbox(
-        "Selecione o município",
-        municipios,
-        index=municipios.index("CAMPINAS") if "CAMPINAS" in municipios else 0
-    )
-    df = df[df["Município"] == municipio_sel]
+    # --- Palavras-chave relacionadas a C&T ---
+    keywords = [
+        "pesquisa", "cientifica", "ciencia", "inovacao", "desenvolvimento",
+        "p&d", "tecnologia", "academica", "robotica", "extensao"
+    ]
 
-    st.markdown(f"**Total de registros encontrados:** `{len(df)}`")
+    # --- Máscaras principais ---
+    mask_funcao = df["Função"].astype(str).str.strip() == "19 - CIENCIA E TECNOLOGIA"
 
-    # --- Gráfico 1: Total por ano ---
-    dados_ano = df.groupby("Ano")["Liquidado"].sum().reset_index()
-    fig1 = px.bar(
-        dados_ano, x="Ano", y="Liquidado", text_auto=".2s",
-        title=f"Total de Despesas em C&T – {municipio_sel}",
-        labels={"Liquidado": "Valor Liquidado (R$)"}
-    )
-    fig1.update_layout(
-        yaxis_tickprefix="R$ ",
-        xaxis_title="Ano",
-        yaxis_title="Total Liquidado",
-        title_x=0.05
-    )
-    fig1.update_traces(texttemplate='%{text:.2s}', hovertemplate='Ano: %{x}<br>R$ %{y:,.2f}<extra></extra>')
-    st.plotly_chart(fig1, use_container_width=True)
+    subfuncoes_validas = [
+        "571 - DESENVOLVIMENTO CIENTIFICO",
+        "572 - DESENVOLVIMENTO TECNOLOGICO E ENGENHARIA",
+        "573 - DIFUSAO DO CONHECIMENTO CIENT.E TECNOLOGICO",
+        "606 - EXTENSAO RURAL",
+        "665 - NORMALIZACAO E QUALIDADE"
+    ]
+    mask_subfuncao = df["Subfunção"].astype(str).str.strip().isin(subfuncoes_validas)
 
-    # --- Gráfico 2: Programas ---
-    top_programas = top_n_outros(df, "Programa", "Liquidado")
-    fig2 = px.bar(
-        top_programas, x="Programa", y="Liquidado",
-        title=f"Top 7 Programas de C&T – {municipio_sel}",
-        labels={"Liquidado": "Valor Liquidado (R$)"}
-    )
-    fig2.update_layout(xaxis_title="Programa", yaxis_tickprefix="R$ ", title_x=0.05)
-    fig2.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
-    st.plotly_chart(fig2, use_container_width=True)
+    def contem_keywords(serie):
+        return serie.str.contains("|".join(keywords), na=False)
 
-    # --- Gráfico 3: Órgão ---
-    top_orgaos = top_n_outros(df, "Órgão", "Liquidado")
-    fig3 = px.bar(
-        top_orgaos, x="Órgão", y="Liquidado",
-        title=f"Top 7 Órgãos em C&T – {municipio_sel}",
-        labels={"Liquidado": "Valor Liquidado (R$)"}
+    mask_keywords = (
+        contem_keywords(df["Ação_norm"]) |
+        contem_keywords(df["Funcional_norm"]) |
+        contem_keywords(df["Credor_norm"]) |
+        contem_keywords(df["Despesa_norm"])
     )
-    fig3.update_layout(xaxis_title="Órgão", yaxis_tickprefix="R$ ", title_x=0.05)
-    fig3.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
-    st.plotly_chart(fig3, use_container_width=True)
 
-    # --- Gráfico 4: UO ---
-    top_uo = top_n_outros(df, "UO", "Liquidado")
-    fig4 = px.bar(
-        top_uo, x="UO", y="Liquidado",
-        title=f"Top 7 Unidades Orçamentárias – {municipio_sel}",
-        labels={"Liquidado": "Valor Liquidado (R$)"}
-    )
-    fig4.update_layout(xaxis_title="UO", yaxis_tickprefix="R$ ", title_x=0.05)
-    fig4.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
-    st.plotly_chart(fig4, use_container_width=True)
+    # --- Aplica filtro combinado (OU) ---
+    df_filtrado = df[mask_funcao | mask_subfuncao | mask_keywords]
 
-    # --- Gráfico 5: Unidade Gestora ---
-    top_gestora = top_n_outros(df, "Unidade Gestora", "Liquidado")
-    fig5 = px.bar(
-        top_gestora, x="Unidade Gestora", y="Liquidado",
-        title=f"Top 7 Unidades Gestoras – {municipio_sel}",
-        labels={"Liquidado": "Valor Liquidado (R$)"}
-    )
-    fig5.update_layout(xaxis_title="Unidade Gestora", yaxis_tickprefix="R$ ", title_x=0.05)
-    fig5.update_traces(hovertemplate='%{x}<br>R$ %{y:,.2f}<extra></extra>')
-    st.plotly_chart(fig5, use_container_width=True)
+    # --- Exibe resultado ---
+    st.markdown(f"**Registros encontrados:** `{len(df_filtrado)}`")
+    st.dataframe(df_filtrado, use_container_width=True)
 
-    # --- Tabela com valores formatados ---
-    df["Liquidado (R$)"] = df["Liquidado"].apply(format_brl)
-    with st.expander("Ver dados brutos filtrados"):
-        st.dataframe(df[[
-            "Ano", "Município", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado (R$)"
-        ]], use_container_width=True)
+    # --- Gráfico por ano ---
+    try:
+        df_filtrado["Ano"] = pd.to_datetime(df_filtrado["Ano"], errors='coerce').dt.year
+        gastos_ano = df_filtrado.groupby("Ano")["Liquidado"].sum().reset_index()
+        st.subheader("Total de despesas por ano")
+        st.bar_chart(gastos_ano.set_index("Ano")["Liquidado"])
+    except:
+        st.warning("Não foi possível gerar o gráfico por ano.")
+
+    # --- Gráfico por unidade gestora ---
+    try:
+        top_ug = df_filtrado.groupby("Unidade Gestora")["Liquidado"].sum().nlargest(10).reset_index()
+        st.subheader("Top 10 unidades gestoras por despesa")
+        st.bar_chart(top_ug.set_index("Unidade Gestora")["Liquidado"])
+    except:
+        st.warning("Não foi possível gerar o gráfico por unidade gestora.")
+
+if __name__ == "__main__":
+    show()
