@@ -24,7 +24,7 @@ pagina = params.get("page", "inicio")
 st.markdown("""
 <style>
     * {
-        font-family: 'Segoe UI', Tahoma, sans-serif !important;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
     }
 
     /* Oculta elementos do Streamlit */
@@ -36,7 +36,7 @@ st.markdown("""
         padding-top: 64px !important;
     }
 
-    /* Barra superior */
+    /* Navbar */
     .navbar {
         position: fixed;
         top: 0;
@@ -53,7 +53,7 @@ st.markdown("""
         box-shadow: 0 1px 6px rgba(0,0,0,0.03);
     }
 
-    /* LOGO refinada */
+    /* Logo refinada */
     .logo-container {
         display: flex;
         align-items: baseline;
