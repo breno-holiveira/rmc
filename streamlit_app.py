@@ -70,7 +70,7 @@ st.markdown("""
     }
 
     .logo-container .highlight {
-        font-size: 26px;
+        font-size: 28px;
         font-weight: 600;
         color: #2f5e88;
         margin-left: 8px;
