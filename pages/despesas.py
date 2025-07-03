@@ -126,7 +126,14 @@ def show():
     else:
         df_uo = df_filtrado.copy()
 
-    dados_uo = df_uo.groupby("Unidade Gestora")["Liquidado"].sum().sort_values(ascending=False).head(10).reset_index()
+dados_uo = (
+    df_uo.groupby("Unidade Gestora")["Liquidado"]
+    .sum()
+    .sort_values(ascending=False)
+    .head(10)
+    .iloc[::-1]  # ← inverte para que o maior fique no topo do gráfico horizontal
+    .reset_index()
+)
 
     fig_uo = px.bar(
         dados_uo,
