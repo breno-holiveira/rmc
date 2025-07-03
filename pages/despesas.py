@@ -88,7 +88,6 @@ def show():
     st.markdown(f"**Registros encontrados:** {len(df_filtrado)}")
 
     # === Gráfico 1: Total por Ano ===
-    st.subheader("Valor total (R$)")
 
     dados_ano = df_filtrado.groupby("Ano")["Liquidado"].sum().reset_index()
 
@@ -104,8 +103,8 @@ def show():
         yaxis_title="Valor (R$)", 
         xaxis_title="Ano", 
         title="Valor total liquidado por ano (R$)", 
-        title_x=0.5,
-        hovermode="x unified",
+        title_x=0.0,
+        hovermode="closest",
         hoverlabel=dict(
             bgcolor="white",
             font_size=14,
@@ -118,8 +117,7 @@ def show():
     st.plotly_chart(fig_ano, use_container_width=True)
 
     # === Gráfico 2: Unidades Gestoras ===
-    st.subheader("Valor liquidado por unidade gestora")
-
+    
     anos_disponiveis = ["Todos"] + sorted(df_filtrado["Ano"].unique())
     ano_sel = st.selectbox("Filtrar por ano:", anos_disponiveis, key="ano_selecionado")
 
@@ -143,8 +141,8 @@ def show():
         xaxis_title="Valor (R$)", 
         yaxis_title="Unidade Gestora", 
         title="Valor por unidade gestora (R$)", 
-        title_x=0.5,
-        hovermode="y unified",
+        title_x=0.0,
+        hovermode="closest",
         hoverlabel=dict(
             bgcolor="white",
             font_size=12,
