@@ -86,6 +86,7 @@ def show():
     df_filtrado = df[mask_funcao | mask_subfuncao | mask_keywords]
 
     st.markdown(f"**Registros encontrados:** {len(df_filtrado)}")
+    st.markdown('***')
 
     # === Gráfico 1: Total por Ano ===
 
