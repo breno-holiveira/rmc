@@ -9,7 +9,6 @@ def load_data():
     df = pd.read_excel("despesas_sp.xlsx", sheet_name="despesas_sp")
     df.columns = df.columns.str.strip()
 
-    # Corrige valores sem separador de milhar e com vírgula decimal
     df["Liquidado"] = (
         df["Liquidado"]
         .astype(str)
@@ -39,13 +38,12 @@ def show():
 
     df = load_data()
 
-    # --- Normalização ---
+    # Normalização
     df["Ação_norm"] = df["Ação"].apply(normalizar)
     df["Funcional_norm"] = df["Funcional Programática"].apply(normalizar)
     df["Credor_norm"] = df["Credor"].apply(normalizar)
     df["Despesa_norm"] = df["Despesa"].apply(normalizar)
 
-    # --- Exclusões específicas ---
     palavras_excluir = [
         "obras", "instalacoes", "mobiliario", "recreativo", "conservacao",
         "reformas", "reposicao", "despesas miudas", "auxilio", "seguro",
@@ -54,12 +52,10 @@ def show():
     mask_excluir = df["Despesa_norm"].str.contains("|".join(palavras_excluir), na=False)
     df = df[~mask_excluir]
 
-    # --- Palavras-chave C&T ---
     keywords = [
         "pesquisa", "cientifica", "ciencia", "inovacao", "desenvolvimento",
         "p&d", "tecnologia", "academica", "robotica", "extensao"
     ]
-
     def contem_keywords(serie):
         return serie.str.contains("|".join(keywords), na=False)
 
@@ -69,7 +65,6 @@ def show():
         contem_keywords(df["Despesa_norm"])
     )
 
-    # --- Filtros principais ---
     mask_funcao = df["Função"].astype(str).str.strip() == "19 - CIENCIA E TECNOLOGIA"
 
     subfuncoes_validas = [
@@ -81,88 +76,48 @@ def show():
     ]
     mask_subfuncao = df["Subfunção"].astype(str).str.strip().isin(subfuncoes_validas)
 
-    # --- Aplicação dos filtros (OU) ---
     df_filtrado = df[mask_funcao | mask_subfuncao | mask_keywords]
 
     st.markdown(f"**Registros encontrados:** {len(df_filtrado)}")
     st.markdown('***')
 
-    # === Gráfico 1: Total por Ano ===
-    dados_ano = df_filtrado.groupby("Ano")["Liquidado"].sum().reset_index()
+    # === Novo Gráfico de Barras Agrupadas ===
+    df_filtrado["Subfunção_Label"] = df_filtrado["Subfunção"].str.extract(r"\d+\s*-\s*(.*)", expand=False).fillna("Outros")
 
-    fig_ano = px.bar(
-        dados_ano,
-        x="Ano",
-        y="Liquidado",
-        labels={"Ano": "Ano", "Liquidado": "R$"},
-        text=None,
-        color_discrete_sequence=["#4472c4"]
-    )
-    fig_ano.update_layout(
-        yaxis_title="Valor (R$)", 
-        xaxis_title="Ano", 
-        title="Valor total liquidado por ano (R$)", 
-        title_x=0.0,
-        hovermode="closest",
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=14,
-            font_family="Arial"
-        )
-    )
-    fig_ano.update_traces(
-        hovertemplate="<b>Ano:</b> %{x}<br><b>Valor:</b> R$ %{y:,.2f}<extra></extra>"
-    )
-    st.plotly_chart(fig_ano, use_container_width=True)
-
-    # === Gráfico 2: Unidades Gestoras ===
-    anos_disponiveis = ["Todos"] + sorted(df_filtrado["Ano"].unique())
-    ano_sel = st.selectbox("Filtrar por ano:", anos_disponiveis, key="ano_selecionado")
-
-    if ano_sel != "Todos":
-        df_uo = df_filtrado[df_filtrado["Ano"] == ano_sel]
-    else:
-        df_uo = df_filtrado.copy()
-
-    dados_uo = (
-        df_uo.groupby("Unidade Gestora")["Liquidado"]
+    dados_grouped = (
+        df_filtrado.groupby(["Ano", "Subfunção_Label"])["Liquidado"]
         .sum()
-        .sort_values(ascending=False)
-        .head(10)
-        .iloc[::-1]
         .reset_index()
     )
 
-    fig_uo = px.bar(
-        dados_uo,
-        x="Liquidado",
-        y="Unidade Gestora",
-        orientation="h",
-        labels={"Liquidado": "R$", "Unidade Gestora": "UG"},
-        text=None,
-        color_discrete_sequence=["#70ad47"]
+    fig_grouped = px.bar(
+        dados_grouped,
+        x="Ano",
+        y="Liquidado",
+        color="Subfunção_Label",
+        barmode="group",
+        labels={"Liquidado": "R$", "Ano": "Ano", "Subfunção_Label": "Categoria"},
+        color_discrete_sequence=px.colors.qualitative.Set2
     )
-    fig_uo.update_layout(
-        xaxis_title="Valor (R$)", 
-        yaxis_title="Unidade Gestora", 
-        title="Valor por unidade gestora (R$)", 
+    fig_grouped.update_layout(
+        title="Dispêndios liquidados por Subfunção e Ano (R$)",
         title_x=0.0,
-        hovermode="closest",
-        hoverlabel=dict(
-            bgcolor="white",
-            font_size=12,
-            font_family="Arial"
-        )
+        yaxis_title="Valor (R$)",
+        xaxis_title="Ano",
+        hovermode="x unified",
+        legend_title="Subfunção",
+        hoverlabel=dict(bgcolor="white", font_size=13, font_family="Arial")
     )
-    fig_uo.update_traces(
-        hovertemplate="<b>Unidade Gestora:</b> %{y}<br><b>Valor:</b> R$ %{x:,.2f}<extra></extra>"
+    fig_grouped.update_traces(
+        hovertemplate="<b>Ano:</b> %{x}<br><b>Categoria:</b> %{legendgroup}<br><b>Valor:</b> R$ %{y:,.2f}<extra></extra>"
     )
-    st.plotly_chart(fig_uo, use_container_width=True)
+    st.plotly_chart(fig_grouped, use_container_width=True)
 
     # === Tabela com dados ===
     with st.expander("📄 Visualizar os dados filtrados"):
-        st.dataframe(df_filtrado[[
-            "Ano", "Função", "Subfunção", "Ação", "Funcional Programática", "Credor", "Despesa", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado"
+        st.dataframe(df_filtrado[[ 
+            "Ano", "Função", "Subfunção", "Ação", "Funcional Programática", "Credor", 
+            "Despesa", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado"
         ]], use_container_width=True)
 
 if __name__ == "__main__":
