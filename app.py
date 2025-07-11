@@ -48,65 +48,58 @@ def buscar_conteudo(termo_busca):
 # Navbar com duas linhas
 def criar_navbar():
     """Cria a navbar com duas linhas conforme especificado"""
-    
-    # Primeira linha - Logo e busca
-    primeira_linha = dbc.Row([
-        dbc.Col([
-            html.H4("RMC em Números", className="mb-0", style={'color': '#333'})
-        ], width=6),
-        dbc.Col([
+
+    # Parte superior - Logo e busca
+    parte_superior = dbc.Row([
+        dbc.Col(
+            html.Div("RMC em Números", className="navbar-title", style={
+                "fontSize": "1.5rem", "fontWeight": "600", "color": "#333"
+            }),
+            width=6, className="d-flex align-items-center"
+        ),
+        dbc.Col(
             dbc.InputGroup([
-                dbc.Input(
-                    id="campo-busca",
-                    placeholder="Pesquisar...",
-                    type="text"
-                ),
-                dbc.Button(
-                    "Buscar",
-                    id="botao-busca",
-                    color="primary",
-                    n_clicks=0
-                )
-            ])
-        ], width=6, className="d-flex justify-content-end")
-    ], className="align-items-center")
-    
-    # Segunda linha - Menu de navegação
-    segunda_linha = dbc.Row([
+                dbc.Input(id="campo-busca", placeholder="Pesquisar...", type="text"),
+                dbc.Button("Buscar", id="botao-busca", color="primary", n_clicks=0)
+            ]),
+            width=6, className="d-flex justify-content-end"
+        )
+    ], className="gx-3 py-2")
+
+    # Parte inferior - Menu de navegação
+    parte_inferior = dbc.Row([
         dbc.Col([
             dbc.Nav([
                 dbc.NavItem(dbc.NavLink("Início", href="/", id="nav-inicio")),
                 dbc.NavItem(dbc.NavLink("Sobre", href="/sobre", id="nav-sobre")),
-                
-                # Dropdown Economia
+
                 dbc.DropdownMenu([
                     dbc.DropdownMenuItem("PIB a preços de mercado", href="/pib-precos-mercado"),
                     dbc.DropdownMenuItem("PIB per capita", href="/pib-per-capita"),
                 ], label="Economia", nav=True, id="dropdown-economia"),
-                
-                # Dropdown Finanças
+
                 dbc.DropdownMenu([
                     dbc.DropdownMenuItem("Despesas", href="/despesas"),
                     dbc.DropdownMenuItem("Receitas", href="/receitas"),
                 ], label="Finanças", nav=True, id="dropdown-financas"),
-                
-                # Dropdown Segurança
+
                 dbc.DropdownMenu([
                     dbc.DropdownMenuItem("Taxa de homicídios", href="/taxa-homicidios"),
                     dbc.DropdownMenuItem("Acidentes de trânsito", href="/acidentes-transito"),
                 ], label="Segurança", nav=True, id="dropdown-seguranca"),
-                
-            ], pills=False, className="w-100")
-        ], width=12)
-    ])
-    
+
+            ], pills=False, className="justify-content-start flex-wrap")
+        ])
+    ], className="gx-3 py-2")
+
+    # Container geral com divisão clara
     return dbc.Navbar([
         dbc.Container([
-            primeira_linha,
-            html.Hr(className="my-2"),
-            segunda_linha
+            parte_superior,
+            html.Hr(className="my-1"),
+            parte_inferior
         ], fluid=True)
-    ], color="white", className="mb-4", style={'backgroundColor': 'white'})
+    ], color="white", className="mb-4 shadow-sm", style={'backgroundColor': 'white'})
 
 # Layout principal da aplicação
 app.layout = html.Div([
