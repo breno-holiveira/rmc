@@ -45,81 +45,85 @@ def buscar_conteudo(termo_busca):
     
     return resultados
 
-# Navbar com duas linhas reais
+# Navbar com duas linhas
 def criar_navbar():
-    """Cria navbar com duas linhas: título + busca na primeira linha, menu na segunda"""
+    """Cria a navbar com duas linhas conforme especificado"""
     
-    # Primeira linha (superior)
-    linha_superior = dbc.Container([
-        dbc.Row([
-            dbc.Col(
-                html.H4("RMC em Números", className="mb-0"),
-                width=4,
-                className="d-flex align-items-center"
-            ),
-            dbc.Col(
-                dbc.InputGroup([
-                    dbc.Input(
-                        id="campo-busca",
-                        placeholder="Pesquisar...",
-                        type="text"
-                    ),
-                    dbc.Button(
-                        "Buscar",
-                        id="botao-busca",
-                        color="primary",
-                        n_clicks=0
-                    )
-                ]),
-                width=5,
-                className="d-flex justify-content-end"
-            ),
-            dbc.Col(
-                html.A("contatos", href="#", style={
-                    "color": "#6c757d",
-                    "text-decoration": "none",
-                    "font-size": "0.9rem",
-                    "margin-left": "15px"
-                }),
-                width=3,
-                className="d-flex align-items-center justify-content-end"
-            )
-        ], align="center", className="py-2")
-    ], fluid=True, style={"backgroundColor": "white", "borderBottom": "1px solid #dee2e6"})
-
-    # Segunda linha (inferior)
-    linha_inferior = dbc.Container([
-        dbc.Row([
-            dbc.Col(
-                dbc.Nav([
-                    dbc.NavItem(dbc.NavLink("Início", href="/", id="nav-inicio")),
-                    dbc.NavItem(dbc.NavLink("Sobre", href="/sobre", id="nav-sobre")),
-
-                    dbc.DropdownMenu([
-                        dbc.DropdownMenuItem("PIB a preços de mercado", href="/pib-precos-mercado"),
-                        dbc.DropdownMenuItem("PIB per capita", href="/pib-per-capita"),
-                    ], label="Economia", nav=True, in_navbar=True),
-
-                    dbc.DropdownMenu([
-                        dbc.DropdownMenuItem("Despesas", href="/despesas"),
-                        dbc.DropdownMenuItem("Receitas", href="/receitas"),
-                    ], label="Finanças", nav=True, in_navbar=True),
-
-                    dbc.DropdownMenu([
-                        dbc.DropdownMenuItem("Taxa de homicídios", href="/taxa-homicidios"),
-                        dbc.DropdownMenuItem("Acidentes de trânsito", href="/acidentes-transito"),
-                    ], label="Segurança", nav=True, in_navbar=True),
-
-                ], className="me-auto", pills=False)
-            )
-        ], className="py-2")
-    ], fluid=True, style={"backgroundColor": "white"})
-
-    # Agrupar as duas linhas
-    return html.Div([
-        linha_superior,
-        linha_inferior
-    ])
+    # Primeira linha - Logo, busca e link Contatos
+    primeira_linha = dbc.Row([
+        dbc.Col(
+            html.H4("RMC em Números", className="mb-0", style={
+                     "color": "#333"}),
+            width=4,
+            className="d-flex align-items-center"
+        ),
+        dbc.Col(
+            dbc.InputGroup([
+                dbc.Input(
+                    id="campo-busca",
+                    placeholder="Pesquisar...",
+                    type="text"
+                ),
+                dbc.Button(
+                    "Buscar",
+                    id="botao-busca",
+                    color="primary",
+                    n_clicks=0
+                )
+            ]),
+            width=5,
+            className="d-flex justify-content-end"
+        ),
+        dbc.Col(
+            html.A("Contatos", href="#", className="nav-link-contatos", style={
+                   "color": "#6c757d", "text-decoration": "none", "font-size": "0.9rem", "margin-left": "15px"}),
+            width=3,
+            className="d-flex align-items-center justify-content-end"
+        )
+    ], className="align-items-center w-100")
+    
+    # Segunda linha - Menu de navegação
+    segunda_linha = dbc.Row([
+        dbc.Col(
+            dbc.Nav([
+                dbc.NavItem(dbc.NavLink("Início", href="/", id="nav-inicio")),
+                dbc.NavItem(dbc.NavLink("Sobre", href="/sobre", id="nav-sobre")),
+                
+                # Dropdown Economia
+                dbc.DropdownMenu([
+                    dbc.DropdownMenuItem("PIB a preços de mercado", href="/pib-precos-mercado"),
+                    dbc.DropdownMenuItem("PIB per capita", href="/pib-per-capita"),
+                ], label="Economia", nav=True, id="dropdown-economia"),
+                
+                # Dropdown Finanças
+                dbc.DropdownMenu([
+                    dbc.DropdownMenuItem("Despesas", href="/despesas"),
+                    dbc.DropdownMenuItem("Receitas", href="/receitas"),
+                ], label="Finanças", nav=True, id="dropdown-financas"),
+                
+                # Dropdown Segurança
+                dbc.DropdownMenu([
+                    dbc.DropdownMenuItem("Taxa de homicídios", href="/taxa-homicidios"),
+                    dbc.DropdownMenuItem("Acidentes de trânsito", href="/acidentes-transito"),
+                ], label="Segurança", nav=True, id="dropdown-seguranca"),
+                
+            ], pills=False, className="w-100")
+        ,
+            width=12
+        )
+    ], className="w-100")
+    
+    return dbc.Navbar([
+        dbc.Container([
+            primeira_linha,
+            html.Hr(className="my-2"),  # Separador visual
+            segunda_linha
+        ], fluid=True)
+    ], color="white", className="mb-4", style={
+        "backgroundColor": "white",
+        "padding-top": "10px",
+        "padding-bottom": "10px"
+    })
 
 # Layout principal da aplicação
 app.layout = html.Div([
@@ -185,8 +189,7 @@ def realizar_busca(n_clicks, termo_busca):
             className="mt-3"
         )
     
-    primeiro_resultado_path = f"/{resultados[0]['arquivo']}".replace("_", "-")
-    return primeiro_resultado_path, []
+    # Redireciona para a primeira página encont    primeiro_resultado_path = f"/{resultados[0][\"arquivo\"]}".replace("_", "-")    return primeiro_resultado_path, []
 
 # Callback para busca com Enter
 @app.callback(
