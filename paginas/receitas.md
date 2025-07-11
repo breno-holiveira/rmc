@@ -1,0 +1,5 @@
+
+# Receitas
+
+Conteúdo sobre receitas.
+
