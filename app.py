@@ -205,3 +205,5 @@ def busca_com_enter(n_submit, n_clicks_atual):
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8050)
+
+
