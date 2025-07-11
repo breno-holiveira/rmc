@@ -8,192 +8,287 @@ import markdown
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = "RMC em Números"
 
-# Função para ler arquivos markdown da pasta /paginas
-def ler_arquivo_pagina(nome_arquivo):
-    """Lê um arquivo markdown da pasta paginas e retorna o conteúdo em HTML"""
-    caminho = os.path.join('paginas', f'{nome_arquivo}.md')
+# Configuração do servidor
+server = app.server
+
+# Função para ler arquivos markdown
+def read_markdown_file(filename):
+    """Lê um arquivo markdown e retorna o conteúdo em HTML"""
     try:
-        with open(caminho, 'r', encoding='utf-8') as arquivo:
-            conteudo_md = arquivo.read()
-            return markdown.markdown(conteudo_md)
+        filepath = os.path.join('paginas', filename)
+        with open(filepath, 'r', encoding='utf-8') as file:
+            content = file.read()
+            return markdown.markdown(content)
     except FileNotFoundError:
-        return f"<h1>Página não encontrada</h1><p>O arquivo {nome_arquivo}.md não foi encontrado.</p>"
+        return f"<h1>Página não encontrada</h1><p>O arquivo {filename} não foi encontrado.</p>"
 
-# Função para buscar em todos os arquivos da pasta /paginas
-def buscar_conteudo(termo_busca):
-    """Busca um termo em todos os arquivos da pasta paginas"""
-    resultados = []
-    pasta_paginas = 'paginas'
+# Função para buscar em arquivos
+def search_in_files(query):
+    """Busca por um termo em todos os arquivos da pasta paginas"""
+    results = []
+    if not query:
+        return results
     
-    if not os.path.exists(pasta_paginas):
-        return []
+    query = query.lower()
+    paginas_dir = 'paginas'
     
-    for arquivo in os.listdir(pasta_paginas):
-        if arquivo.endswith('.md'):
-            caminho = os.path.join(pasta_paginas, arquivo)
-            try:
-                with open(caminho, 'r', encoding='utf-8') as f:
-                    conteudo = f.read().lower()
-                    if termo_busca.lower() in conteudo:
-                        nome_pagina = arquivo.replace('.md', '').replace('_', ' ').title()
-                        resultados.append({
-                            'arquivo': arquivo.replace('.md', ''),
-                            'nome': nome_pagina
-                        })
-            except:
-                continue
+    if os.path.exists(paginas_dir):
+        for filename in os.listdir(paginas_dir):
+            if filename.endswith('.md'):
+                filepath = os.path.join(paginas_dir, filename)
+                try:
+                    with open(filepath, 'r', encoding='utf-8') as file:
+                        content = file.read()
+                        if query in content.lower():
+                            # Extrair título (primeira linha que começa com #)
+                            lines = content.split('\n')
+                            title = filename.replace('.md', '').replace('_', ' ').title()
+                            for line in lines:
+                                if line.startswith('#'):
+                                    title = line.replace('#', '').strip()
+                                    break
+                            
+                            # Extrair snippet do conteúdo
+                            content_lower = content.lower()
+                            query_index = content_lower.find(query)
+                            start = max(0, query_index - 50)
+                            end = min(len(content), query_index + 100)
+                            snippet = content[start:end]
+                            
+                            results.append({
+                                'title': title,
+                                'filename': filename,
+                                'snippet': snippet
+                            })
+                except Exception as e:
+                    continue
     
-    return resultados
+    return results
 
-# Navbar com duas linhas
-def criar_navbar():
-    """Cria a navbar com duas linhas conforme especificado"""
+# Layout da navbar superior
+navbar_top = html.Div([
+    html.Div([
+        html.Div("RMC em Números", className="navbar-title"),
+        html.Div([
+            dcc.Input(
+                id="search-input",
+                type="text",
+                placeholder="Pesquisar...",
+                className="search-input"
+            ),
+            html.Button("Buscar", id="search-button", className="search-button"),
+            html.A("contatos", href="#", className="contact-link")
+        ], className="navbar-right")
+    ], style={'display': 'flex', 'justify-content': 'space-between', 'align-items': 'center'})
+], className="navbar-top")
 
-    # Parte superior - Logo e busca
-    parte_superior = dbc.Row([
-        dbc.Col(
-            html.Div("RMC em Números", className="navbar-title", style={
-                "fontSize": "1.5rem", "fontWeight": "600", "color": "#333"
-            }),
-            width=6, className="d-flex align-items-center"
-        ),
-        dbc.Col(
-            dbc.InputGroup([
-                dbc.Input(id="campo-busca", placeholder="Pesquisar...", type="text"),
-                dbc.Button("Buscar", id="botao-busca", color="primary", n_clicks=0)
-            ]),
-            width=6, className="d-flex justify-content-end"
-        )
-    ], className="gx-3 py-2")
+# Layout da navbar inferior
+navbar_bottom = html.Div([
+    html.Div([
+        html.Button("Início", id="btn-inicio", className="nav-button", n_clicks=0),
+        html.Button("Sobre", id="btn-sobre", className="nav-button", n_clicks=0),
+        
+        # Dropdown Economia
+        html.Div([
+            html.Button("Economia ▼", id="btn-economia", className="nav-button", n_clicks=0),
+            html.Div([
+                html.Div("PIB a preços de mercado", id="btn-pib-mercado", className="dropdown-item", n_clicks=0),
+                html.Div("PIB per capita", id="btn-pib-capita", className="dropdown-item", n_clicks=0),
+            ], id="dropdown-economia", className="dropdown-content")
+        ], className="dropdown"),
+        
+        # Dropdown Finanças
+        html.Div([
+            html.Button("Finanças ▼", id="btn-financas", className="nav-button", n_clicks=0),
+            html.Div([
+                html.Div("Despesas", id="btn-despesas", className="dropdown-item", n_clicks=0),
+                html.Div("Receitas", id="btn-receitas", className="dropdown-item", n_clicks=0),
+            ], id="dropdown-financas", className="dropdown-content")
+        ], className="dropdown"),
+        
+        # Dropdown Segurança
+        html.Div([
+            html.Button("Segurança ▼", id="btn-seguranca", className="nav-button", n_clicks=0),
+            html.Div([
+                html.Div("Taxa de homicídios", id="btn-homicidios", className="dropdown-item", n_clicks=0),
+                html.Div("Acidentes de trânsito", id="btn-acidentes", className="dropdown-item", n_clicks=0),
+            ], id="dropdown-seguranca", className="dropdown-content")
+        ], className="dropdown"),
+        
+    ], className="nav-menu")
+], className="navbar-bottom")
 
-    # Parte inferior - Menu de navegação
-    parte_inferior = dbc.Row([
-        dbc.Col([
-            dbc.Nav([
-                dbc.NavItem(dbc.NavLink("Início", href="/", id="nav-inicio")),
-                dbc.NavItem(dbc.NavLink("Sobre", href="/sobre", id="nav-sobre")),
-
-                dbc.DropdownMenu([
-                    dbc.DropdownMenuItem("PIB a preços de mercado", href="/pib-precos-mercado"),
-                    dbc.DropdownMenuItem("PIB per capita", href="/pib-per-capita"),
-                ], label="Economia", nav=True, id="dropdown-economia"),
-
-                dbc.DropdownMenu([
-                    dbc.DropdownMenuItem("Despesas", href="/despesas"),
-                    dbc.DropdownMenuItem("Receitas", href="/receitas"),
-                ], label="Finanças", nav=True, id="dropdown-financas"),
-
-                dbc.DropdownMenu([
-                    dbc.DropdownMenuItem("Taxa de homicídios", href="/taxa-homicidios"),
-                    dbc.DropdownMenuItem("Acidentes de trânsito", href="/acidentes-transito"),
-                ], label="Segurança", nav=True, id="dropdown-seguranca"),
-
-            ], pills=False, className="justify-content-start flex-wrap")
-        ])
-    ], className="gx-3 py-2")
-
-    # Container geral com divisão clara
-    return dbc.Navbar([
-        dbc.Container([
-            parte_superior,
-            html.Hr(className="my-1"),
-            parte_inferior
-        ], fluid=True)
-    ], color="white", className="mb-4 shadow-sm", style={'backgroundColor': 'white'})
-
-# Layout principal da aplicação
+# Layout principal
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
-    criar_navbar(),
+    navbar_top,
+    navbar_bottom,
     
-    # Container para resultados de busca
-    html.Div(id="resultados-busca", className="container mb-4"),
+    # Área de conteúdo
+    html.Div([
+        html.Div(id="page-content", className="content-area"),
+        html.Div(id="search-results", className="search-results")
+    ], className="main-container"),
     
-    # Container para conteúdo das páginas
-    html.Div(id='conteudo-pagina', className="container")
+    # Store para controlar dropdowns
+    dcc.Store(id="dropdown-states", data={
+        "economia": False,
+        "financas": False,
+        "seguranca": False
+    })
 ])
 
-# Callback para navegação entre páginas
+# Callback para controlar dropdowns
 @app.callback(
-    Output('conteudo-pagina', 'children'),
-    Input('url', 'pathname')
+    [Output("dropdown-economia", "className"),
+     Output("dropdown-financas", "className"),
+     Output("dropdown-seguranca", "className"),
+     Output("dropdown-states", "data")],
+    [Input("btn-economia", "n_clicks"),
+     Input("btn-financas", "n_clicks"),
+     Input("btn-seguranca", "n_clicks")],
+    [State("dropdown-states", "data")]
 )
-def exibir_pagina(pathname):
-    """Exibe o conteúdo da página baseado na URL"""
+def toggle_dropdowns(economia_clicks, financas_clicks, seguranca_clicks, current_states):
+    ctx = dash.callback_context
     
-    # Mapear URLs para arquivos
-    mapeamento_urls = {
-        '/': 'inicio',
-        '/sobre': 'sobre',
-        '/pib-precos-mercado': 'pib_precos_mercado',
-        '/pib-per-capita': 'pib_per_capita',
-        '/despesas': 'despesas',
-        '/receitas': 'receitas',
-        '/taxa-homicidios': 'taxa_homicidios',
-        '/acidentes-transito': 'acidentes_transito'
+    if not ctx.triggered:
+        return "dropdown-content", "dropdown-content", "dropdown-content", current_states
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    # Reset all dropdowns
+    new_states = {"economia": False, "financas": False, "seguranca": False}
+    
+    # Toggle the clicked dropdown
+    if button_id == "btn-economia":
+        new_states["economia"] = not current_states["economia"]
+    elif button_id == "btn-financas":
+        new_states["financas"] = not current_states["financas"]
+    elif button_id == "btn-seguranca":
+        new_states["seguranca"] = not current_states["seguranca"]
+    
+    # Return classes based on states
+    economia_class = "dropdown-content show" if new_states["economia"] else "dropdown-content"
+    financas_class = "dropdown-content show" if new_states["financas"] else "dropdown-content"
+    seguranca_class = "dropdown-content show" if new_states["seguranca"] else "dropdown-content"
+    
+    return economia_class, financas_class, seguranca_class, new_states
+
+# Callback para navegação e conteúdo das páginas
+@app.callback(
+    Output("page-content", "children"),
+    [Input("btn-inicio", "n_clicks"),
+     Input("btn-sobre", "n_clicks"),
+     Input("btn-pib-mercado", "n_clicks"),
+     Input("btn-pib-capita", "n_clicks"),
+     Input("btn-despesas", "n_clicks"),
+     Input("btn-receitas", "n_clicks"),
+     Input("btn-homicidios", "n_clicks"),
+     Input("btn-acidentes", "n_clicks")]
+)
+def display_page(inicio_clicks, sobre_clicks, pib_mercado_clicks, pib_capita_clicks,
+                despesas_clicks, receitas_clicks, homicidios_clicks, acidentes_clicks):
+    
+    ctx = dash.callback_context
+    
+    if not ctx.triggered:
+        # Página inicial por padrão
+        content = read_markdown_file('inicio.md')
+        return html.Div([dcc.Markdown(content, dangerously_allow_html=True)])
+    
+    button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    # Mapear botões para arquivos
+    page_mapping = {
+        "btn-inicio": "inicio.md",
+        "btn-sobre": "sobre.md",
+        "btn-pib-mercado": "pib_precos_mercado.md",
+        "btn-pib-capita": "pib_per_capita.md",
+        "btn-despesas": "despesas.md",
+        "btn-receitas": "receitas.md",
+        "btn-homicidios": "taxa_homicidios.md",
+        "btn-acidentes": "acidentes_transito.md"
     }
     
-    # Obter nome do arquivo baseado na URL
-    nome_arquivo = mapeamento_urls.get(pathname, 'inicio')
+    filename = page_mapping.get(button_id, "inicio.md")
+    content = read_markdown_file(filename)
     
-    # Ler e retornar conteúdo
-    conteudo_html = ler_arquivo_pagina(nome_arquivo)
-    
-    return html.Div([
-        dcc.Markdown(conteudo_html, dangerously_allow_html=True)
-    ])
+    return html.Div([dcc.Markdown(content, dangerously_allow_html=True)])
 
-# Callback para funcionalidade de busca
+# Callback para funcionalidade de pesquisa
 @app.callback(
-    Output('resultados-busca', 'children'),
-    [Input('botao-busca', 'n_clicks')],
-    [State('campo-busca', 'value')]
+    [Output("search-results", "children"),
+     Output("page-content", "children", allow_duplicate=True)],
+    [Input("search-button", "n_clicks"),
+     Input("search-input", "n_submit")],
+    [State("search-input", "value")],
+    prevent_initial_call=True
 )
-def realizar_busca(n_clicks, termo_busca):
-    """Realiza busca nos arquivos da pasta paginas"""
+def perform_search(n_clicks, n_submit, search_query):
+    if (not n_clicks and not n_submit) or not search_query:
+        # Retornar página inicial se não há pesquisa
+        content = read_markdown_file('inicio.md')
+        return html.Div(), html.Div([dcc.Markdown(content, dangerously_allow_html=True)])
     
-    if n_clicks == 0 or not termo_busca:
-        return []
+    results = search_in_files(search_query)
     
-    resultados = buscar_conteudo(termo_busca)
+    if not results:
+        search_content = html.Div([
+            html.H3("Nenhum resultado encontrado"),
+            html.P(f"Não foram encontrados resultados para '{search_query}'.")
+        ])
+        return search_content, html.Div()
     
-    if not resultados:
-        return dbc.Alert(
-            f"Nenhum resultado encontrado para '{termo_busca}'",
-            color="warning",
-            className="mt-3"
+    result_items = []
+    for result in results:
+        result_items.append(
+            html.Div([
+                html.Div(result['title'], className="search-result-title"),
+                html.Div(f"...{result['snippet']}...", className="search-result-content"),
+                html.Button(
+                    "Ver página completa", 
+                    id={"type": "view-page", "index": result['filename']},
+                    className="search-button",
+                    style={"margin-top": "10px", "font-size": "12px", "padding": "5px 10px"}
+                )
+            ], className="search-result-item")
         )
     
-    # Criar lista de resultados
-    lista_resultados = []
-    for resultado in resultados:
-        lista_resultados.append(
-            dbc.ListGroupItem([
-                html.H6(resultado['nome'], className="mb-1"),
-                html.Small(f"Arquivo: {resultado['arquivo']}.md", className="text-muted")
-            ], href=f"/{resultado['arquivo'].replace('_', '-')}", action=True)
-        )
-    
-    return html.Div([
-        dbc.Alert(
-            f"Encontrados {len(resultados)} resultado(s) para '{termo_busca}':",
-            color="info",
-            className="mb-2"
-        ),
-        dbc.ListGroup(lista_resultados)
+    search_content = html.Div([
+        html.H3(f"Resultados da pesquisa para '{search_query}' ({len(results)} resultado{'s' if len(results) > 1 else ''})"),
+        html.Div(result_items)
     ])
+    
+    return search_content, html.Div()
 
-# Callback para busca com Enter
+# Callback para visualizar página completa a partir dos resultados de pesquisa
 @app.callback(
-    Output('botao-busca', 'n_clicks'),
-    Input('campo-busca', 'n_submit'),
-    State('botao-busca', 'n_clicks')
+    Output("page-content", "children", allow_duplicate=True),
+    [Input({"type": "view-page", "index": dash.dependencies.ALL}, "n_clicks")],
+    prevent_initial_call=True
 )
-def busca_com_enter(n_submit, n_clicks_atual):
-    """Permite busca pressionando Enter"""
-    if n_submit:
-        return (n_clicks_atual or 0) + 1
-    return n_clicks_atual or 0
+def view_page_from_search(n_clicks_list):
+    ctx = dash.callback_context
+    
+    if not ctx.triggered or not any(n_clicks_list):
+        raise dash.exceptions.PreventUpdate
+    
+    # Encontrar qual botão foi clicado
+    button_id = ctx.triggered[0]['prop_id']
+    filename = eval(button_id.split('.')[0])['index']
+    
+    content = read_markdown_file(filename)
+    return html.Div([dcc.Markdown(content, dangerously_allow_html=True)])
 
+# Callback para permitir pesquisa com Enter
+@app.callback(
+    Output("search-input", "n_submit"),
+    [Input("search-input", "n_submit")],
+    prevent_initial_call=True
+)
+def handle_enter_search(n_submit):
+    return 0
+
+# Executar a aplicação
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8050)
