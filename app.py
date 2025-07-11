@@ -11,7 +11,7 @@ app.title = "RMC em Números"
 
 # LAYOUT PRINCIPAL
 app.layout = html.Div([
-    dcc.Location(id="url", refresh=False),  # <-- Monitorar URL
+    dcc.Location(id="url", refresh=False),
 
     # 1ª LINHA DA NAVBAR
     html.Div([
@@ -45,32 +45,41 @@ app.layout = html.Div([
         html.Div([
             html.Nav([
                 html.Ul([
-                    html.Li([html.A("Início", href="/", className="nav-link-bottom")], className="nav-item-bottom"),
-
-                    html.Li([html.A("Sobre", href="/sobre", className="nav-link-bottom")], className="nav-item-bottom"),
-
+                    # Início
                     html.Li([
-                        html.A("Economia", href="#", className="nav-link-bottom dropdown-toggle", id="economia-dropdown"),
+                        html.A("Início", href="/", className="nav-link-bottom")
+                    ], className="nav-item-bottom"),
+
+                    # Sobre
+                    html.Li([
+                        html.A("Sobre", href="/sobre", className="nav-link-bottom")
+                    ], className="nav-item-bottom"),
+
+                    # Economia (com dropdown)
+                    html.Li([
+                        html.A("Economia ▼", href="#", className="nav-link-bottom dropdown-toggle", id="economia-dropdown"),
                         html.Ul([
                             html.Li([html.A("Produto Interno Bruto", href="/economia/pib", className="dropdown-link")]),
                             html.Li([html.A("Emprego", href="/economia/emprego", className="dropdown-link")])
-                        ], className="dropdown-menu", id="economia-menu")
+                        ], className="dropdown-menu", id="economia-menu", style={"display": "none"})
                     ], className="nav-item-bottom dropdown"),
 
+                    # Finanças (com dropdown)
                     html.Li([
-                        html.A("Finanças", href="#", className="nav-link-bottom dropdown-toggle", id="financas-dropdown"),
+                        html.A("Finanças ▼", href="#", className="nav-link-bottom dropdown-toggle", id="financas-dropdown"),
                         html.Ul([
                             html.Li([html.A("Despesas", href="/financas/despesas", className="dropdown-link")]),
                             html.Li([html.A("Receitas", href="/financas/receitas", className="dropdown-link")])
-                        ], className="dropdown-menu", id="financas-menu")
+                        ], className="dropdown-menu", id="financas-menu", style={"display": "none"})
                     ], className="nav-item-bottom dropdown"),
 
+                    # Segurança (com dropdown)
                     html.Li([
-                        html.A("Segurança", href="#", className="nav-link-bottom dropdown-toggle", id="seguranca-dropdown"),
+                        html.A("Segurança ▼", href="#", className="nav-link-bottom dropdown-toggle", id="seguranca-dropdown"),
                         html.Ul([
                             html.Li([html.A("Taxa de homicídios", href="/seguranca/homicidios", className="dropdown-link")]),
                             html.Li([html.A("Acidentes de Trânsito", href="/seguranca/transito", className="dropdown-link")])
-                        ], className="dropdown-menu", id="seguranca-menu")
+                        ], className="dropdown-menu", id="seguranca-menu", style={"display": "none"})
                     ], className="nav-item-bottom dropdown"),
 
                 ], className="nav-menu-bottom")
@@ -88,21 +97,7 @@ app.layout = html.Div([
 # CALLBACKS
 # =====================
 
-# 🟡 Callback da Busca
-@app.callback(
-    Output("page-content", "children"),
-    [Input("search-button", "n_clicks")],
-    [State("search-input", "value")]
-)
-def search_content(n_clicks, search_value):
-    if n_clicks > 0 and search_value:
-        return html.Div([
-            html.H3(f"Resultados da busca para: '{search_value}'"),
-            html.P("Funcionalidade de busca preparada para conteúdo em /paginas")
-        ])
-    return html.Div()
-
-# 🔵 Callback de navegação por URL
+# Callback de navegação por URL (principal)
 @app.callback(
     Output("page-content", "children"),
     Input("url", "pathname")
@@ -130,33 +125,58 @@ def render_page(pathname):
             html.P(f"URL: {pathname}")
         ])
 
-# 🟣 Callbacks para abrir/fechar os menus dropdown (Economia, Finanças, Segurança)
+# Callback da Busca (separado para evitar conflitos)
+@app.callback(
+    Output("page-content", "children", allow_duplicate=True),
+    Input("search-button", "n_clicks"),
+    State("search-input", "value"),
+    prevent_initial_call=True
+)
+def search_content(n_clicks, search_value):
+    if n_clicks > 0 and search_value:
+        # Aqui você pode implementar a busca real nos arquivos de /paginas
+        return html.Div([
+            html.H3(f"Resultados da busca para: '{search_value}'"),
+            html.P("Funcionalidade de busca preparada para conteúdo em /paginas"),
+            html.Hr(),
+            html.A("← Voltar", href="/", className="btn btn-secondary")
+        ])
+    return dash.no_update
+
+# Callbacks para dropdowns (hover-based via CSS, mas mantendo click como fallback)
 @app.callback(
     Output("economia-menu", "style"),
     Input("economia-dropdown", "n_clicks"),
     prevent_initial_call=True
 )
-def toggle_menu_economia(n):
-    return {"display": "block" if n and n % 2 == 1 else "none"}
+def toggle_economia_menu(n_clicks):
+    if n_clicks:
+        return {"display": "block" if n_clicks % 2 == 1 else "none"}
+    return {"display": "none"}
 
 @app.callback(
     Output("financas-menu", "style"),
     Input("financas-dropdown", "n_clicks"),
     prevent_initial_call=True
 )
-def toggle_menu_financas(n):
-    return {"display": "block" if n and n % 2 == 1 else "none"}
+def toggle_financas_menu(n_clicks):
+    if n_clicks:
+        return {"display": "block" if n_clicks % 2 == 1 else "none"}
+    return {"display": "none"}
 
 @app.callback(
     Output("seguranca-menu", "style"),
     Input("seguranca-dropdown", "n_clicks"),
     prevent_initial_call=True
 )
-def toggle_menu_seguranca(n):
-    return {"display": "block" if n and n % 2 == 1 else "none"}
+def toggle_seguranca_menu(n_clicks):
+    if n_clicks:
+        return {"display": "block" if n_clicks % 2 == 1 else "none"}
+    return {"display": "none"}
 
 # =====================
 # INICIAR SERVIDOR
 # =====================
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8050)
+
