@@ -35,7 +35,7 @@ app.layout = html.Div([
         ], className="navbar-top-container")
     ], className="navbar-top"),
     
-    # Segunda linha da navbar: Links de navegação
+    # 2ª LINHA DA NAVBAR
     html.Div([
         html.Div([
             html.Nav([
@@ -51,20 +51,24 @@ app.layout = html.Div([
                     html.Li([
                         html.A("Economia", href="/economia", className="nav-link-bottom dropdown-toggle", id="economia-dropdown"),
                         html.Ul([
-                            html.Li([html.A("Subitem 1", href="/economia/subitem1", className="dropdown-link")]),
-                            html.Li([html.A("Subitem 2", href="/economia/subitem2", className="dropdown-link")])
+                            html.Li([html.A("Produto Interno Bruto", href="/economia/pib", className="dropdown-link")]),
+                            html.Li([html.A("Emprego", href="/economia/emprego", className="dropdown-link")])
                         ], className="dropdown-menu", id="economia-menu")
                     ], className="nav-item-bottom dropdown"),
                     
                     html.Li([
-                        html.A("Finanças", href="/financas", className="nav-link-bottom")
-                    ], className="nav-item-bottom")
+                        html.A("Finanças", href="/financas", className="nav-link-bottom dropdown-toggle", id="financas-dropdown"),
+                        html.Ul([
+                            html.Li([html.A("Despesas", href="/financas/despesas", className="dropdown-link")]),
+                            html.Li([html.A("Receitas", href="/financas/receitas", className="dropdown-link")])
+                        ], className="dropdown-menu", id="financas-menu")
+                    ], className="nav-item-bottom dropdown"),
                 ], className="nav-menu-bottom")
             ], className="navbar-bottom-nav")
         ], className="navbar-bottom-container")
     ], className="navbar-bottom"),
     
-    # Área de conteúdo principal (vazia conforme solicitado)
+    # CONTEÚDO PRINCIPAL
     html.Main([
         html.Div(id="page-content", className="main-content")
     ], className="main")
