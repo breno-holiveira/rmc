@@ -1,9 +1,4 @@
-/* Estilos gerais para RMC em Números */
-
-/* Importar fonte moderna do Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-/* Reset e configurações básicas */
+/* Estilos gerais */
 * {
     margin: 0;
     padding: 0;
@@ -11,272 +6,230 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #ffffff;
+    color: #333333;
     line-height: 1.6;
-    color: #333;
-    background-color: #fafafa;
 }
 
 /* Container principal */
-.container {
+.main-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 20px;
 }
 
-/* Navbar personalizada */
-.navbar {
-    background-color: white !important;
-    border-bottom: 1px solid #e9ecef;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+/* Navbar superior */
+.navbar-top {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.navbar .container-fluid {
-    padding: 15px 30px;
-}
-
-/* Título principal */
-.navbar h4 {
+.navbar-title {
+    font-size: 24px;
     font-weight: 600;
-    color: #2c3e50 !important;
-    font-size: 1.5rem;
+    color: #2c3e50;
 }
 
-/* Campo de busca */
-.input-group {
-    max-width: 300px;
-}
-
-.form-control {
-    border: 1px solid #ddd;
-    border-radius: 6px 0 0 6px;
-    padding: 8px 12px;
-    font-size: 14px;
-}
-
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-}
-
-/* Botão de busca */
-.btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    border-radius: 0 6px 6px 0;
-    padding: 8px 16px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-}
-
-/* Navegação */
-.nav {
+.navbar-right {
+    display: flex;
+    align-items: center;
     gap: 10px;
 }
 
-.nav-link {
-    color: #495057 !important;
-    font-weight: 500;
-    padding: 8px 16px !important;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 250px;
 }
 
-.nav-link:hover {
-    color: #007bff !important;
+.search-button {
+    padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #2980b9;
+}
+
+.contact-link {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 10px;
+    transition: color 0.3s;
+}
+
+.contact-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* Navbar inferior */
+.navbar-bottom {
+    background-color: #ffffff;
+    border-bottom: 2px solid #e0e0e0;
+    padding: 10px 20px;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: #2c3e50;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-button:hover {
     background-color: #f8f9fa;
+    color: #3498db;
 }
 
-/* Dropdowns */
-.dropdown-menu {
-    border: 1px solid #e9ecef;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    padding: 8px 0;
+.nav-button.active {
+    background-color: #3498db;
+    color: white;
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    z-index: 1000;
+    top: 100%;
+    left: 0;
+}
+
+.dropdown-content.show {
+    display: block;
 }
 
 .dropdown-item {
-    padding: 8px 16px;
-    font-size: 14px;
-    color: #495057;
-    transition: all 0.2s ease;
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 .dropdown-item:hover {
     background-color: #f8f9fa;
-    color: #007bff;
-}
-
-/* Separador entre linhas da navbar */
-hr {
-    margin: 10px 0 !important;
-    border-color: #e9ecef;
+    color: #3498db;
 }
 
 /* Conteúdo principal */
-#conteudo-pagina {
-    background-color: white;
-    border-radius: 8px;
-    padding: 30px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    min-height: 400px;
+.content-area {
+    padding: 30px 20px;
+    min-height: 500px;
 }
 
-/* Títulos */
-h1 {
+.content-area h1 {
     color: #2c3e50;
-    font-weight: 600;
     margin-bottom: 20px;
-    font-size: 2.2rem;
+    font-size: 32px;
+    font-weight: 600;
 }
 
-h2 {
+.content-area h2 {
     color: #34495e;
-    font-weight: 500;
     margin-bottom: 15px;
-    font-size: 1.8rem;
+    font-size: 24px;
+    font-weight: 500;
 }
 
-h3 {
-    color: #34495e;
-    font-weight: 500;
-    margin-bottom: 12px;
-    font-size: 1.4rem;
-}
-
-/* Parágrafos */
-p {
+.content-area p {
     margin-bottom: 15px;
-    color: #555;
     font-size: 16px;
     line-height: 1.7;
 }
 
-/* Resultados de busca */
-#resultados-busca {
+/* Resultados de pesquisa */
+.search-results {
     margin-top: 20px;
 }
 
-.alert {
-    border-radius: 8px;
-    border: none;
-    font-weight: 500;
-}
-
-.alert-info {
-    background-color: #e3f2fd;
-    color: #1565c0;
-}
-
-.alert-warning {
-    background-color: #fff3e0;
-    color: #ef6c00;
-}
-
-/* Lista de resultados */
-.list-group {
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.list-group-item {
-    border: 1px solid #e9ecef;
-    padding: 15px 20px;
-    transition: all 0.2s ease;
-}
-
-.list-group-item:hover {
+.search-result-item {
     background-color: #f8f9fa;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.list-group-item h6 {
-    color: #2c3e50;
+.search-result-item:hover {
+    background-color: #e9ecef;
+}
+
+.search-result-title {
     font-weight: 600;
+    color: #2c3e50;
     margin-bottom: 5px;
 }
 
-.list-group-item .text-muted {
-    font-size: 13px;
-    color: #6c757d !important;
+.search-result-content {
+    color: #666;
+    font-size: 14px;
 }
 
 /* Responsividade */
 @media (max-width: 768px) {
-    .navbar .container-fluid {
-        padding: 10px 15px;
-    }
-    
-    .navbar h4 {
-        font-size: 1.3rem;
-    }
-    
-    .input-group {
-        max-width: 250px;
-        margin-top: 10px;
-    }
-    
-    .nav {
+    .navbar-top {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
     }
     
-    #conteudo-pagina {
-        padding: 20px;
-        margin: 15px;
+    .navbar-right {
+        width: 100%;
+        justify-content: center;
     }
     
-    h1 {
-        font-size: 1.8rem;
+    .search-input {
+        width: 200px;
     }
     
-    .container {
-        padding: 0 15px;
-    }
-}
-
-@media (max-width: 576px) {
-    .navbar .row {
-        flex-direction: column;
+    .nav-menu {
+        flex-wrap: wrap;
         gap: 15px;
     }
     
-    .input-group {
-        max-width: 100%;
-    }
-    
-    .nav {
-        justify-content: center;
+    .main-container {
+        padding: 10px;
     }
 }
-
-/* Animações suaves */
-.nav-link, .dropdown-item, .list-group-item, .btn {
-    transition: all 0.2s ease-in-out;
-}
-
-/* Melhorias visuais */
-.dropdown-toggle::after {
-    margin-left: 8px;
-}
-
-/* Espaçamento consistente */
-.mb-4 {
-    margin-bottom: 1.5rem !important;
-}
-
-.mt-3 {
-    margin-top: 1rem !important;
-}
-
-.mb-2 {
-    margin-bottom: 0.5rem !important;
-}
-
