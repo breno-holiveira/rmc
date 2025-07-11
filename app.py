@@ -1,41 +1,36 @@
-"""
-RMC Data - Site acadêmico minimalista com Dash
-Inspirado no Harvard Dataverse Support
-"""
-
 import dash
 from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 
-# Inicialização da aplicação Dash
+# INICIALIZAÇÃO DASH
 app = dash.Dash(__name__, external_stylesheets=["assets/style.css"])
-app.title = "RMC Data"
+app.title = "RMC em Números"
 
-# Layout principal da aplicação
+# LAYOUT PRINCIPAL
 app.layout = html.Div([
-    # Primeira linha da navbar: Logo e busca
+    # 1ª LINHA DA NAVBAR
     html.Div([
         html.Div([
-            # Logo/Nome do site - estilo Harvard
+            # LOGO
             html.Div([
-                html.A("RMC Data", href="/", className="navbar-brand")
+                html.A("RMC em Números", href="/", className="navbar-brand")
             ], className="navbar-logo-top"),
             
-            # Barra de busca e Contact Us
+            # BUSCA E CONTATO
             html.Div([
                 dcc.Input(
                     id="search-input",
                     type="text",
-                    placeholder="",
+                    placeholder="Digite...",
                     className="search-input-top"
                 ),
                 html.Button(
-                    "Search",
+                    "Buscar",
                     id="search-button",
                     className="search-button-top",
                     n_clicks=0
                 ),
-                html.A("Contact Us", href="/contact", className="contact-link-top")
+                html.A("Contato", href="/contact", className="contact-link-top")
             ], className="top-search-contact-area")
         ], className="navbar-top-container")
     ], className="navbar-top"),
