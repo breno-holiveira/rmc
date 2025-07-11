@@ -63,6 +63,14 @@ app.layout = html.Div([
                             html.Li([html.A("Receitas", href="/financas/receitas", className="dropdown-link")])
                         ], className="dropdown-menu", id="financas-menu")
                     ], className="nav-item-bottom dropdown"),
+
+                    html.Li([
+                        html.A("Segurança", href="/seguranca", className="nav-link-bottom dropdown-toggle", id="seguranca-dropdown"),
+                        html.Ul([
+                            html.Li([html.A("Taxa de homicídios", href="/seguranca/homicidios", className="dropdown-link")]),
+                            html.Li([html.A("Acidentes de Trânsito", href="/seguranca/transito", className="dropdown-link")])
+                        ], className="dropdown-menu", id="seguranca-menu")
+                    ], className="nav-item-bottom dropdown"),
                 ], className="nav-menu-bottom")
             ], className="navbar-bottom-nav")
         ], className="navbar-bottom-container")
