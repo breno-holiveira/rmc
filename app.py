@@ -3,7 +3,7 @@ from dash import html, dcc, Input, Output, State
 import dash_bootstrap_components as dbc
 
 # Importação das páginas
-from paginas import despesas, receitas, pib, emprego, homicidios, transito, sobre, inicio
+from paginas import despesas
 
 # INICIALIZAÇÃO DASH
 app = dash.Dash(__name__, external_stylesheets=["assets/style.css"])
