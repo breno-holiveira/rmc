@@ -1,0 +1,313 @@
+/* 
+RMC Data - Estilo CSS
+Inspirado no Harvard Dataverse Support
+Estilo acadêmico Harvard-style
+*/
+
+/* Reset e configurações básicas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+/* Primeira linha da navbar: Logo e busca */
+.navbar-top {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 10px 0;
+}
+
+.navbar-top-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.navbar-logo-top .navbar-brand {
+    font-family: "Georgia", serif; /* Fonte mais clássica para o título */
+    font-size: 28px;
+    font-weight: 700;
+    color: #003366; /* Azul escuro para o nome do site */
+    text-decoration: none;
+    letter-spacing: -0.8px;
+}
+
+.navbar-logo-top .navbar-brand:hover {
+    color: #002244;
+    text-decoration: none;
+}
+
+.top-search-contact-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-input-top {
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    font-size: 14px;
+    width: 200px;
+    border-radius: 0; /* Bordas quadradas */
+}
+
+.search-button-top {
+    background: #2c5aa0;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 0; /* Bordas quadradas */
+    transition: background-color 0.2s ease;
+}
+
+.search-button-top:hover {
+    background: #1e3f73;
+}
+
+.contact-link-top {
+    color: #2c5aa0;
+    text-decoration: none;
+    font-size: 14px;
+    margin-left: 15px;
+}
+
+.contact-link-top:hover {
+    text-decoration: underline;
+}
+
+/* Segunda linha da navbar: Links de navegação */
+.navbar-bottom {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 5px 0;
+}
+
+.navbar-bottom-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.navbar-bottom-nav {
+    display: flex;
+    justify-content: flex-start; /* Alinha os links à esquerda */
+}
+
+.nav-menu-bottom {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 25px; /* Espaçamento entre os links */
+}
+
+.nav-item-bottom {
+    position: relative;
+}
+
+.nav-link-bottom {
+    color: #495057; /* Cinza mais escuro */
+    text-decoration: none;
+    font-weight: normal; /* Sem negrito */
+    font-size: 16px;
+    padding: 8px 0; /* Ajusta padding */
+    transition: all 0.2s ease;
+    display: block;
+    position: relative;
+}
+
+.nav-link-bottom::after {
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #003366; /* Sublinhado azul escuro */
+    transition: width 0.2s ease-in-out;
+}
+
+.nav-link-bottom:hover::after {
+    width: 100%;
+}
+
+.nav-link-bottom:hover {
+    color: #003366; /* Escurece a fonte no hover */
+    text-decoration: none;
+}
+
+/* Dropdown */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    content: "\25BC"; /* Triângulo para baixo */
+    font-size: 10px;
+    margin-left: 5px;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.dropdown:hover .dropdown-toggle::after {
+    transform: rotate(180deg); /* Gira o triângulo para cima no hover */
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 0; /* Bordas quadradas */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    list-style: none;
+    padding: 8px 0;
+    min-width: 160px;
+    display: none;
+    z-index: 1001;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu li {
+    margin: 0;
+}
+
+.dropdown-link {
+    color: #495057;
+    text-decoration: none;
+    padding: 8px 16px;
+    display: block;
+    font-size: 14px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-link:hover {
+    background-color: #f0f0f0;
+    color: #003366;
+    text-decoration: none;
+}
+
+/* Conteúdo principal */
+.main {
+    min-height: calc(100vh - 150px); /* Altura ajustada pela navbar de duas linhas */
+    background-color: #ffffff;
+    margin-top: 20px;
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Resultados de busca */
+.search-results {
+    background-color: #f8f9fa;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.search-results h3 {
+    color: #003366;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.search-results p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .navbar-top-container,
+    .navbar-bottom-container {
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 20px;
+    }
+    
+    .top-search-contact-area {
+        flex-direction: column;
+        align-items: flex-end;
+        width: 100%;
+    }
+    
+    .search-input-top {
+        width: 100%;
+    }
+    
+    .nav-menu-bottom {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    .nav-item-bottom {
+        width: auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 24px;
+    }
+    
+    .nav-menu-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .nav-link-bottom {
+        width: 100%;
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-top-container,
+    .navbar-bottom-container {
+        padding: 8px 15px;
+    }
+    
+    .navbar-brand {
+        font-size: 20px;
+    }
+    
+    .search-input-top {
+        font-size: 13px;
+    }
+    
+    .search-button-top,
+    .contact-link-top {
+        font-size: 13px;
+    }
+    
+    .nav-link-bottom {
+        font-size: 14px;
+        padding: 6px 0;
+    }
+    
+    .main-content {
+        padding: 20px 15px;
+    }
+}
