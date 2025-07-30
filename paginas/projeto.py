@@ -26,7 +26,7 @@ with col1:
     st.image("arquivos/logo-pucc.png", width=250)
     
 with col2:
-    st.write("")  # coluna vazia para margem
-
-with col3:
     st.image("arquivos/logo-pucc.png", width=250)
+    
+with col3:
+    st.write("")  # coluna vazia para margem
