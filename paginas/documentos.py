@@ -14,4 +14,11 @@ st.markdown(
 
 st.markdown('### Sites')
 
-
+st.markdown(
+    """
+    - **Fonte:** Sistema de Informações Gerenciais da Execução Orçamentária - SIGEO  
+      Secretaria da Fazenda e Planejamento do Estado de São Paulo  
+      [https://www.fazenda.sp.gov.br/SigeoLei131/Paginas/FlexConsDespesa.aspx](https://www.fazenda.sp.gov.br/SigeoLei131/Paginas/FlexConsDespesa.aspx)
+    """,
+    unsafe_allow_html=True
+)
