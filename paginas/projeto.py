@@ -18,7 +18,11 @@ st.markdown(
     '''
 )
 
-col1, col2, col3 = st.columns([1, 2, 1])  # centraliza usando três colunas, coluna do meio maior
-
-with col2:
-    st.image("arquivos/logo-pucc.png")
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="arquivos/logo-pucc.png" width="200"/>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
