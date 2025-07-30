@@ -18,9 +18,15 @@ st.markdown(
     '''
 )
 
+st.image("arquivos/logo-pucc.png", width=400)
+
 st.markdown(
     """
-    <img src="arquivos/logo-pucc.png" style="width:400px; height:auto;" />
+    <style>
+    div.stImage > div {
+        pointer-events: none;  /* desabilita clique */
+    }
+    </style>
     """,
     unsafe_allow_html=True
 )
