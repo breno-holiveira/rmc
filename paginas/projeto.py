@@ -23,4 +23,4 @@ st.markdown('***')
 col1, col2, col3, col4, col5 = st.columns([3, 1, 2, 1, 3])
 
 with col3:
-    st.image("arquivos/logo-pucc.png", width=300)
+    st.image("arquivos/logo-pucc.png")
