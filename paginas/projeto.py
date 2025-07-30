@@ -20,15 +20,13 @@ st.markdown(
 
 st.markdown('***')
 
-st.image("arquivos/logo-pucc.png", width=300)
-
 col1, col2, col3 = st.columns([1, 6, 1])
 
 with col1:
     st.write("")
 
 with col2:
-    st.image("arquivos/logo-pucc.png", use_container_width=True, width=300)
+    st.image("arquivos/logo-pucc.png", use_container_width=False)
 
 with col3:
     st.write("")
