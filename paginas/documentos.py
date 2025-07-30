@@ -8,3 +8,10 @@ st.markdown(
     '</a>',
     unsafe_allow_html=True
 )
+
+st.markdown(
+    '<a href="https://antigo.mctic.gov.br/mctic/export/sites/institucional/indicadores/detalhe/Manuais/RIECTI-Manual-da-Rede-de-Indicadores-Estaduais-de-CT-2015.pdf" target="_blank" download>'
+    'Instruções para Mensuração de C&T - RIECTI (PDF)'
+    '</a>',
+    unsafe_allow_html=True
+)
