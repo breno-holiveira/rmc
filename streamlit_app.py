@@ -1,13 +1,14 @@
 import streamlit as st
 
 pages = {
-    "Início": [
-        st.Page("teste1.py", title="Teste 1"),
-        st.Page("teste2.py", title="Teste 2"),
-    ],
     "Sobre": [
-        st.Page("teste3.py", title="Teste 3"),
-        st.Page("teste4.py", title="Teste 4"),
+        st.Page("teste1.py", title="Projeto de Pesquisa"),
+        st.Page("teste2.py", title="Equipe"),
+    ],
+    "Dados e Resultados": [
+        st.Page("teste3.py", title="Metodologia"),
+        st.Page("teste4.py", title="Dados Municipais"),
+        st.Page("teste5.py", title="Dados Estaduais"),
     ],
 }
 
