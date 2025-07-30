@@ -18,7 +18,7 @@ st.markdown(
     '''
 )
 
-col1, col2, col3 = st.columns([1, 2, 1])  # col2 é maior e centraliza
+col1, col2, col3 = st.columns([1, 2, 1])
 
 with col2:
     st.image("arquivos/logo-pucc.png")
