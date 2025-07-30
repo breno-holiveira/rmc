@@ -5,4 +5,4 @@ backgroundColor = "#ffffff"
 [theme.sidebar]
 backgroundColor = "#003366"
 textColor = "#ffffff"
-FontSize = 26
+FontSize = "26"
