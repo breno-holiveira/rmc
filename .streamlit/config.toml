@@ -1,7 +1,10 @@
 [theme]
 base = "light"
-backgroundColor = "#fafafa"
+primaryColor = "#5c5c5c"             # Cinza escuro elegante para interações (botões, links)
+backgroundColor = "#f4f4f4"          # Branco suave para fundo geral
+secondaryBackgroundColor = "#e0e0e0" # Painéis/cards com contraste sutil
+textColor = "#1a1a1a"                # Quase preto, excelente legibilidade
 
 [theme.sidebar]
-backgroundColor = "#2454a4"
-textColor = "#fafafa"
+backgroundColor = "#d6d6d6"          # Cinza claro sofisticado na sidebar
+textColor = "#2b2b2b" 
