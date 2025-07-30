@@ -3,7 +3,7 @@ import streamlit as st
 st.markdown(
     """
     <h2 style='text-align: center;'>
-        Dispêndio Público em Ciência e Tecnologia no Município de Campinas (2016-2024)
+        Dispêndio Público em Ciência e Tecnologia no Município de Campinas
     </h2>
     """,
     unsafe_allow_html=True
