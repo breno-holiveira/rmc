@@ -2,13 +2,14 @@ import streamlit as st
 
 pages = {
     "Sobre": [
-        st.Page("teste1.py", title="Projeto de Pesquisa"),
-        st.Page("teste2.py", title="Equipe"),
+        st.Page("projeto.py", title="Projeto de Pesquisa"),
+        st.Page("integrantes.py", title="Integrantes"),
     ],
     "Dados e Resultados": [
-        st.Page("teste3.py", title="Metodologia"),
-        st.Page("teste4.py", title="Dados Municipais"),
-        st.Page("teste5.py", title="Dados Estaduais"),
+        st.Page("metodologia.py", title="Metodologia"),
+        st.Page("municipais.py", title="Dispêndios Municipais em C&T"),
+        st.Page("estaduais.py", title="Dispêndios Estaduais em C&T"),
+        st.Page("documentos.py", title="Referências e Documentos"),
     ],
 }
 
