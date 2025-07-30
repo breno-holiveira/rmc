@@ -18,11 +18,4 @@ st.markdown(
     '''
 )
 
-st.markdown(
-    """
-    <div style="text-align:center;">
-        <img src="arquivos/logo-pucc.png" style="width:50%; height:auto;" />
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.image("arquivos/logo-pucc.png", width=400)
