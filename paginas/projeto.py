@@ -18,4 +18,4 @@ st.markdown(
     '''
 )
 
-st.image("arquivos/logo-pucc.png", use_container_width=True)
+st.image("arquivos/logo-pucc.png", width=200)
