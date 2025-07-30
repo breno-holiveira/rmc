@@ -1,9 +1,9 @@
 import streamlit as st
 
 pages = {
-    "Sobre": [
+    "Início": [
         st.Page("paginas/projeto.py", title="Projeto de Pesquisa"),
-        st.Page("paginas/integrantes.py", title="Integrantes"),
+        st.Page("paginas/equipe.py", title="Equipe"),
     ],
     "Dados e Resultados": [
         st.Page("paginas/metodologia.py", title="Metodologia"),
