@@ -24,7 +24,7 @@ st.markdown(
     """
     <div style="text-align: center;">
         <img src="https://raw.githubusercontent.com/breno-holiveira/rmc/6a877335054485578baf29c24278bd119385937f/arquivos/logo-pucc.png"
-             style="width:100px; border-radius: 0px;" />
+             style="width:150px; border-radius: 0px;" />
     </div>
     """,
     unsafe_allow_html=True
