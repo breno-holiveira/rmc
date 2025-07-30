@@ -5,4 +5,4 @@ backgroundColor = "#ffffff"
 [theme.sidebar]
 backgroundColor = "#003366"
 textColor = "#ffffff"
-borderColor = "#FF0000"
+headingFontSizes = "2rem"
