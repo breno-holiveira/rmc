@@ -9,7 +9,7 @@ pages = {
         st.Page("metodologia.py", title="Metodologia"),
         st.Page("municipais.py", title="Dispêndios Municipais em C&T"),
         st.Page("estaduais.py", title="Dispêndios Estaduais em C&T"),
-        st.Page("documentos.py", title="Referências e Documentos"),
+        st.Page("bibliografia.py", title="Bibliografia e Downloads de bibliografia e arquivos importantes"),
     ],
 }
 
