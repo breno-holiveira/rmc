@@ -1,6 +1,13 @@
 import streamlit as st
 
-st.markdown('## Dispêndio Público em Ciência em Tecnologia no Município de Campinas (2016-2024)')
+st.markdown(
+    """
+    <h2 style='text-align: center;'>
+        Dispêndio Público em Ciência e Tecnologia no Município de Campinas (2016-2024)
+    </h2>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown(
     '''
