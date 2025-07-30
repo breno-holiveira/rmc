@@ -3,5 +3,5 @@ base = "light"
 backgroundColor = "#fafafa"
 
 [theme.sidebar]
-backgroundColor = "#054f9c"
+backgroundColor = "#003366"
 textColor = "#fafafa"
