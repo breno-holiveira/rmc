@@ -3,6 +3,5 @@ base = "light"
 backgroundColor = "#ffffff"
 
 [theme.sidebar]
-backgroundColor = "#003366"
+backgroundColor = "#004080"
 textColor = "#ffffff"
-FontSize = "26"
