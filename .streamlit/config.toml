@@ -1,7 +1,7 @@
 [theme]
 base = "light"
 backgroundColor = "#ffffff"
-textColor = "#2e3a4c"
+textColor = "#ffffff"
 
 [theme.sidebar]
 backgroundColor = "#1b4773"
