@@ -20,13 +20,11 @@ st.markdown(
 
 st.markdown('***')
 
-col1, col2, col3 = st.columns([1, 2, 2])
-
-with col1:
-    st.image("arquivos/logo-pucc.png", width=250)
-    
-with col2:
-    st.image("arquivos/logo-pucc.png", width=250)
-    
-with col3:
-    st.write("")  # coluna vazia para margem
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <img src="arquivos/logo-pucc.png" style="max-width: 300px; width: 100%; height: auto;" />
+    </div>
+    """,
+    unsafe_allow_html=True
+)
