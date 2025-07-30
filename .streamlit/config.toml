@@ -1,9 +1,8 @@
 [theme]
 base = "light"
 backgroundColor = "#ffffff"
-accentColor = "#3a8de0"
+textColor = "#2e3a4c"
 
 [theme.sidebar]
 backgroundColor = "#1b4773"
 textColor = "#e3ecf3"
-accentColor = "#3a8de0"
