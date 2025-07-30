@@ -20,11 +20,7 @@ st.markdown(
 
 st.markdown('***')
 
-st.markdown(
-    """
-    <div style="text-align: center;">
-        <img src="arquivos/logo-pucc.png" style="max-width: 300px; width: 100%; height: auto;" />
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+col1, col2, col3, col4, col5 = st.columns([3, 1, 2, 1, 3])
+
+with col3:
+    st.image("arquivos/logo-pucc.png", width=300)
