@@ -3,7 +3,7 @@ import streamlit as st
 st.markdown('## Equipe')
 
 st.markdown(
-    '**Orientadora:** Prof.ª Dr.ª Daniela Scarpa Beneli \u2003'
+    '**Orientadora:** Prof.ª Dr.ª Daniela Scarpa Beneli \u2002'
     '<a href="https://lattes.cnpq.br/3699082804969492" '
     'style="text-decoration: none; color: #1f77b4;">'
     '<span style="font-size: 16px;">🔍︎ Currículo Lattes</span></a>',
