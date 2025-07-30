@@ -20,4 +20,4 @@ st.markdown(
 
 st.markdown('***')
 
-st.image("arquivos/logo-pucc.png")
+st.image("arquivos/logo-pucc.png", width=500)
