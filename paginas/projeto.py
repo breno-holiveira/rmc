@@ -20,7 +20,7 @@ st.markdown(
 
 st.markdown(
     """
-    <img src="arquivos/logo-pucc.png" style="width:400px; height:auto; pointer-events:none;" />
+    <img src="arquivos/logo-pucc.png" style="width:400px; height:auto;" />
     """,
     unsafe_allow_html=True
 )
