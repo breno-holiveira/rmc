@@ -18,15 +18,4 @@ st.markdown(
     '''
 )
 
-st.image("arquivos/logo-pucc.png", width=400)
-
-st.markdown(
-    """
-    <style>
-    div.stImage > div {
-        pointer-events: none;  /* desabilita clique */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+st.image("arquivos/logo-pucc.png")
