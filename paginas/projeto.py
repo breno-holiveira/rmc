@@ -17,3 +17,5 @@ st.markdown(
     Para consultar os resultados, a metodologia e o material utilizado, navegue pelo menu lateral.
     '''
 )
+
+st.image("arquivos/logo-pucc.png", use_column_width=True)
