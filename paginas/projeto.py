@@ -27,7 +27,7 @@ with col1:
     st.write("")
 
 with col2:
-    st.image("arquivos/logo-pucc.png", use_column_width=True)
+    st.image("arquivos/logo-pucc.png", use_container_width=True)
 
 with col3:
     st.write("")
