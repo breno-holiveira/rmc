@@ -1,5 +1,8 @@
 import streamlit as st
 
+with open("arquivos/logo-pucc.svg", "r", encoding="utf-8") as f:
+    svg_content = f.read()
+
 st.markdown(
     """
     <h2 style='text-align: center;'>
@@ -18,4 +21,11 @@ st.markdown(
     '''
 )
 
-st.image("arquivos/logo-pucc.png")
+st.markdown(
+    f"""
+    <div style="text-align: center;">
+        {svg_content}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
