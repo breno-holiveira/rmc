@@ -20,7 +20,7 @@ st.markdown(
 
 st.markdown('***')
 
-col1, col2, col3, col4, col5 = st.columns([3, 1, 4, 1, 3])
+col1, col2, col3, col4, col5, col6, col7 = st.columns([4, 1, 2, 1, 2, 1, 4])
 
-with col3:
-    st.image("arquivos/logo-pucc.png")
+with col4:
+    st.image("arquivos/logo-pucc.png", use_container_width=True)
