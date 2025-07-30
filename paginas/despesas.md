@@ -1,5 +1,0 @@
-
-# Despesas
-
-Conteúdo sobre despesas.
-
