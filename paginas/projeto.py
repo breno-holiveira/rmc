@@ -1,8 +1,4 @@
 import streamlit as st
-import re
-
-with open("arquivos/logo-pucc.svg", "r", encoding="utf-8") as f:
-    svg_raw = f.read()
 
 st.markdown(
     """
@@ -22,15 +18,4 @@ st.markdown(
     '''
 )
 
-match = re.search(r"<svg.*?</svg>", svg_raw, re.DOTALL)
-svg_clean = match.group(0) if match else svg_raw  # Fallback se regex falhar
-
-# Exibe o SVG centralizado
-st.markdown(
-    f"""
-    <div style="text-align: center;">
-        {svg_clean}
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.image("arquivos/logo-pucc.png", width=400)
