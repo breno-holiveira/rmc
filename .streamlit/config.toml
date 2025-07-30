@@ -5,6 +5,3 @@ backgroundColor = "#ffffff"
 [theme.sidebar]
 backgroundColor = "#0e4194"
 textColor = "#ffffff"
-
-[layout]
-wideMode = true
