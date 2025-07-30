@@ -5,4 +5,4 @@ backgroundColor = "#ffffff"
 [theme.sidebar]
 backgroundColor = "#003366"
 textColor = "#ffffff"
-secondaryBackgroundColor = "#003366"
+secondaryBackgroundColor = "#FF0000"
