@@ -1,5 +1,7 @@
 import streamlit as st
 
+st.set_page_config(layout="wide")
+
 pages = {    
     "Início": [
         st.Page("paginas/projeto.py", title="Projeto de Pesquisa"),
