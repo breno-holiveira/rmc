@@ -23,8 +23,8 @@ st.markdown('***')
 st.markdown(
     """
     <div style="text-align: center;">
-        <img src="https://github.com/breno-holiveira/rmc/blob/6a877335054485578baf29c24278bd119385937f/arquivos/logo-pucc.png"
-             style="width:300px; border-radius:0px;" />
+        <img src="https://raw.githubusercontent.com/breno-holiveira/rmc/6a877335054485578baf29c24278bd119385937f/arquivos/logo-pucc.png"
+             style="width:300px; border-radius: 0px;" />
     </div>
     """,
     unsafe_allow_html=True
