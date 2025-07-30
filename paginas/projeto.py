@@ -4,12 +4,9 @@ st.markdown('## Dispêndio Público em Ciência em Tecnologia no Município de C
 
 st.markdown(
     '''
-    O projeto de pesquisa visa mensurar os dispêndios públicos municipais e estaduais em Ciência e Tecnologia (C&T) na cidade de Campinas/SP, no período de 2016 a 2024.
+    O projeto de pesquisa, fruto de uma Iniciação Científica financiada pela Pontifícia Universidade Católica de Campinas (PUC-Campinas), tem como objetivo mensurar
+    dispêndios públicos municipais e estaduais em Ciência e Tecnologia (C&T) no município de Campinas/SP, no período de 2016 a 2024.
 
-    Para isso, foram adotadas [metodologias](./metodologia). reconhecidas nacional e internacionalmente, buscando analisar de forma rigorosa os investimentos e seu impacto no desenvolvimento local.
-
-    Navegue pelas seções do site para conhecer a equipe, a metodologia aplicada, os dados coletados e as análises realizadas.
-
-    Esperamos que este trabalho contribua para a compreensão e o aprimoramento das políticas públicas em C&T na região.
+    Para isso, foram utilizadas metodologias reconhecidas nacional e internacionalmente, como o Manual de Frascati (OCDE) e instruções da (RIECTI).
     '''
 )
