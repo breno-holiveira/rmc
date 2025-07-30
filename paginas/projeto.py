@@ -18,7 +18,13 @@ st.markdown(
     '''
 )
 
-col1, col2, col3 = st.columns([1, 2, 1])
+col1, col2, col3 = st.columns([1, 2, 1])  # Coluna central maior para centralizar imagem
+
+with col1:
+    st.write(' ')  # Espaço vazio
 
 with col2:
-    st.image("arquivos/logo-pucc.png")
+    st.image("arquivos/logo-pucc.png")  # Imagem centralizada na coluna do meio
+
+with col3:
+    st.write(' ')  # Espaço vazio
