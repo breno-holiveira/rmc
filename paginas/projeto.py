@@ -18,15 +18,4 @@ st.markdown(
     '''
 )
 
-
-col1, col2, col3 = st.columns([1, 2, 1])
-
-with col2:
-    st.markdown(
-        """
-        <div style="display: flex; justify-content: center;">
-            <img src="arquivos/logo-pucc.png" width="200" />
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+st.image("arquivos/logo-pucc.png")
