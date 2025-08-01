@@ -42,7 +42,8 @@ def show():
     # --- Normalização ---
     df["Ação_norm"] = df["Ação"].apply(normalizar)
     df["Funcional_norm"] = df["Funcional Programática"].apply(normalizar)
-    df["Credor_norm"] = df["Credor"].apply(normalizar)
+    # Linha removida:
+    # df["Credor_norm"] = df["Credor"].apply(normalizar)
     df["Despesa_norm"] = df["Despesa"].apply(normalizar)
 
     # --- Exclusões específicas ---
@@ -161,8 +162,9 @@ def show():
 
     # === Tabela com dados ===
     with st.expander("📄 Visualizar os dados filtrados"):
+        # Removida a coluna "Credor" da exibição:
         st.dataframe(df_filtrado[[
-            "Ano", "Função", "Subfunção", "Ação", "Funcional Programática", "Credor", "Despesa", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado"
+            "Ano", "Função", "Subfunção", "Ação", "Funcional Programática", "Despesa", "Programa", "Órgão", "UO", "Unidade Gestora", "Liquidado"
         ]], use_container_width=True)
 
 if __name__ == "__main__":
