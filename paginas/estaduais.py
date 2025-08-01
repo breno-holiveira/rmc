@@ -11,7 +11,7 @@ import plotly.express as px
 # === Carrega dados ===
 @st.cache_data
 def load_data():
-    df = pd.read_excel("arquivos/despesas_sp.csv", sheet_name="despesas_sp")
+    df = pd.read_csv("arquivos/despesas_sp.csv")
     df.columns = df.columns.str.strip()
 
     # Corrige valores sem separador de milhar e com vírgula decimal
