@@ -4,7 +4,6 @@ st.markdown('## Dispêndios Estaduais em C&T')
 
 ## GRÁFICO
 
-import streamlit as st
 import pandas as pd
 import unicodedata
 import plotly.express as px
@@ -12,7 +11,7 @@ import plotly.express as px
 # === Carrega dados ===
 @st.cache_data
 def load_data():
-    df = pd.read_excel("arquivos/despesas_sp.xlsx", sheet_name="despesas_sp")
+    df = pd.read_excel("arquivos/despesas_sp.csv", sheet_name="despesas_sp")
     df.columns = df.columns.str.strip()
 
     # Corrige valores sem separador de milhar e com vírgula decimal
